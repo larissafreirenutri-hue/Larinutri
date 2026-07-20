@@ -28,6 +28,41 @@ function Citacao({ texto }: { texto: string }) {
   );
 }
 
+/** Refeição livre, no mesmo tom leve do formulário do paciente. */
+function RefeicaoLivre({ checkin }: { checkin: Checkin }) {
+  // Nulo quer dizer que a pergunta não existia ou não foi respondida.
+  // Nesse caso não mostra nada, em vez de afirmar que não teve.
+  if (checkin.refeicao_livre === null || checkin.refeicao_livre === undefined) {
+    return null;
+  }
+
+  if (!checkin.refeicao_livre) {
+    return (
+      <p className="rounded-xl bg-areia-clara px-4 py-3 font-sans text-[14px] text-neutro">
+        Sem refeição livre nesta semana.
+      </p>
+    );
+  }
+
+  const qtd = checkin.refeicao_livre_qtd;
+
+  return (
+    <div className="rounded-xl bg-areia-clara px-4 py-3">
+      <p className="font-sans text-[14px] font-semibold text-tinta">
+        Refeição livre
+        {qtd !== null && qtd !== undefined
+          ? `: ${qtd} ${qtd === 1 ? "vez" : "vezes"}`
+          : ""}
+      </p>
+      {checkin.refeicao_livre_oque ? (
+        <p className="mt-1 font-sans text-[14px] leading-relaxed text-neutro">
+          {checkin.refeicao_livre_oque}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function DadoPaciente({
   rotulo,
   valor,
@@ -117,11 +152,12 @@ export function Ficha({
                     />
                   ))}
 
-                  {ultimo.observacoes ? (
-                    <div className="mt-5">
+                  <div className="mt-5 space-y-3">
+                    <RefeicaoLivre checkin={ultimo} />
+                    {ultimo.observacoes ? (
                       <Citacao texto={ultimo.observacoes} />
-                    </div>
-                  ) : null}
+                    ) : null}
+                  </div>
 
                   {ultimo.alerta_clinico ? (
                     <div className="mt-4">
@@ -260,11 +296,10 @@ export function Ficha({
                             ))
                           )}
 
-                          {c.observacoes ? (
-                            <div className="mt-5">
-                              <Citacao texto={c.observacoes} />
-                            </div>
-                          ) : null}
+                          <div className="mt-5 space-y-3">
+                            <RefeicaoLivre checkin={c} />
+                            {c.observacoes ? <Citacao texto={c.observacoes} /> : null}
+                          </div>
 
                           {c.alerta_clinico ? (
                             <div className="mt-4">

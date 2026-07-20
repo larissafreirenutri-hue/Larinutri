@@ -106,6 +106,22 @@ export async function enviarCheckinRico(
     return { erro: "As observações estão muito longas, use até 2000 caracteres." };
   }
 
+  // Sem resposta, fica nulo. O paciente não é obrigado a responder,
+  // e nulo diz "não perguntado", diferente de false, que diz "não teve".
+  const bruto = String(formData.get("refeicao_livre") ?? "");
+  const refeicaoLivre =
+    bruto === "sim" ? true : bruto === "nao" ? false : null;
+
+  const qtdBruta = Number(String(formData.get("refeicao_livre_qtd") ?? "").trim());
+  const refeicaoQtd =
+    refeicaoLivre && Number.isInteger(qtdBruta) && qtdBruta >= 0 && qtdBruta <= 50
+      ? qtdBruta
+      : null;
+
+  const refeicaoOque = refeicaoLivre
+    ? String(formData.get("refeicao_livre_oque") ?? "").trim().slice(0, 200) || null
+    : null;
+
   const supabase = await createClient();
 
   // A função é SECURITY DEFINER e resolve paciente e semana pelo link.
@@ -125,6 +141,9 @@ export async function enviarCheckinRico(
     p_geral: nota(formData.get("semana_geral")),
     p_alerta: String(formData.get("alerta_clinico") ?? "").trim() || null,
     p_obs: observacoes || null,
+    p_refeicao_livre: refeicaoLivre,
+    p_refeicao_qtd: refeicaoQtd,
+    p_refeicao_oque: refeicaoOque,
   });
 
   if (error) {

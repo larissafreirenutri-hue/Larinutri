@@ -41,6 +41,9 @@ export type Checkin = {
   tranquilidade?: number | null;
   semana_geral?: number | null;
   alerta_clinico?: string | null;
+  refeicao_livre?: boolean | null;
+  refeicao_livre_qtd?: number | null;
+  refeicao_livre_oque?: string | null;
   observacoes: string | null;
   created_at: string;
 };

@@ -105,6 +105,101 @@ function Deslizante({
   );
 }
 
+/**
+ * Refeição livre. O tom é deliberadamente leve: ela faz parte do
+ * plano, e perguntar com cara de fiscalização faz o paciente mentir,
+ * que é justamente o que estraga o acompanhamento.
+ */
+function RefeicaoLivre() {
+  const [teve, setTeve] = useState<boolean | null>(null);
+
+  const botao = (ativo: boolean) =>
+    `flex-1 rounded-xl border px-4 py-2.5 font-sans text-[15px] font-medium transition ${
+      ativo
+        ? "border-vital bg-vital text-white"
+        : "border-linha bg-white text-tinta hover:border-vital/50"
+    }`;
+
+  return (
+    <div className="mt-6 border-t border-linha pt-5">
+      <p className="font-sans text-[15px] font-semibold text-tinta">
+        Teve refeição livre nesta semana?
+      </p>
+      <p className="mt-1 font-sans text-[13px] text-neutro">
+        Refeição livre faz parte do plano. Responder com sinceridade ajuda a
+        sua nutri a ajustar, não a cobrar.
+      </p>
+
+      {/* O valor real vai num campo escondido, para o servidor receber
+          sempre algo definido, mesmo se ninguém tocar nos botões. */}
+      <input
+        type="hidden"
+        name="refeicao_livre"
+        value={teve === null ? "" : teve ? "sim" : "nao"}
+      />
+
+      <div className="mt-3 flex gap-3">
+        <button
+          type="button"
+          onClick={() => setTeve(true)}
+          aria-pressed={teve === true}
+          className={botao(teve === true)}
+        >
+          Sim
+        </button>
+        <button
+          type="button"
+          onClick={() => setTeve(false)}
+          aria-pressed={teve === false}
+          className={botao(teve === false)}
+        >
+          Não
+        </button>
+      </div>
+
+      {teve ? (
+        <div className="mt-4 grid gap-4 sm:grid-cols-[120px_minmax(0,1fr)]">
+          <div>
+            <label
+              htmlFor="refeicao_livre_qtd"
+              className="block font-sans text-[13px] font-semibold text-tinta"
+            >
+              Quantas vezes?
+            </label>
+            <input
+              id="refeicao_livre_qtd"
+              name="refeicao_livre_qtd"
+              type="number"
+              min={0}
+              max={50}
+              step={1}
+              defaultValue={1}
+              inputMode="numeric"
+              className="mt-1.5 w-full rounded-[10px] border border-linha bg-white px-3 py-2.5 font-sans text-[14px] text-tinta outline-none focus:border-vital"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="refeicao_livre_oque"
+              className="block font-sans text-[13px] font-semibold text-tinta"
+            >
+              O que você comeu?
+            </label>
+            <input
+              id="refeicao_livre_oque"
+              name="refeicao_livre_oque"
+              maxLength={200}
+              placeholder="Ex: pizza no sábado, sobremesa no almoço"
+              className="mt-1.5 w-full rounded-[10px] border border-linha bg-white px-3 py-2.5 font-sans text-[14px] text-tinta placeholder:text-tenue outline-none focus:border-vital"
+            />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function BotaoEnviar() {
   const { pending } = useFormStatus();
   return (
@@ -213,6 +308,8 @@ export function FormularioRico({
               alto={d.alto}
             />
           ))}
+
+          {secao.chave === "alimentacao" ? <RefeicaoLivre /> : null}
 
           {secao.chave === "fechamento" ? (
             <>
