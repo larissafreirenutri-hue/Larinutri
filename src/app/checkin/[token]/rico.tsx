@@ -201,6 +201,55 @@ function RefeicaoLivre() {
   );
 }
 
+/** Treinos da semana, com o "quais" aparecendo só quando houve algum. */
+function Treinos() {
+  const [qtd, setQtd] = useState(0);
+
+  return (
+    <div className="mb-5">
+      <label
+        htmlFor="treinos_qtd"
+        className="block font-sans text-[15px] font-semibold text-tinta"
+      >
+        Quantas vezes você praticou atividade física?
+      </label>
+      <p className="mt-1 font-sans text-[13px] text-neutro">
+        Conte treinos, caminhadas, esportes, o que mexeu o corpo nesta semana.
+      </p>
+      <input
+        id="treinos_qtd"
+        name="treinos_qtd"
+        type="number"
+        min={0}
+        max={21}
+        step={1}
+        value={qtd}
+        onChange={(e) => setQtd(Math.max(0, Number(e.target.value) || 0))}
+        inputMode="numeric"
+        className="mt-2.5 w-full rounded-[10px] border border-linha bg-white px-3 py-2.5 font-sans text-[14px] text-tinta outline-none focus:border-vital sm:w-32"
+      />
+
+      {qtd > 0 ? (
+        <div className="mt-4">
+          <label
+            htmlFor="treinos_quais"
+            className="block font-sans text-[13px] font-semibold text-tinta"
+          >
+            Quais foram?
+          </label>
+          <input
+            id="treinos_quais"
+            name="treinos_quais"
+            maxLength={300}
+            placeholder="Ex: musculação 3x, corrida no domingo"
+            className="mt-1.5 w-full rounded-[10px] border border-linha bg-white px-3 py-2.5 font-sans text-[14px] text-tinta placeholder:text-tenue outline-none focus:border-vital"
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function BotaoEnviar() {
   const { pending } = useFormStatus();
   return (
@@ -302,6 +351,7 @@ export function FormularioRico({
         {/* Fotos entram depois de Bem-estar, antes do Fechamento. */}
         {secao.chave === "fechamento" ? <FotosDaSemana token={token} /> : null}
         <Secao titulo={secao.titulo} apoio={secao.apoio}>
+          {secao.chave === "treino" ? <Treinos /> : null}
           {DIMENSOES.filter((d) => d.secao === secao.chave).map((d) => (
             <Deslizante
               key={d.campo}

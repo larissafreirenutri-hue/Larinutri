@@ -136,6 +136,16 @@ export async function enviarCheckinRico(
     .filter((f) => f.length > 0 && f.startsWith(`${token}/`))
     .slice(0, 5);
 
+  const treinosQtdBruto = Number(String(formData.get("treinos_qtd") ?? "").trim());
+  const treinosQtd =
+    Number.isInteger(treinosQtdBruto) && treinosQtdBruto >= 0 && treinosQtdBruto <= 21
+      ? treinosQtdBruto
+      : null;
+  const treinosQuais =
+    treinosQtd && treinosQtd > 0
+      ? String(formData.get("treinos_quais") ?? "").trim().slice(0, 300) || null
+      : null;
+
   const supabase = await createClient();
 
   // A função é SECURITY DEFINER e resolve paciente e semana pelo link.
@@ -159,6 +169,8 @@ export async function enviarCheckinRico(
     p_refeicao_qtd: refeicaoQtd,
     p_refeicao_oque: refeicaoOque,
     p_fotos: fotos.length > 0 ? fotos : null,
+    p_treinos_qtd: treinosQtd,
+    p_treinos_quais: treinosQuais,
   });
 
   if (error) {

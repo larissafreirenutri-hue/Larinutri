@@ -29,6 +29,25 @@ function Citacao({ texto }: { texto: string }) {
   );
 }
 
+/** Treinos da semana, quantidade e o que foi feito. */
+function Treinos({ checkin }: { checkin: Checkin }) {
+  const qtd = checkin.dias_atividade_fisica;
+  if (qtd === null || qtd === undefined) return null;
+
+  return (
+    <div className="rounded-xl bg-areia-clara px-4 py-3">
+      <p className="font-sans text-[14px] font-semibold text-tinta">
+        Atividade física: {qtd} {qtd === 1 ? "vez" : "vezes"}
+      </p>
+      {checkin.atividade_quais ? (
+        <p className="mt-1 font-sans text-[14px] leading-relaxed text-neutro">
+          {checkin.atividade_quais}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 /** Refeição livre, no mesmo tom leve do formulário do paciente. */
 function RefeicaoLivre({ checkin }: { checkin: Checkin }) {
   // Nulo quer dizer que a pergunta não existia ou não foi respondida.
@@ -158,6 +177,7 @@ export function Ficha({
 
                   <div className="mt-5 space-y-4">
                     <Galeria urls={urlsPorCheckin[ultimo.id] ?? []} />
+                    <Treinos checkin={ultimo} />
                     <RefeicaoLivre checkin={ultimo} />
                     {ultimo.observacoes ? (
                       <Citacao texto={ultimo.observacoes} />
@@ -303,6 +323,7 @@ export function Ficha({
 
                           <div className="mt-5 space-y-4">
                             <Galeria urls={urlsPorCheckin[c.id] ?? []} />
+                            <Treinos checkin={c} />
                             <RefeicaoLivre checkin={c} />
                             {c.observacoes ? <Citacao texto={c.observacoes} /> : null}
                           </div>

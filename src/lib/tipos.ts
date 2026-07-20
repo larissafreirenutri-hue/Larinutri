@@ -45,6 +45,7 @@ export type Checkin = {
   refeicao_livre_qtd?: number | null;
   refeicao_livre_oque?: string | null;
   fotos?: string[] | null;
+  atividade_quais?: string | null;
   observacoes: string | null;
   created_at: string;
 };
