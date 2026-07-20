@@ -11,14 +11,17 @@ import {
 } from "@/lib/dimensoes";
 import { Cartao, Medidor, Selo, AlertaClinico, Vazio } from "../../ui";
 import { LinhaEvolucao } from "./evolucao";
+import { AbaAnamnese } from "./anamnese-aba";
+import type { Anamnese, AnamneseLink } from "@/lib/anamnese";
 import { Galeria } from "./galeria";
 
-type Aba = "visao" | "checkins" | "evolucao";
+type Aba = "visao" | "checkins" | "evolucao" | "anamnese";
 
 const ABAS: { chave: Aba; rotulo: string }[] = [
   { chave: "visao", rotulo: "Visão geral" },
   { chave: "checkins", rotulo: "Check-ins" },
   { chave: "evolucao", rotulo: "Evolução" },
+  { chave: "anamnese", rotulo: "Anamnese" },
 ];
 
 function Citacao({ texto }: { texto: string }) {
@@ -104,6 +107,9 @@ export function Ficha({
   paciente,
   checkins,
   urlsPorCheckin,
+  anamnese,
+  anamneseLink,
+  agora,
   botaoEditarDados,
 }: {
   paciente: Paciente;
@@ -111,6 +117,9 @@ export function Ficha({
   checkins: Checkin[];
   /** URLs assinadas das fotos, por id de check-in. */
   urlsPorCheckin: Record<string, string[]>;
+  anamnese: Anamnese | null;
+  anamneseLink: AnamneseLink | null;
+  agora: number;
   botaoEditarDados: React.ReactNode;
 }) {
   const [aba, setAba] = useState<Aba>("visao");
@@ -348,6 +357,15 @@ export function Ficha({
         <div className="mt-6">
           <LinhaEvolucao checkins={checkins} />
         </div>
+      ) : null}
+
+      {aba === "anamnese" ? (
+        <AbaAnamnese
+          patientId={paciente.id}
+          anamnese={anamnese}
+          link={anamneseLink}
+          agora={agora}
+        />
       ) : null}
     </>
   );

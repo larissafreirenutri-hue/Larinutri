@@ -74,6 +74,13 @@ export default function PrivacidadePage() {
           você responde apenas o que quiser.
         </p>
         <p>
+          <strong className="text-creme">Anamnese inicial.</strong> No começo do
+          acompanhamento, você responde um formulário mais completo sobre a sua
+          rotina, o seu histórico de saúde, o seu sono e as suas preferências
+          alimentares. Essas respostas dão a base do seu plano e são tratadas com
+          o mesmo cuidado dos demais dados de saúde.
+        </p>
+        <p>
           <strong className="text-creme">Fotos de acompanhamento.</strong> Você
           pode, se quiser, enviar até cinco fotos por check-in. Elas são
           opcionais, ficam guardadas em área privada com acesso restrito, e só a

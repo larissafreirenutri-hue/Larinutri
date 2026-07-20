@@ -6,6 +6,7 @@ import { formatarData } from "@/lib/formato";
 import { agora } from "@/lib/visao-geral";
 import { statusEfetivo, proximaSemana, type CheckinLink } from "@/lib/links";
 import type { Checkin, Paciente } from "@/lib/tipos";
+import type { Anamnese, AnamneseLink } from "@/lib/anamnese";
 import { gerarLinkDoPaciente } from "../../links/actions";
 import { Avatar } from "../../marca";
 import {
@@ -45,18 +46,38 @@ export default async function PacientePage({
 
   const paciente = dadosPaciente as Paciente;
 
-  const [checkinsRes, linksRes] = await Promise.all([
-    supabase
-      .from("checkins")
-      .select("*")
-      .eq("patient_id", id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("checkin_links")
-      .select("*")
-      .eq("patient_id", id)
-      .order("gerado_em", { ascending: false }),
-  ]);
+  const [checkinsRes, linksRes, anamneseRes, anamneseLinkRes] =
+    await Promise.all([
+      supabase
+        .from("checkins")
+        .select("*")
+        .eq("patient_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("checkin_links")
+        .select("*")
+        .eq("patient_id", id)
+        .order("gerado_em", { ascending: false }),
+      // A anamnese ativa é a que não foi substituída.
+      supabase
+        .from("anamneses")
+        .select("*")
+        .eq("patient_id", id)
+        .is("substituida_em", null)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("anamnese_links")
+        .select("*")
+        .eq("patient_id", id)
+        .order("gerado_em", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+  const anamnese = (anamneseRes.data ?? null) as Anamnese | null;
+  const anamneseLink = (anamneseLinkRes.data ?? null) as AnamneseLink | null;
 
   const checkins = (checkinsRes.data ?? []) as Checkin[];
 
@@ -177,6 +198,9 @@ export default async function PacientePage({
         paciente={paciente}
         checkins={checkins}
         urlsPorCheckin={urlsPorCheckin}
+        anamnese={anamnese}
+        anamneseLink={anamneseLink}
+        agora={momento}
         botaoEditarDados={
           <Link
             href={`/painel/pacientes/${paciente.id}/editar`}
