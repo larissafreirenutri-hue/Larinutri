@@ -28,6 +28,23 @@ export async function gerarLink(
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Dois links ativos para a mesma semana confundem o paciente, que
+  // pode responder o antigo, e a resposta cairia na semana errada.
+  const { data: jaExiste } = await supabase
+    .from("checkin_links")
+    .select("id")
+    .eq("patient_id", patientId)
+    .eq("semana", semana)
+    .neq("status", "respondido")
+    .gt("expira_em", new Date().toISOString())
+    .maybeSingle();
+
+  if (jaExiste) {
+    return {
+      erro: `Já existe um link ativo para a semana ${semana}. Apague o antigo ou gere para outra semana.`,
+    };
+  }
+
   const token = gerarToken(semana);
 
   const { error } = await supabase.from("checkin_links").insert({
@@ -108,4 +125,38 @@ export async function limparExpirados() {
     .lt("expira_em", new Date().toISOString());
 
   revalidatePath("/painel/links");
+}
+
+/** Gera o link da semana seguinte para o mesmo paciente. */
+export async function novoLinkDaSemanaSeguinte(formData: FormData) {
+  const patientId = String(formData.get("patient_id") ?? "");
+  if (!patientId) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: existentes } = await supabase
+    .from("checkin_links")
+    .select("semana")
+    .eq("patient_id", patientId);
+
+  const semanas = (existentes ?? [])
+    .map((l) => l.semana)
+    .filter((s): s is number => typeof s === "number");
+
+  const semana = semanas.length === 0 ? 1 : Math.max(...semanas) + 1;
+
+  await supabase.from("checkin_links").insert({
+    patient_id: patientId,
+    semana,
+    token: gerarToken(semana),
+    status: "gerado",
+    owner: user.id,
+  });
+
+  revalidatePath("/painel/links");
+  revalidatePath(`/painel/pacientes/${patientId}`);
 }
