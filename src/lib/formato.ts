@@ -35,6 +35,26 @@ export function formatarDataHora(iso: string) {
   return DATA_HORA_BR.format(new Date(iso));
 }
 
+const MOEDA = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
+
+export function formatarMoeda(valor: number | null) {
+  if (valor === null) return null;
+  return MOEDA.format(valor);
+}
+
+/** Data no formato do input type="date", no fuso de Brasília. */
+export function paraCampoData(iso: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(iso));
+}
+
 /** Peso com uma casa decimal e vírgula, como se escreve no Brasil. */
 export function formatarPeso(kg: number | null) {
   if (kg === null) return null;
