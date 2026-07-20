@@ -27,9 +27,12 @@ function BotaoSalvar({ rotulo }: { rotulo: string }) {
 export function FormularioPaciente({
   paciente,
   onCancelar,
+  aoSalvar,
 }: {
   paciente?: Paciente;
   onCancelar?: React.ReactNode;
+  /** Chamado depois de um cadastro bem-sucedido, para fechar o diálogo. */
+  aoSalvar?: () => void;
 }) {
   const editando = Boolean(paciente);
   const [estado, acao] = useActionState<EstadoPaciente, FormData>(
@@ -41,10 +44,13 @@ export function FormularioPaciente({
   // Ao criar com sucesso, a action volta sem erro e a lista revalida.
   // Limpar o formulário deixa a Larissa emendar o próximo cadastro.
   useEffect(() => {
-    if (!editando && !estado.erro) {
+    // Só reage quando a action confirmou o cadastro. Sem o ok, o
+    // efeito dispararia já na montagem e fecharia o diálogo sozinho.
+    if (!editando && estado.ok) {
       formRef.current?.reset();
+      aoSalvar?.();
     }
-  }, [estado, editando]);
+  }, [estado, editando, aoSalvar]);
 
   return (
     <form ref={formRef} action={acao} className="space-y-4">

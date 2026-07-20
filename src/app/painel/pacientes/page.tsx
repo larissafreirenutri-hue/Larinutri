@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import type { Checkin, Paciente } from "@/lib/tipos";
-import { juntarResumos } from "@/lib/pacientes";
-import { CabecalhoArea } from "../cabecalho-area";
-import { SubNavegacao } from "./subnavegacao";
-import { ListaPacientes } from "./lista-pacientes";
+import type { Paciente } from "@/lib/tipos";
+import { montarCarteira, type NotasPaciente } from "@/lib/carteira";
+import { TituloPagina } from "../ui";
+import { Carteira } from "./carteira";
 import { NovoPaciente } from "./novo-paciente";
 
 export const metadata: Metadata = {
@@ -14,43 +13,35 @@ export const metadata: Metadata = {
 export default async function PacientesPage() {
   const supabase = await createClient();
 
-  // O RLS limita as duas consultas às linhas desta nutricionista.
-  // Os check-ins vêm só com as colunas que o resumo usa, para não
-  // trazer as observações inteiras de todo mundo nesta tela.
-  const [pacientesRes, checkinsRes] = await Promise.all([
+  // O RLS limita as duas consultas às linhas desta nutricionista,
+  // inclusive na view, que usa security_invoker.
+  const [pacientesRes, notasRes] = await Promise.all([
     supabase.from("patients").select("*").order("full_name"),
-    supabase
-      .from("checkins")
-      .select(
-        "id, patient_id, created_at, peso_kg, adesao_plano, adesao_plano_texto, dias_atividade_fisica",
-      ),
+    supabase.from("patient_scores").select("*"),
   ]);
 
-  const erro = pacientesRes.error ?? checkinsRes.error;
+  const erro = pacientesRes.error ?? notasRes.error;
 
-  const pacientes = juntarResumos(
+  const carteira = montarCarteira(
     (pacientesRes.data ?? []) as Paciente[],
-    (checkinsRes.data ?? []) as Checkin[],
+    (notasRes.data ?? []) as NotasPaciente[],
   );
+
+  const botaoNovo = <NovoPaciente />;
 
   return (
     <>
-      <CabecalhoArea
-        titulo="Pacientes"
-        apoio="Cadastro, links de check-in e histórico de cada paciente."
-      />
-      <SubNavegacao />
-      <NovoPaciente />
+      <TituloPagina olho="Carteira" titulo="Pacientes" acao={botaoNovo} />
 
       {erro ? (
         <p
           role="alert"
-          className="mt-8 rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="mt-8 rounded-xl border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           Não foi possível carregar os pacientes. {erro.message}
         </p>
       ) : (
-        <ListaPacientes pacientes={pacientes} />
+        <Carteira pacientes={carteira} botaoNovo={botaoNovo} />
       )}
     </>
   );

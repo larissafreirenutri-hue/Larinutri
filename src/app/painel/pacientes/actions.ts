@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export type EstadoPaciente = { erro?: string };
+export type EstadoPaciente = { erro?: string; ok?: boolean };
 
 /** Campo de texto opcional vira null quando vem vazio, para não gravar "". */
 function opcional(valor: FormDataEntryValue | null) {
@@ -68,7 +68,7 @@ export async function criarPaciente(
   }
 
   revalidatePath("/painel/pacientes");
-  return {};
+  return { ok: true };
 }
 
 export async function atualizarPaciente(
