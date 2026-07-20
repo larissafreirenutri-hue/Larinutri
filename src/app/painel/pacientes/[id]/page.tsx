@@ -15,6 +15,7 @@ import {
   CLASSE_BOTAO_SECUNDARIO,
 } from "../../ui";
 import { Ficha } from "./ficha";
+import { createAdminClient, BUCKET_FOTOS } from "@/lib/supabase/admin";
 import { arquivarPaciente } from "../actions";
 
 export const metadata: Metadata = {
@@ -58,6 +59,26 @@ export default async function PacientePage({
   ]);
 
   const checkins = (checkinsRes.data ?? []) as Checkin[];
+
+  // As fotos vivem em bucket privado. Aqui elas ganham URL assinada de
+  // leitura, válida por uma hora, gerada no servidor. O caminho bruto
+  // nunca chega ao navegador.
+  const urlsPorCheckin: Record<string, string[]> = {};
+  const comFotos = checkins.filter((c) => (c.fotos ?? []).length > 0);
+
+  if (comFotos.length > 0) {
+    const admin = createAdminClient();
+    await Promise.all(
+      comFotos.map(async (c) => {
+        const { data } = await admin.storage
+          .from(BUCKET_FOTOS)
+          .createSignedUrls(c.fotos as string[], 60 * 60);
+        urlsPorCheckin[c.id] = (data ?? [])
+          .map((d) => d.signedUrl)
+          .filter((u): u is string => Boolean(u));
+      }),
+    );
+  }
   const links = (linksRes.data ?? []) as CheckinLink[];
   const linkAtual = links[0] ?? null;
 
@@ -155,6 +176,7 @@ export default async function PacientePage({
       <Ficha
         paciente={paciente}
         checkins={checkins}
+        urlsPorCheckin={urlsPorCheckin}
         botaoEditarDados={
           <Link
             href={`/painel/pacientes/${paciente.id}/editar`}

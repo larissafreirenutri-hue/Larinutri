@@ -11,6 +11,7 @@ import {
 } from "@/lib/dimensoes";
 import { Cartao, Medidor, Selo, AlertaClinico, Vazio } from "../../ui";
 import { LinhaEvolucao } from "./evolucao";
+import { Galeria } from "./galeria";
 
 type Aba = "visao" | "checkins" | "evolucao";
 
@@ -83,11 +84,14 @@ function DadoPaciente({
 export function Ficha({
   paciente,
   checkins,
+  urlsPorCheckin,
   botaoEditarDados,
 }: {
   paciente: Paciente;
   /** Do mais recente para o mais antigo. */
   checkins: Checkin[];
+  /** URLs assinadas das fotos, por id de check-in. */
+  urlsPorCheckin: Record<string, string[]>;
   botaoEditarDados: React.ReactNode;
 }) {
   const [aba, setAba] = useState<Aba>("visao");
@@ -152,7 +156,8 @@ export function Ficha({
                     />
                   ))}
 
-                  <div className="mt-5 space-y-3">
+                  <div className="mt-5 space-y-4">
+                    <Galeria urls={urlsPorCheckin[ultimo.id] ?? []} />
                     <RefeicaoLivre checkin={ultimo} />
                     {ultimo.observacoes ? (
                       <Citacao texto={ultimo.observacoes} />
@@ -296,7 +301,8 @@ export function Ficha({
                             ))
                           )}
 
-                          <div className="mt-5 space-y-3">
+                          <div className="mt-5 space-y-4">
+                            <Galeria urls={urlsPorCheckin[c.id] ?? []} />
                             <RefeicaoLivre checkin={c} />
                             {c.observacoes ? <Citacao texto={c.observacoes} /> : null}
                           </div>

@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { DIMENSOES, corDaNota } from "@/lib/dimensoes";
 import { enviarCheckinRico, type EstadoCheckin } from "./actions";
+import { FotosDaSemana } from "./fotos";
 
 const SECOES = [
   {
@@ -297,7 +298,10 @@ export function FormularioRico({
       </Secao>
 
       {SECOES.map((secao) => (
-        <Secao key={secao.chave} titulo={secao.titulo} apoio={secao.apoio}>
+        <div key={`bloco-${secao.chave}`}>
+        {/* Fotos entram depois de Bem-estar, antes do Fechamento. */}
+        {secao.chave === "fechamento" ? <FotosDaSemana token={token} /> : null}
+        <Secao titulo={secao.titulo} apoio={secao.apoio}>
           {DIMENSOES.filter((d) => d.secao === secao.chave).map((d) => (
             <Deslizante
               key={d.campo}
@@ -378,6 +382,7 @@ export function FormularioRico({
             </>
           ) : null}
         </Secao>
+        </div>
       ))}
 
       {estado.erro ? (
@@ -388,6 +393,32 @@ export function FormularioRico({
           {estado.erro}
         </p>
       ) : null}
+
+      <div className="mb-4 rounded-[18px] border border-linha bg-cartao px-[22px] py-5 shadow-cartao">
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            name="consentimento"
+            required
+            className="mt-0.5 h-4 w-4 shrink-0 accent-[#A9723F]"
+          />
+          <span className="font-sans text-[13px] leading-relaxed text-neutro">
+            Autorizo o uso destas informações de saúde, incluindo as fotos que
+            eu enviar, pela nutricionista Larissa Freire, exclusivamente para o
+            meu acompanhamento nutricional. Posso pedir a exclusão dos meus
+            dados a qualquer momento. Saiba mais na{" "}
+            <a
+              href="/privacidade"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-vital-fundo underline underline-offset-2"
+            >
+              política de privacidade
+            </a>
+            .
+          </span>
+        </label>
+      </div>
 
       <div className="mb-8 flex justify-end">
         <BotaoEnviar />

@@ -96,6 +96,12 @@ export async function enviarCheckinRico(
     return { erro: "Link inválido. Peça um novo para a sua nutricionista." };
   }
 
+  // Conferido aqui também, não só no navegador. Validação de front-end
+  // é conveniência, e dado de saúde não entra sem autorização.
+  if (formData.get("consentimento") !== "on") {
+    return { erro: "É preciso aceitar o uso dos dados para enviar o check-in." };
+  }
+
   const peso = numeroOpcional(formData.get("peso_kg"));
   if (peso !== null && (peso <= 0 || peso >= 500)) {
     return { erro: "Informe um peso válido, entre 1 e 499 quilos." };
@@ -122,6 +128,14 @@ export async function enviarCheckinRico(
     ? String(formData.get("refeicao_livre_oque") ?? "").trim().slice(0, 200) || null
     : null;
 
+  // Os caminhos vêm dos campos escondidos, já enviados ao storage.
+  // O teto de cinco é reforçado aqui, não só no navegador.
+  const fotos = formData
+    .getAll("fotos")
+    .map((f) => String(f).trim())
+    .filter((f) => f.length > 0 && f.startsWith(`${token}/`))
+    .slice(0, 5);
+
   const supabase = await createClient();
 
   // A função é SECURITY DEFINER e resolve paciente e semana pelo link.
@@ -144,6 +158,7 @@ export async function enviarCheckinRico(
     p_refeicao_livre: refeicaoLivre,
     p_refeicao_qtd: refeicaoQtd,
     p_refeicao_oque: refeicaoOque,
+    p_fotos: fotos.length > 0 ? fotos : null,
   });
 
   if (error) {

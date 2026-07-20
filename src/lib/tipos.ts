@@ -44,6 +44,7 @@ export type Checkin = {
   refeicao_livre?: boolean | null;
   refeicao_livre_qtd?: number | null;
   refeicao_livre_oque?: string | null;
+  fotos?: string[] | null;
   observacoes: string | null;
   created_at: string;
 };

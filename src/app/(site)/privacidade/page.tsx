@@ -74,6 +74,13 @@ export default function PrivacidadePage() {
           você responde apenas o que quiser.
         </p>
         <p>
+          <strong className="text-creme">Fotos de acompanhamento.</strong> Você
+          pode, se quiser, enviar até cinco fotos por check-in. Elas são
+          opcionais, ficam guardadas em área privada com acesso restrito, e só a
+          nutricionista consegue visualizá-las, por meio de um endereço
+          temporário que expira. Elas nunca ficam disponíveis por link público.
+        </p>
+        <p>
           Essas informações são dados pessoais sensíveis, porque dizem respeito à
           sua saúde. Por isso elas só são tratadas com o seu consentimento
           expresso, que você dá ao marcar a caixa antes de enviar cada check-in.
@@ -88,8 +95,9 @@ export default function PrivacidadePage() {
       <Bloco titulo="Para que os dados são usados">
         <p>
           Exclusivamente para o seu acompanhamento nutricional. A nutricionista
-          usa as respostas dos check-ins para entender a sua evolução, ajustar o
-          seu plano alimentar e preparar as consultas.
+          usa as respostas dos check-ins, e as fotos que você enviar, para
+          entender a sua evolução, ajustar o seu plano alimentar e preparar as
+          consultas.
         </p>
         <p>
           Os seus dados não são vendidos, alugados nem usados para publicidade,
