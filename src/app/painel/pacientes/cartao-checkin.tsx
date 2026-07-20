@@ -18,9 +18,12 @@ function Medida({ rotulo, valor }: { rotulo: string; valor: string | null }) {
 export function CartaoCheckin({
   checkin,
   mostrarPaciente = false,
+  destacado = false,
 }: {
   checkin: CheckinComPaciente;
   mostrarPaciente?: boolean;
+  /** Realça check-ins recentes, que são os que pedem atenção. */
+  destacado?: boolean;
 }) {
   const medidas = [
     { rotulo: "Peso", valor: formatarPeso(checkin.peso_kg) },
@@ -41,7 +44,13 @@ export function CartaoCheckin({
   const preenchidas = medidas.filter((m) => m.valor);
 
   return (
-    <li className="rounded-lg border border-dourado/20 bg-creme/5 px-5 py-4">
+    <li
+      className={`rounded-xl border px-5 py-4 transition ${
+        destacado
+          ? "border-dourado/50 bg-dourado/[0.07]"
+          : "border-dourado/20 bg-creme/5 hover:border-dourado/35"
+      }`}
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         {mostrarPaciente && checkin.patients ? (
           <Link

@@ -3,12 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { CheckinComPaciente, Paciente } from "@/lib/tipos";
+import { resumir, marcarRecentes } from "@/lib/pacientes";
+import { formatarData, formatarPeso } from "@/lib/formato";
 import { CartaoCheckin } from "../cartao-checkin";
 import { BotaoCopiarLink } from "../botao-copiar-link";
+import { BotaoExcluir } from "../botao-excluir";
 import { GraficoPeso, type PontoPeso } from "../grafico-peso";
+import { Kpi, Variacao, SeloAdesao } from "../indicadores";
 
 export const metadata: Metadata = {
-  title: "Histórico do paciente, Larissa Freire Nutricionista",
+  title: "Ficha do paciente, Larissa Freire Nutricionista",
 };
 
 export default async function PacientePage({
@@ -33,23 +37,27 @@ export default async function PacientePage({
 
   const paciente = dadosPaciente as Paciente;
 
-  // Ordem cronológica, do mais antigo para o mais novo, que é como se
-  // lê a evolução de um acompanhamento.
   const { data: dadosCheckins, error } = await supabase
     .from("checkins")
     .select("*, patients(id, full_name)")
     .eq("patient_id", id)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false });
 
   const checkins = (dadosCheckins ?? []) as CheckinComPaciente[];
+  const resumo = resumir(checkins);
 
-  const pontosPeso: PontoPeso[] = checkins
+  // O gráfico lê da esquerda para a direita, então precisa da ordem
+  // inversa da lista, que mostra o mais recente primeiro.
+  const pontosPeso: PontoPeso[] = [...checkins]
+    .reverse()
     .filter((c) => c.peso_kg !== null)
     .map((c) => ({ data: c.created_at, peso: c.peso_kg as number }));
 
+  const comRecencia = marcarRecentes(checkins);
+
   return (
     <>
-      <section className="mt-10">
+      <header className="border-b border-dourado/15 pb-6">
         <Link
           href="/painel/pacientes"
           className="font-sans text-sm text-dourado transition hover:text-dourado/80"
@@ -58,11 +66,11 @@ export default async function PacientePage({
         </Link>
 
         <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 className="font-display text-2xl text-creme">
+          <div className="min-w-0">
+            <h1 className="font-display text-3xl text-creme">
               {paciente.full_name}
-            </h2>
-            <p className="mt-1 font-sans text-sm text-creme/55">
+            </h1>
+            <p className="mt-2 font-sans text-sm text-creme/55">
               {[paciente.phone, paciente.email].filter(Boolean).join("  ·  ") ||
                 "Sem contato cadastrado"}
             </p>
@@ -76,6 +84,7 @@ export default async function PacientePage({
             >
               Editar
             </Link>
+            <BotaoExcluir id={paciente.id} nome={paciente.full_name} />
           </div>
         </div>
 
@@ -89,7 +98,7 @@ export default async function PacientePage({
             </p>
           </div>
         ) : null}
-      </section>
+      </header>
 
       {error ? (
         <p
@@ -100,42 +109,98 @@ export default async function PacientePage({
         </p>
       ) : null}
 
-      {pontosPeso.length > 0 ? (
-        <section className="mt-10">
-          <GraficoPeso pontos={pontosPeso} />
-        </section>
-      ) : null}
-
-      <section className="mt-10">
-        <div className="flex items-baseline justify-between">
-          <h3 className="font-display text-xl text-dourado">
-            Histórico de check-ins
-          </h3>
-          {checkins.length > 0 ? (
-            <span className="font-sans text-xs text-creme/50">
-              {checkins.length}{" "}
-              {checkins.length === 1 ? "resposta" : "respostas"}
-            </span>
-          ) : null}
+      {checkins.length === 0 ? (
+        <div className="mt-10 rounded-xl border border-dashed border-dourado/25 px-6 py-16 text-center">
+          <p className="font-display text-xl text-creme/70">
+            Nenhum check-in recebido ainda
+          </p>
+          <p className="mx-auto mt-3 max-w-sm font-sans text-sm leading-relaxed text-creme/50">
+            Copie o link de check-in acima e envie para{" "}
+            {paciente.full_name.split(" ")[0]}. Assim que a primeira resposta
+            chegar, o histórico e a evolução aparecem aqui.
+          </p>
         </div>
+      ) : (
+        <>
+          <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Kpi
+              rotulo="Peso atual"
+              valor={formatarPeso(resumo.pesoAtual) ?? "sem medida"}
+              rodape={
+                resumo.ultimoEm
+                  ? `medido em ${formatarData(resumo.ultimoEm)}`
+                  : undefined
+              }
+            />
+            <Kpi
+              rotulo="Variação total"
+              valor={
+                <Variacao
+                  valor={resumo.variacao}
+                  tendencia={resumo.tendencia}
+                  className="text-2xl"
+                />
+              }
+              rodape={
+                resumo.pesoInicial !== null
+                  ? `desde ${formatarPeso(resumo.pesoInicial)}`
+                  : "sem comparação"
+              }
+            />
+            <Kpi
+              rotulo="Atividade física"
+              valor={
+                resumo.mediaDiasAtividade === null
+                  ? "sem registro"
+                  : `${resumo.mediaDiasAtividade.toLocaleString("pt-BR", {
+                      maximumFractionDigits: 1,
+                    })} dias`
+              }
+              rodape="média por semana"
+            />
+            <Kpi
+              rotulo="Adesão recente"
+              valor={
+                resumo.adesaoRecente ? (
+                  <SeloAdesao valor={resumo.adesaoRecente} />
+                ) : (
+                  "sem registro"
+                )
+              }
+              rodape={`${resumo.totalCheckins} ${
+                resumo.totalCheckins === 1 ? "check-in" : "check-ins"
+              } no total`}
+            />
+          </section>
 
-        {checkins.length === 0 ? (
-          <div className="mt-5 rounded-lg border border-dashed border-dourado/25 px-6 py-12 text-center">
-            <p className="font-display text-lg text-creme/70">
-              Nenhum check-in recebido ainda
-            </p>
-            <p className="mt-2 font-sans text-sm text-creme/50">
-              Copie o link acima e envie para {paciente.full_name.split(" ")[0]}.
-            </p>
-          </div>
-        ) : (
-          <ul className="mt-5 space-y-3">
-            {checkins.map((checkin) => (
-              <CartaoCheckin key={checkin.id} checkin={checkin} />
-            ))}
-          </ul>
-        )}
-      </section>
+          {pontosPeso.length > 0 ? (
+            <section className="mt-8">
+              <GraficoPeso pontos={pontosPeso} />
+            </section>
+          ) : null}
+
+          <section className="mt-10">
+            <div className="flex items-baseline justify-between">
+              <h2 className="font-display text-xl text-dourado">
+                Histórico de check-ins
+              </h2>
+              <span className="font-sans text-xs text-creme/45">
+                do mais recente ao mais antigo
+              </span>
+            </div>
+
+            <ul className="mt-5 space-y-3">
+              {comRecencia.map((checkin) => (
+                <CartaoCheckin
+                  key={checkin.id}
+                  checkin={checkin}
+                  destacado={checkin.recente}
+                />
+              ))}
+            </ul>
+          </section>
+        </>
+      )}
     </>
   );
 }
