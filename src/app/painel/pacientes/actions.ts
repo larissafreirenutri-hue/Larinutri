@@ -50,7 +50,7 @@ export async function criarPaciente(
     return { erro: `Não foi possível salvar o paciente. ${error.message}` };
   }
 
-  revalidatePath("/painel");
+  revalidatePath("/painel/pacientes");
   return {};
 }
 
@@ -82,8 +82,8 @@ export async function atualizarPaciente(
     return { erro: `Não foi possível salvar as alterações. ${error.message}` };
   }
 
-  revalidatePath("/painel");
-  redirect("/painel");
+  revalidatePath("/painel/pacientes");
+  redirect("/painel/pacientes");
 }
 
 export async function excluirPaciente(formData: FormData) {
@@ -93,5 +93,5 @@ export async function excluirPaciente(formData: FormData) {
   const supabase = await createClient();
   await supabase.from("patients").delete().eq("id", id);
 
-  revalidatePath("/painel");
+  revalidatePath("/painel/pacientes");
 }

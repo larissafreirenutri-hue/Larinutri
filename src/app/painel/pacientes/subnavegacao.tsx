@@ -4,20 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const ABAS = [
-  { href: "/painel", rotulo: "Pacientes" },
-  { href: "/painel/checkins", rotulo: "Check-ins" },
+  { href: "/painel/pacientes", rotulo: "Pacientes" },
+  { href: "/painel/pacientes/checkins", rotulo: "Check-ins" },
 ];
 
-export function Navegacao() {
+export function SubNavegacao() {
   const caminho = usePathname();
 
   return (
-    <nav className="mt-8 flex gap-1 border-b border-dourado/20">
+    <nav className="mt-6 flex gap-1 border-b border-dourado/15">
       {ABAS.map((aba) => {
-        // Pacientes fica ativa também nas telas de detalhe e edição.
+        // A lista de pacientes só fica ativa no caminho exato, senão
+        // ficaria acesa também na aba de check-ins.
         const ativa =
-          aba.href === "/painel"
-            ? caminho === "/painel" || caminho.startsWith("/painel/pacientes")
+          aba.href === "/painel/pacientes"
+            ? caminho === aba.href
             : caminho.startsWith(aba.href);
 
         return (

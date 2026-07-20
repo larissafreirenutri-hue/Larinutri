@@ -3,9 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { CheckinComPaciente, Paciente } from "@/lib/tipos";
-import { CartaoCheckin } from "../../cartao-checkin";
-import { BotaoCopiarLink } from "../../botao-copiar-link";
-import { GraficoPeso, type PontoPeso } from "../../grafico-peso";
+import { CartaoCheckin } from "../cartao-checkin";
+import { BotaoCopiarLink } from "../botao-copiar-link";
+import { GraficoPeso, type PontoPeso } from "../grafico-peso";
 
 export const metadata: Metadata = {
   title: "Histórico do paciente, Larissa Freire Nutricionista",
@@ -51,7 +51,7 @@ export default async function PacientePage({
     <>
       <section className="mt-10">
         <Link
-          href="/painel"
+          href="/painel/pacientes"
           className="font-sans text-sm text-dourado transition hover:text-dourado/80"
         >
           ← Voltar aos pacientes

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import type { CheckinComPaciente, Paciente } from "@/lib/tipos";
 import { CartaoCheckin } from "../cartao-checkin";
+import { SubNavegacao } from "../subnavegacao";
+import { CabecalhoArea } from "../../cabecalho-area";
 import { Filtros } from "./filtros";
 
 export const metadata: Metadata = {
@@ -48,6 +50,12 @@ export default async function CheckinsPage({
 
   return (
     <>
+      <CabecalhoArea
+        titulo="Pacientes"
+        apoio="Cadastro, links de check-in e histórico de cada paciente."
+      />
+      <SubNavegacao />
+
       <section className="mt-10">
         <div className="flex items-baseline justify-between">
           <h2 className="font-display text-xl text-dourado">

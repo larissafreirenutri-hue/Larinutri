@@ -53,7 +53,7 @@ export function Filtros({
           {PERIODOS.map((p) => (
             <Link
               key={p.chave}
-              href={`/painel/checkins?periodo=${p.chave}`}
+              href={`/painel/pacientes/checkins?periodo=${p.chave}`}
               aria-current={periodo === p.chave ? "true" : undefined}
               className={`rounded-md border px-3 py-2 font-sans text-xs transition ${
                 periodo === p.chave

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Paciente } from "@/lib/tipos";
-import { FormularioPaciente } from "../../../formulario-paciente";
+import { FormularioPaciente } from "../../formulario-paciente";
 
 export const metadata: Metadata = {
   title: "Editar paciente, Larissa Freire Nutricionista",
