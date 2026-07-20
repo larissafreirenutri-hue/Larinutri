@@ -73,21 +73,38 @@ export async function POST(
   // nome de arquivo original.
   const caminho = `${token}/${crypto.randomUUID()}.${extensao}`;
 
-  const admin = createAdminClient();
-  const { data: assinada, error: erroAssinatura } = await admin.storage
-    .from(BUCKET_FOTOS)
-    .createSignedUploadUrl(caminho);
+  try {
+    // createAdminClient lança se a SUPABASE_SECRET_KEY faltar. Sem o
+    // try, isso viraria um 500 genérico, sem pista no formulário nem
+    // no log. O erro real vai para o terminal do servidor, e o
+    // paciente recebe só uma mensagem limpa, sem vazar segredo.
+    const admin = createAdminClient();
+    const { data: assinada, error: erroAssinatura } = await admin.storage
+      .from(BUCKET_FOTOS)
+      .createSignedUploadUrl(caminho);
 
-  if (erroAssinatura || !assinada) {
+    if (erroAssinatura || !assinada) {
+      console.error(
+        "[upload] createSignedUploadUrl falhou:",
+        erroAssinatura?.message ?? "sem dados retornados",
+      );
+      return NextResponse.json(
+        { erro: "Não foi possível preparar o envio da foto. Tente de novo." },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json({
+      caminho,
+      urlAssinada: assinada.signedUrl,
+      tokenUpload: assinada.token,
+    });
+  } catch (e) {
+    const mensagem = e instanceof Error ? e.message : String(e);
+    console.error("[upload] exceção ao preparar o envio:", mensagem);
     return NextResponse.json(
       { erro: "Não foi possível preparar o envio da foto. Tente de novo." },
       { status: 500 },
     );
   }
-
-  return NextResponse.json({
-    caminho,
-    urlAssinada: assinada.signedUrl,
-    tokenUpload: assinada.token,
-  });
 }
