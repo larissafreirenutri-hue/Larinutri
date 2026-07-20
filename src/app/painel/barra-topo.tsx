@@ -82,7 +82,7 @@ export function BarraTopo({ botaoSair }: { botaoSair: React.ReactNode }) {
         </nav>
 
         <div className="ml-auto hidden shrink-0 items-center gap-3 lg:flex">
-          <AlternadorPerfil />
+          <AlternadorPerfil caminho={caminho} />
           {botaoSair}
         </div>
 
@@ -118,7 +118,7 @@ export function BarraTopo({ botaoSair }: { botaoSair: React.ReactNode }) {
           </nav>
 
           <div className="mt-4 flex flex-col gap-3 border-t border-sobre-escuro/10 pt-4">
-            <AlternadorPerfil />
+            <AlternadorPerfil caminho={caminho} />
             {botaoSair}
           </div>
         </div>
@@ -127,19 +127,35 @@ export function BarraTopo({ botaoSair }: { botaoSair: React.ReactNode }) {
   );
 }
 
-/** O modo Paciente ainda não existe, então avisa em vez de enganar. */
-function AlternadorPerfil() {
+/**
+ * O modo Paciente mostra como é a experiência dele, em leitura. Não
+ * existe portal com login de paciente, e a tela diz isso.
+ */
+function AlternadorPerfil({ caminho }: { caminho: string }) {
+  const noModoPaciente = caminho === "/painel/paciente";
+
   return (
     <div className="flex items-center rounded-xl bg-sobre-escuro-forte/10 p-1">
-      <span className="rounded-lg bg-sobre-escuro-forte px-3.5 py-1.5 font-sans text-[13px] font-medium text-barra">
+      <Link
+        href="/painel"
+        className={`rounded-lg px-3.5 py-1.5 font-sans text-[13px] transition ${
+          noModoPaciente
+            ? "text-sobre-escuro/60 hover:text-sobre-escuro-forte"
+            : "bg-sobre-escuro-forte font-medium text-barra"
+        }`}
+      >
         Nutricionista
-      </span>
-      <span
-        title="Em breve"
-        className="cursor-not-allowed px-3.5 py-1.5 font-sans text-[13px] text-sobre-escuro/45"
+      </Link>
+      <Link
+        href="/painel/paciente"
+        className={`rounded-lg px-3.5 py-1.5 font-sans text-[13px] transition ${
+          noModoPaciente
+            ? "bg-sobre-escuro-forte font-medium text-barra"
+            : "text-sobre-escuro/60 hover:text-sobre-escuro-forte"
+        }`}
       >
         Paciente
-      </span>
+      </Link>
     </div>
   );
 }

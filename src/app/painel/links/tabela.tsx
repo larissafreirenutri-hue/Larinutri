@@ -256,7 +256,7 @@ export function Links({
             />
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[900px] border-collapse">
               <thead>
                 <tr className="border-b border-linha">
@@ -384,6 +384,90 @@ export function Links({
             </table>
           </div>
         )}
+
+        {/* No celular a tabela viraria 900px de rolagem lateral. */}
+        {visiveis.length > 0 ? (
+          <ul className="divide-y divide-linha md:hidden">
+            {visiveis.map((link) => (
+              <li key={link.id} className="px-5 py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Avatar
+                      nome={link.patients?.full_name ?? "?"}
+                      tamanho="sm"
+                    />
+                    <div className="min-w-0">
+                      <p className="truncate font-sans text-[15px] font-semibold text-tinta">
+                        {link.patients?.full_name ?? "Paciente removido"}
+                      </p>
+                      <p className="font-mono text-[12px] text-neutro">
+                        semana {link.semana ?? "sem número"}
+                      </p>
+                    </div>
+                  </div>
+                  <SeloLink status={link.efetivo} />
+                </div>
+
+                <p className="mt-3 break-all font-mono text-[12.5px] text-neutro">
+                  {link.token}
+                </p>
+                <p className="mt-1 font-mono text-[12px] text-tenue">
+                  gerado {formatarData(link.gerado_em)} · expira{" "}
+                  {formatarData(link.expira_em)}
+                </p>
+
+                <div className="mt-3.5 flex flex-wrap gap-2">
+                  {link.status === "gerado" && link.efetivo !== "expirado" ? (
+                    <form action={marcarEnviado}>
+                      <input type="hidden" name="id" value={link.id} />
+                      <button type="submit" className={CLASSE_BOTAO_SECUNDARIO}>
+                        Marcar enviado
+                      </button>
+                    </form>
+                  ) : null}
+
+                  <Copiar token={link.token} />
+
+                  <a
+                    href={`/checkin/${link.token}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={CLASSE_BOTAO_SECUNDARIO}
+                  >
+                    Ver
+                  </a>
+
+                  <form action={novoLinkDaSemanaSeguinte}>
+                    <input
+                      type="hidden"
+                      name="patient_id"
+                      value={link.patient_id}
+                    />
+                    <button type="submit" className={CLASSE_BOTAO_SECUNDARIO}>
+                      Novo
+                    </button>
+                  </form>
+
+                  <form action={excluirLink}>
+                    <input type="hidden" name="id" value={link.id} />
+                    <button
+                      type="submit"
+                      onClick={(e) => {
+                        const ok = window.confirm(
+                          `Apagar o link de ${link.patients?.full_name ?? "este paciente"}? Se ele já foi enviado, o paciente não vai mais conseguir responder.`,
+                        );
+                        if (!ok) e.preventDefault();
+                      }}
+                      className="inline-flex items-center rounded-xl border border-argila/35 px-3.5 py-2.5 font-sans text-[14px] text-argila transition hover:bg-argila-suave"
+                    >
+                      Apagar
+                    </button>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </Cartao>
 
       {visiveis.length > 0 && visiveis.length !== links.length ? (

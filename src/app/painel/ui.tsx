@@ -35,7 +35,7 @@ export function TituloPagina({
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
         {olho ? <Olho>{olho}</Olho> : null}
-        <h1 className="mt-2 font-display text-[40px] leading-[1.1] text-barra">
+        <h1 className="mt-2 font-display text-[30px] leading-[1.1] text-barra sm:text-[40px]">
           {titulo}
         </h1>
         {apoio ? (
@@ -115,8 +115,8 @@ export function Medidor({
   const corFinal = nota === null ? "#E4D8C2" : corDaNota(nota, cor);
 
   return (
-    <div className="flex items-center gap-4 py-[7px]">
-      <span className="w-[150px] shrink-0 font-sans text-[14.5px] text-tinta sm:w-[170px]">
+    <div className="flex items-center gap-2.5 py-[7px] sm:gap-4">
+      <span className="w-[104px] shrink-0 font-sans text-[13px] leading-snug text-tinta sm:w-[170px] sm:text-[14.5px]">
         {rotulo}
       </span>
 

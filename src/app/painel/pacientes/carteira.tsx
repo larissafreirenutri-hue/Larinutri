@@ -204,7 +204,7 @@ export function Carteira({
           />
         </div>
       ) : (
-        <Cartao className="mt-6 overflow-hidden">
+        <Cartao className="mt-6 hidden overflow-hidden md:block">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[920px] border-collapse">
               <thead>
@@ -337,6 +337,104 @@ export function Carteira({
           </div>
         </Cartao>
       )}
+
+      {/* No celular a tabela viraria 920px de rolagem lateral, então
+          cada paciente vira um cartão. */}
+      {visiveis.length > 0 ? (
+        <ul className="mt-6 space-y-3 md:hidden">
+          {visiveis.map((p) => (
+            <li
+              key={p.id}
+              className="rounded-[18px] border border-linha bg-cartao px-4 py-4 shadow-cartao"
+            >
+              <button
+                type="button"
+                onClick={() => router.push(`/painel/pacientes/${p.id}`)}
+                className="flex w-full items-start gap-3 text-left"
+              >
+                <Avatar nome={p.full_name} />
+                <span className="min-w-0 flex-1">
+                  <span className="block font-sans text-[16px] font-semibold text-tinta">
+                    {p.full_name}
+                  </span>
+                  <span className="mt-0.5 block font-mono text-[12.5px] text-neutro">
+                    {p.restricao || "Nenhuma"}
+                  </span>
+                </span>
+                <SeloStatusPaciente status={p.status ?? "ativo"} />
+              </button>
+
+              <dl className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-linha pt-3.5">
+                <div className="col-span-2">
+                  <dt className="olho">Objetivo</dt>
+                  <dd className="mt-0.5 font-sans text-[14.5px] text-tinta">
+                    {p.objetivo || "Sem objetivo"}
+                    <span className="block font-sans text-[13px] text-neutro">
+                      {[p.plano_nome, p.plano_duracao].filter(Boolean).join(" ") ||
+                        "Sem plano"}
+                    </span>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="olho">Última resposta</dt>
+                  <dd className="mt-0.5 font-sans text-[14.5px] text-tinta">
+                    {p.ultimoEm ? formatarData(p.ultimoEm) : "–"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="olho">Nota</dt>
+                  <dd className="mt-0.5 flex items-baseline gap-2">
+                    <span className="font-mono text-[16px] font-bold text-tinta">
+                      {p.nota ?? "–"}
+                    </span>
+                    {p.nota !== null ? (
+                      <Tendencia tendencia={p.tendencia} delta={p.delta} />
+                    ) : null}
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="mt-3.5 flex flex-wrap gap-2 border-t border-linha pt-3.5">
+                <button
+                  type="button"
+                  onClick={() => router.push(`/painel/pacientes/${p.id}/editar`)}
+                  className={CLASSE_ACAO}
+                >
+                  Editar
+                </button>
+
+                <form action={arquivarPaciente}>
+                  <input type="hidden" name="id" value={p.id} />
+                  <input
+                    type="hidden"
+                    name="status"
+                    value={p.status === "arquivado" ? "ativo" : "arquivado"}
+                  />
+                  <button type="submit" className={CLASSE_ACAO}>
+                    {p.status === "arquivado" ? "Reativar" : "Arquivar"}
+                  </button>
+                </form>
+
+                <form action={excluirPaciente}>
+                  <input type="hidden" name="id" value={p.id} />
+                  <button
+                    type="submit"
+                    onClick={(e) => {
+                      const ok = window.confirm(
+                        `Excluir ${p.full_name}? Os check-ins e links dele vão junto, e a ação não pode ser desfeita. Para apenas tirar da lista, use Arquivar.`,
+                      );
+                      if (!ok) e.preventDefault();
+                    }}
+                    className="rounded-[10px] border border-argila/35 bg-cartao px-3.5 py-2 font-sans text-[13.5px] text-argila transition hover:bg-argila-suave"
+                  >
+                    Excluir
+                  </button>
+                </form>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {visiveis.length > 0 ? (
         <p className="mt-4 font-mono text-[12.5px] text-neutro">

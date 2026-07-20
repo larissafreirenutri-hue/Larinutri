@@ -140,7 +140,7 @@ export default async function TriagemPage() {
   return (
     <>
       <Olho>{diaDaSemana(momento)} · sua semana</Olho>
-      <h1 className="mt-2 font-display text-[40px] leading-[1.1] text-barra">
+      <h1 className="mt-2 font-display text-[30px] leading-[1.1] text-barra sm:text-[40px]">
         Triagem da semana
       </h1>
       <p className="mt-2 max-w-2xl font-sans text-[15px] text-neutro">
