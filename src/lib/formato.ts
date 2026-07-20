@@ -14,8 +14,21 @@ const DATA_HORA_BR = new Intl.DateTimeFormat("pt-BR", {
   timeZone: "America/Sao_Paulo",
 });
 
+const DATA_EXTENSO = new Intl.DateTimeFormat("pt-BR", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "America/Sao_Paulo",
+});
+
 export function formatarData(iso: string) {
   return DATA_BR.format(new Date(iso));
+}
+
+/** Ex: "domingo, 19 de julho de 2026" */
+export function formatarDataExtenso(momento: number | string) {
+  return DATA_EXTENSO.format(new Date(momento));
 }
 
 export function formatarDataHora(iso: string) {
