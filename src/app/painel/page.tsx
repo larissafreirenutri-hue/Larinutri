@@ -113,10 +113,10 @@ export default async function VisaoGeralPage() {
           Ver pacientes
         </Link>
         <Link
-          href="/painel/pacientes/checkins"
+          href="/painel/esteira"
           className="rounded-md border border-linha px-5 py-2.5 font-sans text-sm text-vital-fundo transition hover:bg-vital/10"
         >
-          Revisar check-ins
+          Ver a esteira
         </Link>
       </section>
 

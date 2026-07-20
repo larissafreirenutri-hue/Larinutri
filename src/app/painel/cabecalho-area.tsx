@@ -22,14 +22,3 @@ export function CabecalhoArea({
   );
 }
 
-/** Aviso padrão das áreas que ainda não foram construídas. */
-export function EmConstrucao({ oQueVem }: { oQueVem: string }) {
-  return (
-    <div className="mt-10 rounded-lg border border-dashed border-linha px-6 py-14 text-center">
-      <p className="font-display text-xl text-vital-fundo">Em construção</p>
-      <p className="mx-auto mt-3 max-w-md font-sans text-sm leading-relaxed text-neutro">
-        {oQueVem}
-      </p>
-    </div>
-  );
-}
