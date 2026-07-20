@@ -35,6 +35,37 @@ export function Marca() {
   );
 }
 
+/**
+ * Cores de avatar das referências. A escolha vem do nome, então o
+ * mesmo paciente tem sempre a mesma cor, em qualquer tela e sem
+ * precisar guardar isso no banco.
+ */
+const CORES_AVATAR = [
+  "#5A4FCF",
+  "#8B5E34",
+  "#D98C34",
+  "#BC5443",
+  "#3FA9C4",
+  "#5FAE5A",
+  "#7C6BD1",
+  "#C99A3A",
+];
+
+/**
+ * FNV-1a. Com mais de oito pacientes as cores repetem, e não tem como
+ * ser diferente. A cor é decoração, quem identifica são as iniciais.
+ * O que importa aqui é ser estável: o mesmo nome dá sempre a mesma cor.
+ */
+function corDoNome(nome: string) {
+  let h = 2166136261;
+  for (let i = 0; i < nome.length; i++) {
+    h ^= nome.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  h = (h >>> 16) ^ h;
+  return CORES_AVATAR[(h >>> 0) % CORES_AVATAR.length];
+}
+
 /** Avatar quadrado com as iniciais, como nas referências. */
 export function Avatar({
   nome,
@@ -60,7 +91,8 @@ export function Avatar({
   return (
     <span
       aria-hidden
-      className={`grid shrink-0 place-items-center bg-areia-clara font-mono font-bold tracking-wide text-vital-fundo ${medidas}`}
+      style={{ backgroundColor: corDoNome(nome) }}
+      className={`grid shrink-0 place-items-center font-mono font-bold tracking-wide text-white ${medidas}`}
     >
       {iniciais || "?"}
     </span>

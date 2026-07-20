@@ -117,6 +117,14 @@
   color: var(--vital-fundo);
 }
 
+/* Rolagem sem barra visível, para a navegação em telas médias. */
+@utility sem-barra {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
