@@ -23,7 +23,7 @@ export async function moverTriagem(id: string, destino: string) {
   if (error) return { erro: "Não foi possível mover o check-in." };
 
   revalidatePath("/painel/esteira");
-  revalidatePath("/painel/triagem");
+  revalidatePath("/painel");
   return {};
 }
 

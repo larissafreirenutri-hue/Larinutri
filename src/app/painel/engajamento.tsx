@@ -1,5 +1,5 @@
 import type { SemanaEngajamento } from "@/lib/triagem";
-import { Cartao } from "../ui";
+import { Cartao } from "./ui";
 
 /**
  * Barras pareadas, enviados ao lado de respondidos, como na referência.

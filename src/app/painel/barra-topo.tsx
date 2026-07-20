@@ -21,11 +21,11 @@ import {
  * antes de Ajustes, que fecha a lista.
  */
 const ITENS = [
-  { href: "/painel/triagem", rotulo: "Triagem", Icone: IconeTriagem },
+  { href: "/painel", rotulo: "Triagem", Icone: IconeTriagem },
   { href: "/painel/esteira", rotulo: "Esteira", Icone: IconeEsteira },
   { href: "/painel/links", rotulo: "Links", Icone: IconeLinks },
   { href: "/painel/pacientes", rotulo: "Pacientes", Icone: IconePacientes },
-  { href: "/painel", rotulo: "Visão geral", Icone: IconeVisao },
+  { href: "/painel/visao-geral", rotulo: "Visão geral", Icone: IconeVisao },
   { href: "/painel/vendas", rotulo: "Vendas", Icone: IconeVendas },
   { href: "/painel/financeiro", rotulo: "Financeiro", Icone: IconeFinanceiro },
   { href: "/painel/trabalho", rotulo: "Trabalho", Icone: IconeTrabalho },
@@ -33,7 +33,8 @@ const ITENS = [
 ];
 
 function ativo(href: string, caminho: string) {
-  // Visão geral só acende no caminho exato, senão ficaria acesa em tudo.
+  // A Triagem mora em /painel, então só acende no caminho exato.
+  // Por prefixo, ela ficaria acesa em todas as telas do painel.
   if (href === "/painel") return caminho === "/painel";
   return caminho === href || caminho.startsWith(`${href}/`);
 }
@@ -46,7 +47,7 @@ export function BarraTopo({ botaoSair }: { botaoSair: React.ReactNode }) {
   return (
     <header className="sticky top-0 z-50 bg-barra/[0.97] backdrop-blur">
       <div className="mx-auto flex w-full max-w-[1500px] items-center gap-4 px-5 py-2.5">
-        <Link href="/painel/triagem" onClick={fechar} className="shrink-0">
+        <Link href="/painel" onClick={fechar} className="shrink-0">
           <Marca />
         </Link>
 
