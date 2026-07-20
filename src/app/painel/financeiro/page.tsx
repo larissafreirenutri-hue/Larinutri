@@ -53,7 +53,7 @@ export default async function FinanceiroPage() {
       {erro ? (
         <p
           role="alert"
-          className="mt-8 rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="mt-8 rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           Não foi possível carregar os lançamentos. {erro.message}
         </p>
@@ -64,7 +64,7 @@ export default async function FinanceiroPage() {
           rotulo="Recebido no mês"
           valor={formatarMoeda(resumo.receitaRecebida) ?? "R$ 0,00"}
           rodape="receitas pagas"
-          destaque="text-emerald-200"
+          destaque="text-emerald-700"
         />
         <Kpi
           rotulo="A receber"
@@ -81,30 +81,30 @@ export default async function FinanceiroPage() {
                   resumo.atrasadosQtd === 1 ? "cobrança" : "cobranças"
                 }`
           }
-          destaque={resumo.atrasado > 0 ? "text-red-200" : undefined}
+          destaque={resumo.atrasado > 0 ? "text-argila" : undefined}
         />
         <Kpi
           rotulo="Despesas do mês"
           valor={formatarMoeda(resumo.despesasPagas) ?? "R$ 0,00"}
           rodape="despesas pagas"
-          destaque="text-amber-200"
+          destaque="text-mel-tinta"
         />
         <Kpi
           rotulo="Resultado do mês"
           valor={formatarMoeda(resumo.resultado) ?? "R$ 0,00"}
           rodape="recebido menos despesas"
-          destaque={positivo ? "text-emerald-200" : "text-red-200"}
+          destaque={positivo ? "text-emerald-700" : "text-argila"}
         />
       </section>
 
       <NovoLancamento pacientes={pacientes} hoje={diaDeHoje(momento)} />
 
       {lancamentos.length === 0 ? (
-        <div className="mt-8 rounded-xl border border-dashed border-dourado/25 px-6 py-14 text-center">
-          <p className="font-display text-xl text-creme/70">
+        <div className="mt-8 rounded-xl border border-dashed border-linha px-6 py-14 text-center">
+          <p className="font-display text-xl text-neutro">
             Nenhum lançamento ainda
           </p>
-          <p className="mx-auto mt-3 max-w-sm font-sans text-sm leading-relaxed text-creme/50">
+          <p className="mx-auto mt-3 max-w-sm font-sans text-sm leading-relaxed text-neutro">
             Registre a primeira consulta recebida ou uma despesa do consultório.
             Os indicadores acima passam a fazer sentido a partir daí.
           </p>
@@ -116,7 +116,7 @@ export default async function FinanceiroPage() {
           </section>
 
           <section className="mt-10">
-            <h2 className="font-display text-xl text-dourado">Lançamentos</h2>
+            <h2 className="font-display text-xl text-vital-fundo">Lançamentos</h2>
             <Lista
               lancamentos={comAtraso}
               pacientes={pacientes}

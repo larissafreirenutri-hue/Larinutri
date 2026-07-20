@@ -12,16 +12,16 @@ import {
   type EstadoTrabalho,
 } from "./actions";
 
-const rotulo = "block font-sans text-sm text-creme/80";
+const rotulo = "block font-sans text-sm text-tinta";
 const controle =
-  "mt-2 w-full rounded-md border border-dourado/30 bg-creme/5 px-4 py-2.5 font-sans text-sm text-creme placeholder:text-creme/35 outline-none focus:border-dourado focus:ring-1 focus:ring-dourado";
+  "mt-2 w-full rounded-md border border-linha bg-cartao px-4 py-2.5 font-sans text-sm text-tinta placeholder:text-neutro outline-none focus:border-vital focus:ring-1 focus:ring-vital";
 const seletor =
-  "mt-2 rounded-md border border-dourado/30 bg-creme/5 px-3 py-2 font-sans text-sm text-creme outline-none focus:border-dourado";
+  "mt-2 rounded-md border border-linha bg-cartao px-3 py-2 font-sans text-sm text-tinta outline-none focus:border-vital";
 
 const CORES_PRIORIDADE: Record<string, string> = {
-  Alta: "border-red-300/40 text-red-200",
-  Média: "border-dourado/40 text-dourado",
-  Baixa: "border-creme/25 text-creme/55",
+  Alta: "border-argila/35 text-argila",
+  Média: "border-linha text-vital-fundo",
+  Baixa: "border-linha text-neutro",
 };
 
 function BotaoSalvar({ texto }: { texto: string }) {
@@ -30,7 +30,7 @@ function BotaoSalvar({ texto }: { texto: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90 disabled:opacity-60"
+      className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10 disabled:opacity-60"
     >
       {pending ? "Salvando..." : texto}
     </button>
@@ -58,7 +58,7 @@ function FormularioTarefa({
 
       <div>
         <label htmlFor={`titulo-${tarefa?.id ?? "novo"}`} className={rotulo}>
-          Título <span className="text-dourado">*</span>
+          Título <span className="text-vital-fundo">*</span>
         </label>
         <input
           id={`titulo-${tarefa?.id ?? "novo"}`}
@@ -84,11 +84,11 @@ function FormularioTarefa({
             defaultValue={tarefa?.prioridade ?? ""}
             className={controle}
           >
-            <option value="" className="bg-marrom">
+            <option value="" className="bg-cartao">
               Sem prioridade
             </option>
             {PRIORIDADES.map((p) => (
-              <option key={p} value={p} className="bg-marrom">
+              <option key={p} value={p} className="bg-cartao">
                 {p}
               </option>
             ))}
@@ -118,11 +118,11 @@ function FormularioTarefa({
             defaultValue={tarefa?.patient_id ?? ""}
             className={controle}
           >
-            <option value="" className="bg-marrom">
+            <option value="" className="bg-cartao">
               Sem vínculo
             </option>
             {pacientes.map((p) => (
-              <option key={p.id} value={p.id} className="bg-marrom">
+              <option key={p.id} value={p.id} className="bg-cartao">
                 {p.full_name}
               </option>
             ))}
@@ -151,7 +151,7 @@ function FormularioTarefa({
       {estado.erro ? (
         <p
           role="alert"
-          className="rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           {estado.erro}
         </p>
@@ -163,7 +163,7 @@ function FormularioTarefa({
           <button
             type="button"
             onClick={onPronto}
-            className="font-sans text-sm text-creme/60 transition hover:text-creme"
+            className="font-sans text-sm text-neutro transition hover:text-tinta"
           >
             Cancelar
           </button>
@@ -205,19 +205,19 @@ export function Tarefas({
   return (
     <section className="mt-12">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-display text-xl text-dourado">Tarefas</h2>
+        <h2 className="font-display text-xl text-vital-fundo">Tarefas</h2>
         <button
           type="button"
           onClick={() => setNovaAberta((a) => !a)}
           aria-expanded={novaAberta}
-          className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90"
+          className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10"
         >
           {novaAberta ? "Fechar" : "Adicionar tarefa"}
         </button>
       </div>
 
       {novaAberta ? (
-        <div className="mt-5 rounded-xl border border-dourado/25 bg-creme/5 px-6 py-6">
+        <div className="mt-5 rounded-xl border border-linha bg-cartao px-6 py-6">
           <FormularioTarefa
             pacientes={pacientes}
             onPronto={() => setNovaAberta(false)}
@@ -234,10 +234,10 @@ export function Tarefas({
             className={seletor}
             aria-label="Filtrar tarefas por situação"
           >
-            <option value="pendente" className="bg-marrom">Pendentes</option>
-            <option value="concluída" className="bg-marrom">Concluídas</option>
-            <option value="atrasada" className="bg-marrom">Atrasadas</option>
-            <option value="todas" className="bg-marrom">Todas</option>
+            <option value="pendente" className="bg-cartao">Pendentes</option>
+            <option value="concluída" className="bg-cartao">Concluídas</option>
+            <option value="atrasada" className="bg-cartao">Atrasadas</option>
+            <option value="todas" className="bg-cartao">Todas</option>
           </select>
         </div>
 
@@ -251,9 +251,9 @@ export function Tarefas({
             className={seletor}
             aria-label="Filtrar tarefas por prioridade"
           >
-            <option value="todas" className="bg-marrom">Todas</option>
+            <option value="todas" className="bg-cartao">Todas</option>
             {PRIORIDADES.map((p) => (
-              <option key={p} value={p} className="bg-marrom">{p}</option>
+              <option key={p} value={p} className="bg-cartao">{p}</option>
             ))}
           </select>
         </div>
@@ -265,7 +265,7 @@ export function Tarefas({
               setStatus("atrasada");
               setPrioridade("todas");
             }}
-            className="rounded-md border border-red-300/40 px-4 py-2 font-sans text-sm text-red-200 transition hover:bg-red-900/25"
+            className="rounded-md border border-argila/35 px-4 py-2 font-sans text-sm text-argila transition hover:bg-argila-suave"
           >
             Ver {atrasadas} {atrasadas === 1 ? "atrasada" : "atrasadas"}
           </button>
@@ -273,17 +273,17 @@ export function Tarefas({
       </div>
 
       {tarefas.length === 0 ? (
-        <div className="mt-6 rounded-xl border border-dashed border-dourado/25 px-6 py-12 text-center">
-          <p className="font-display text-lg text-creme/70">
+        <div className="mt-6 rounded-xl border border-dashed border-linha px-6 py-12 text-center">
+          <p className="font-display text-lg text-neutro">
             Nenhuma tarefa por aqui
           </p>
-          <p className="mt-2 font-sans text-sm text-creme/50">
+          <p className="mt-2 font-sans text-sm text-neutro">
             Registre o que precisa ser feito e tire da cabeça.
           </p>
         </div>
       ) : visiveis.length === 0 ? (
-        <div className="mt-6 rounded-xl border border-dashed border-dourado/25 px-6 py-10 text-center">
-          <p className="font-sans text-sm text-creme/55">
+        <div className="mt-6 rounded-xl border border-dashed border-linha px-6 py-10 text-center">
+          <p className="font-sans text-sm text-neutro">
             Nenhuma tarefa com esses filtros.
           </p>
         </div>
@@ -297,8 +297,8 @@ export function Tarefas({
                 key={t.id}
                 className={`rounded-xl border px-5 py-4 ${
                   t.atrasada
-                    ? "border-red-300/40 bg-red-900/15"
-                    : "border-dourado/20 bg-creme/5"
+                    ? "border-argila/35 bg-argila-suave"
+                    : "border-linha bg-cartao"
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -312,8 +312,8 @@ export function Tarefas({
                       }
                       className={`flex h-5 w-5 items-center justify-center rounded border transition ${
                         feita
-                          ? "border-emerald-300/60 bg-emerald-400/25 text-emerald-100"
-                          : "border-dourado/40 hover:border-dourado"
+                          ? "border-emerald-600/40 bg-emerald-50 text-emerald-700"
+                          : "border-linha hover:border-vital"
                       }`}
                     >
                       {feita ? "✓" : ""}
@@ -323,7 +323,7 @@ export function Tarefas({
                   <div className="min-w-0 flex-1">
                     <p
                       className={`font-sans text-sm ${
-                        feita ? "text-creme/40 line-through" : "text-creme"
+                        feita ? "text-neutro line-through" : "text-tinta"
                       }`}
                     >
                       {t.titulo}
@@ -343,7 +343,7 @@ export function Tarefas({
                       {t.due_date ? (
                         <span
                           className={`font-sans text-xs ${
-                            t.atrasada ? "text-red-200" : "text-creme/45"
+                            t.atrasada ? "text-argila" : "text-neutro"
                           }`}
                         >
                           {t.atrasada ? "venceu " : "até "}
@@ -352,14 +352,14 @@ export function Tarefas({
                       ) : null}
 
                       {t.patients ? (
-                        <span className="font-sans text-xs text-creme/45">
+                        <span className="font-sans text-xs text-neutro">
                           {t.patients.full_name}
                         </span>
                       ) : null}
                     </div>
 
                     {t.descricao ? (
-                      <p className="mt-2 whitespace-pre-wrap font-sans text-xs leading-relaxed text-creme/60">
+                      <p className="mt-2 whitespace-pre-wrap font-sans text-xs leading-relaxed text-neutro">
                         {t.descricao}
                       </p>
                     ) : null}
@@ -371,7 +371,7 @@ export function Tarefas({
                       onClick={() =>
                         setEditando(editando === t.id ? null : t.id)
                       }
-                      className="rounded-md border border-dourado/40 px-3 py-1.5 font-sans text-xs text-dourado transition hover:bg-dourado/10"
+                      className="rounded-md border border-linha px-3 py-1.5 font-sans text-xs text-vital-fundo transition hover:bg-vital/10"
                     >
                       {editando === t.id ? "Fechar" : "Editar"}
                     </button>
@@ -386,7 +386,7 @@ export function Tarefas({
                           );
                           if (!ok) e.preventDefault();
                         }}
-                        className="rounded-md border border-red-300/30 px-3 py-1.5 font-sans text-xs text-red-200 transition hover:bg-red-900/25"
+                        className="rounded-md border border-argila/35 px-3 py-1.5 font-sans text-xs text-argila transition hover:bg-argila-suave"
                       >
                         Excluir
                       </button>
@@ -395,7 +395,7 @@ export function Tarefas({
                 </div>
 
                 {editando === t.id ? (
-                  <div className="mt-4 border-t border-dourado/15 pt-4">
+                  <div className="mt-4 border-t border-linha pt-4">
                     <FormularioTarefa
                       tarefa={t}
                       pacientes={pacientes}

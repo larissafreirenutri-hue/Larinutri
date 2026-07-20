@@ -36,7 +36,7 @@ export function BotaoCopiarLink({ token }: { token: string }) {
       type="button"
       onClick={copiar}
       aria-live="polite"
-      className="rounded-md border border-dourado/40 px-3 py-1.5 font-sans text-xs text-dourado transition hover:bg-dourado/10"
+      className="rounded-md border border-linha px-3 py-1.5 font-sans text-xs text-vital-fundo transition hover:bg-vital/10"
     >
       {copiado ? "Link copiado" : falhou ? "Copie manualmente" : "Copiar link de check-in"}
     </button>

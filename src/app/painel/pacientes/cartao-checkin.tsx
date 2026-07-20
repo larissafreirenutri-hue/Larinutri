@@ -8,10 +8,10 @@ function Medida({ rotulo, valor }: { rotulo: string; valor: string | null }) {
 
   return (
     <div>
-      <dt className="font-sans text-[11px] uppercase tracking-wider text-creme/40">
+      <dt className="font-sans text-[11px] uppercase tracking-wider text-neutro">
         {rotulo}
       </dt>
-      <dd className="mt-0.5 font-sans text-sm text-creme/90">{valor}</dd>
+      <dd className="mt-0.5 font-sans text-sm text-tinta">{valor}</dd>
     </div>
   );
 }
@@ -48,26 +48,26 @@ export function CartaoCheckin({
     <li
       className={`rounded-xl border px-5 py-4 transition ${
         destacado
-          ? "border-dourado/50 bg-dourado/[0.07]"
-          : "border-dourado/20 bg-creme/5 hover:border-dourado/35"
+          ? "border-linha bg-vital/[0.07]"
+          : "border-linha bg-cartao hover:border-linha"
       }`}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         {mostrarPaciente && checkin.patients ? (
           <Link
             href={`/painel/pacientes/${checkin.patients.id}`}
-            className="font-display text-lg text-creme transition hover:text-dourado"
+            className="font-display text-lg text-tinta transition hover:text-vital-fundo"
           >
             {checkin.patients.full_name}
           </Link>
         ) : (
-          <span className="font-display text-lg text-creme">
+          <span className="font-display text-lg text-tinta">
             {formatarDataHora(checkin.created_at)}
           </span>
         )}
 
         {mostrarPaciente ? (
-          <span className="font-sans text-xs text-creme/45">
+          <span className="font-sans text-xs text-neutro">
             {formatarDataHora(checkin.created_at)}
           </span>
         ) : null}
@@ -80,18 +80,18 @@ export function CartaoCheckin({
           ))}
         </dl>
       ) : (
-        <p className="mt-3 font-sans text-sm text-creme/40">
+        <p className="mt-3 font-sans text-sm text-neutro">
           Nenhuma medida preenchida neste check-in.
         </p>
       )}
 
       {checkin.observacoes ? (
         <details className="group mt-4">
-          <summary className="cursor-pointer font-sans text-xs text-dourado transition hover:text-dourado/80">
+          <summary className="cursor-pointer font-sans text-xs text-vital-fundo transition hover:text-vital">
             <span className="group-open:hidden">Ver observações</span>
             <span className="hidden group-open:inline">Ocultar observações</span>
           </summary>
-          <p className="mt-3 whitespace-pre-wrap border-l-2 border-dourado/30 pl-4 font-sans text-sm leading-relaxed text-creme/75">
+          <p className="mt-3 whitespace-pre-wrap border-l-2 border-linha pl-4 font-sans text-sm leading-relaxed text-neutro">
             {checkin.observacoes}
           </p>
         </details>

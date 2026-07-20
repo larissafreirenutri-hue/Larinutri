@@ -35,22 +35,22 @@ export default async function EditarPacientePage({
     <section className="mt-10 max-w-2xl">
       <Link
         href={`/painel/pacientes/${paciente.id}`}
-        className="font-sans text-sm text-dourado transition hover:text-dourado/80"
+        className="font-sans text-sm text-vital-fundo transition hover:text-vital"
       >
         ← Voltar para {paciente.full_name}
       </Link>
 
-      <h2 className="mt-5 font-display text-xl text-dourado">
+      <h2 className="mt-5 font-display text-xl text-vital-fundo">
         Editar paciente
       </h2>
 
-      <div className="mt-5 rounded-lg border border-dourado/25 bg-creme/5 px-6 py-6">
+      <div className="mt-5 rounded-lg border border-linha bg-cartao px-6 py-6">
         <FormularioPaciente
           paciente={paciente}
           onCancelar={
             <Link
               href={`/painel/pacientes/${paciente.id}`}
-              className="font-sans text-sm text-creme/60 transition hover:text-creme"
+              className="font-sans text-sm text-neutro transition hover:text-tinta"
             >
               Cancelar
             </Link>

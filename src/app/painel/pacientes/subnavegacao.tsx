@@ -12,7 +12,7 @@ export function SubNavegacao() {
   const caminho = usePathname();
 
   return (
-    <nav className="mt-6 flex gap-1 border-b border-dourado/15">
+    <nav className="mt-6 flex gap-1 border-b border-linha">
       {ABAS.map((aba) => {
         // A lista de pacientes só fica ativa no caminho exato, senão
         // ficaria acesa também na aba de check-ins.
@@ -28,8 +28,8 @@ export function SubNavegacao() {
             aria-current={ativa ? "page" : undefined}
             className={`-mb-px border-b-2 px-4 py-3 font-sans text-sm transition ${
               ativa
-                ? "border-dourado text-dourado"
-                : "border-transparent text-creme/55 hover:text-creme"
+                ? "border-vital text-vital-fundo"
+                : "border-transparent text-neutro hover:text-tinta"
             }`}
           >
             {aba.rotulo}

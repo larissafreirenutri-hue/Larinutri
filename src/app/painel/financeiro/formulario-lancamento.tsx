@@ -9,9 +9,9 @@ import {
   type EstadoLancamento,
 } from "./actions";
 
-const rotulo = "block font-sans text-sm text-creme/80";
+const rotulo = "block font-sans text-sm text-tinta";
 const controle =
-  "mt-2 w-full rounded-md border border-dourado/30 bg-creme/5 px-4 py-2.5 font-sans text-sm text-creme placeholder:text-creme/35 outline-none focus:border-dourado focus:ring-1 focus:ring-dourado";
+  "mt-2 w-full rounded-md border border-linha bg-cartao px-4 py-2.5 font-sans text-sm text-tinta placeholder:text-neutro outline-none focus:border-vital focus:ring-1 focus:ring-vital";
 
 function Botao({ texto }: { texto: string }) {
   const { pending } = useFormStatus();
@@ -19,7 +19,7 @@ function Botao({ texto }: { texto: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90 disabled:opacity-60"
+      className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10 disabled:opacity-60"
     >
       {pending ? "Salvando..." : texto}
     </button>
@@ -64,7 +64,7 @@ export function FormularioLancamento({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="tipo" className={rotulo}>
-            Tipo <span className="text-dourado">*</span>
+            Tipo <span className="text-vital-fundo">*</span>
           </label>
           <select
             id="tipo"
@@ -73,10 +73,10 @@ export function FormularioLancamento({
             onChange={(e) => setTipo(e.target.value as "receita" | "despesa")}
             className={controle}
           >
-            <option value="receita" className="bg-marrom">
+            <option value="receita" className="bg-cartao">
               Receita
             </option>
-            <option value="despesa" className="bg-marrom">
+            <option value="despesa" className="bg-cartao">
               Despesa
             </option>
           </select>
@@ -84,7 +84,7 @@ export function FormularioLancamento({
 
         <div>
           <label htmlFor="valor" className={rotulo}>
-            Valor <span className="text-dourado">*</span>
+            Valor <span className="text-vital-fundo">*</span>
           </label>
           <input
             id="valor"
@@ -101,7 +101,7 @@ export function FormularioLancamento({
 
         <div className="sm:col-span-2">
           <label htmlFor="descricao" className={rotulo}>
-            Descrição <span className="text-dourado">*</span>
+            Descrição <span className="text-vital-fundo">*</span>
           </label>
           <input
             id="descricao"
@@ -124,10 +124,10 @@ export function FormularioLancamento({
             onChange={(e) => setStatus(e.target.value as "pago" | "pendente")}
             className={controle}
           >
-            <option value="pago" className="bg-marrom">
+            <option value="pago" className="bg-cartao">
               Pago
             </option>
-            <option value="pendente" className="bg-marrom">
+            <option value="pendente" className="bg-cartao">
               Pendente
             </option>
           </select>
@@ -136,7 +136,7 @@ export function FormularioLancamento({
         {status === "pendente" ? (
           <div>
             <label htmlFor="vencimento" className={rotulo}>
-              Vencimento <span className="text-dourado">*</span>
+              Vencimento <span className="text-vital-fundo">*</span>
             </label>
             <input
               id="vencimento"
@@ -182,11 +182,11 @@ export function FormularioLancamento({
               defaultValue={lancamento?.patient_id ?? ""}
               className={controle}
             >
-              <option value="" className="bg-marrom">
+              <option value="" className="bg-cartao">
                 Sem vínculo
               </option>
               {pacientes.map((p) => (
-                <option key={p.id} value={p.id} className="bg-marrom">
+                <option key={p.id} value={p.id} className="bg-cartao">
                   {p.full_name}
                 </option>
               ))}
@@ -198,7 +198,7 @@ export function FormularioLancamento({
       {estado.erro ? (
         <p
           role="alert"
-          className="rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           {estado.erro}
         </p>
@@ -225,15 +225,15 @@ export function NovoLancamento({
           type="button"
           onClick={() => setAberto((a) => !a)}
           aria-expanded={aberto}
-          className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90"
+          className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10"
         >
           {aberto ? "Fechar" : "Adicionar lançamento"}
         </button>
       </div>
 
       {aberto ? (
-        <div className="mt-6 rounded-xl border border-dourado/25 bg-creme/5 px-6 py-6">
-          <h2 className="font-display text-lg text-dourado">Novo lançamento</h2>
+        <div className="mt-6 rounded-xl border border-linha bg-cartao px-6 py-6">
+          <h2 className="font-display text-lg text-vital-fundo">Novo lançamento</h2>
           <div className="mt-5">
             <FormularioLancamento pacientes={pacientes} hoje={hoje} />
           </div>

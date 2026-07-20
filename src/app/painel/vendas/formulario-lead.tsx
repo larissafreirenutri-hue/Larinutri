@@ -5,9 +5,9 @@ import { useFormStatus } from "react-dom";
 import { ETAPAS, type Lead } from "@/lib/vendas";
 import { criarLead, atualizarLead, type EstadoLead } from "./actions";
 
-const rotulo = "block font-sans text-sm text-creme/80";
+const rotulo = "block font-sans text-sm text-tinta";
 const controle =
-  "mt-2 w-full rounded-md border border-dourado/30 bg-creme/5 px-4 py-2.5 font-sans text-sm text-creme placeholder:text-creme/35 outline-none focus:border-dourado focus:ring-1 focus:ring-dourado";
+  "mt-2 w-full rounded-md border border-linha bg-cartao px-4 py-2.5 font-sans text-sm text-tinta placeholder:text-neutro outline-none focus:border-vital focus:ring-1 focus:ring-vital";
 
 function Botao({ texto }: { texto: string }) {
   const { pending } = useFormStatus();
@@ -15,7 +15,7 @@ function Botao({ texto }: { texto: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90 disabled:cursor-not-allowed disabled:opacity-60"
+      className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10 disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? "Salvando..." : texto}
     </button>
@@ -47,7 +47,7 @@ export function FormularioLead({
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label htmlFor="nome" className={rotulo}>
-            Nome do contato <span className="text-dourado">*</span>
+            Nome do contato <span className="text-vital-fundo">*</span>
           </label>
           <input
             id="nome"
@@ -131,7 +131,7 @@ export function FormularioLead({
             className={controle}
           >
             {ETAPAS.map((e) => (
-              <option key={e} value={e} className="bg-marrom">
+              <option key={e} value={e} className="bg-cartao">
                 {e}
               </option>
             ))}
@@ -156,7 +156,7 @@ export function FormularioLead({
       {estado.erro ? (
         <p
           role="alert"
-          className="rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           {estado.erro}
         </p>
@@ -181,15 +181,15 @@ export function NovoLead() {
           type="button"
           onClick={() => setAberto((a) => !a)}
           aria-expanded={aberto}
-          className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90"
+          className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10"
         >
           {aberto ? "Fechar" : "Adicionar lead"}
         </button>
       </div>
 
       {aberto ? (
-        <div className="mt-6 rounded-xl border border-dourado/25 bg-creme/5 px-6 py-6">
-          <h2 className="font-display text-lg text-dourado">Novo lead</h2>
+        <div className="mt-6 rounded-xl border border-linha bg-cartao px-6 py-6">
+          <h2 className="font-display text-lg text-vital-fundo">Novo lead</h2>
           <div className="mt-5">
             <FormularioLead />
           </div>

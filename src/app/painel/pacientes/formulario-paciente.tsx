@@ -17,7 +17,7 @@ function BotaoSalvar({ rotulo }: { rotulo: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90 disabled:cursor-not-allowed disabled:opacity-60"
+      className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10 disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? "Salvando..." : rotulo}
     </button>
@@ -81,10 +81,27 @@ export function FormularioPaciente({
         dica="opcional"
       />
 
+      <div className="border-t border-linha pt-5">
+        <p className="olho">Plano e acompanhamento</p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Campo id="objetivo" rotulo="Objetivo" padrao={paciente?.objetivo} dica="Recomposição corporal" />
+          <Campo id="restricao" rotulo="Restrições" padrao={paciente?.restricao} dica="Sem lactose" />
+          <Campo id="plano_nome" rotulo="Plano" padrao={paciente?.plano_nome} dica="Platinum" />
+          <Campo id="plano_duracao" rotulo="Duração do plano" padrao={paciente?.plano_duracao} dica="6 meses" />
+          <Campo id="plano_vence" rotulo="Vence em" tipo="date" padrao={paciente?.plano_vence} />
+          <Campo id="peso_inicial" rotulo="Peso inicial, em kg" padrao={paciente?.peso_inicial?.toString().replace(".", ",")} dica="88,2" />
+          <Campo id="altura" rotulo="Altura, em metros" padrao={paciente?.altura?.toString().replace(".", ",")} dica="1,67" />
+          <Campo id="sono_habitual" rotulo="Sono habitual" padrao={paciente?.sono_habitual} dica="7 a 8h, dorme ~23h" />
+          <Campo id="treino_planejado" rotulo="Treino planejado" padrao={paciente?.treino_planejado} dica="4x / semana" />
+          <Campo id="meta_agua" rotulo="Meta de água" padrao={paciente?.meta_agua} dica="3 L / dia" />
+        </div>
+      </div>
+
       {estado.erro ? (
         <p
           role="alert"
-          className="rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           {estado.erro}
         </p>

@@ -86,20 +86,20 @@ export default async function VisaoGeralPage() {
 
   return (
     <>
-      <header className="border-b border-dourado/15 pb-6">
-        <h1 className="font-display text-3xl text-creme">
+      <header className="border-b border-linha pb-6">
+        <h1 className="font-display text-3xl text-tinta">
           {saudacao(momento)}, Larissa
         </h1>
-        <p className="mt-2 font-sans text-sm text-creme/55">
+        <p className="mt-2 font-sans text-sm text-neutro">
           {formatarDataExtenso(momento)}
         </p>
-        <p className="mt-1 font-sans text-xs text-creme/35">{user?.email}</p>
+        <p className="mt-1 font-sans text-xs text-neutro">{user?.email}</p>
       </header>
 
       {erro ? (
         <p
           role="alert"
-          className="mt-8 rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="mt-8 rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           Não foi possível carregar os dados. {erro.message}
         </p>
@@ -108,13 +108,13 @@ export default async function VisaoGeralPage() {
       <section className="mt-8 flex flex-wrap gap-3">
         <Link
           href="/painel/pacientes"
-          className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90"
+          className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10"
         >
           Ver pacientes
         </Link>
         <Link
           href="/painel/pacientes/checkins"
-          className="rounded-md border border-dourado/40 px-5 py-2.5 font-sans text-sm text-dourado transition hover:bg-dourado/10"
+          className="rounded-md border border-linha px-5 py-2.5 font-sans text-sm text-vital-fundo transition hover:bg-vital/10"
         >
           Revisar check-ins
         </Link>
@@ -152,23 +152,23 @@ export default async function VisaoGeralPage() {
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         <section>
           <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-xl text-dourado">
+            <h2 className="font-display text-xl text-vital-fundo">
               Precisam de atenção
             </h2>
             {atencao.length > 0 ? (
-              <span className="font-sans text-xs text-creme/45">
+              <span className="font-sans text-xs text-neutro">
                 {atencao.length}
               </span>
             ) : null}
           </div>
-          <p className="mt-1 font-sans text-xs text-creme/40">
+          <p className="mt-1 font-sans text-xs text-neutro">
             Sem check-in há mais de {DIAS_ATENCAO} dias
           </p>
 
           {atencao.length === 0 ? (
-            <div className="mt-5 rounded-xl border border-dashed border-dourado/25 px-6 py-10 text-center">
-              <p className="font-display text-lg text-creme/70">Todos em dia</p>
-              <p className="mt-2 font-sans text-sm text-creme/45">
+            <div className="mt-5 rounded-xl border border-dashed border-linha px-6 py-10 text-center">
+              <p className="font-display text-lg text-neutro">Todos em dia</p>
+              <p className="mt-2 font-sans text-sm text-neutro">
                 Ninguém está atrasado no check-in.
               </p>
             </div>
@@ -178,12 +178,12 @@ export default async function VisaoGeralPage() {
                 <li key={paciente.id}>
                   <Link
                     href={`/painel/pacientes/${paciente.id}`}
-                    className="flex items-center justify-between gap-4 rounded-lg border border-dourado/20 bg-creme/5 px-4 py-3 transition hover:border-dourado/40"
+                    className="flex items-center justify-between gap-4 rounded-lg border border-linha bg-cartao px-4 py-3 transition hover:border-linha"
                   >
-                    <span className="min-w-0 truncate font-sans text-sm text-creme/90">
+                    <span className="min-w-0 truncate font-sans text-sm text-tinta">
                       {paciente.full_name}
                     </span>
-                    <span className="shrink-0 font-sans text-xs text-amber-200/80">
+                    <span className="shrink-0 font-sans text-xs text-mel-tinta">
                       {paciente.diasSemCheckin === null
                         ? "nunca respondeu"
                         : `há ${paciente.diasSemCheckin} dias`}
@@ -196,19 +196,19 @@ export default async function VisaoGeralPage() {
         </section>
 
         <section>
-          <h2 className="font-display text-xl text-dourado">
+          <h2 className="font-display text-xl text-vital-fundo">
             Check-ins recentes
           </h2>
-          <p className="mt-1 font-sans text-xs text-creme/40">
+          <p className="mt-1 font-sans text-xs text-neutro">
             As últimas respostas que chegaram
           </p>
 
           {recentes.length === 0 ? (
-            <div className="mt-5 rounded-xl border border-dashed border-dourado/25 px-6 py-10 text-center">
-              <p className="font-display text-lg text-creme/70">
+            <div className="mt-5 rounded-xl border border-dashed border-linha px-6 py-10 text-center">
+              <p className="font-display text-lg text-neutro">
                 Nenhum check-in ainda
               </p>
-              <p className="mt-2 font-sans text-sm text-creme/45">
+              <p className="mt-2 font-sans text-sm text-neutro">
                 Envie o link de check-in para os seus pacientes.
               </p>
             </div>
@@ -218,17 +218,17 @@ export default async function VisaoGeralPage() {
                 <li key={checkin.id}>
                   <Link
                     href={`/painel/pacientes/${checkin.patient_id}`}
-                    className="flex items-center justify-between gap-4 rounded-lg border border-dourado/20 bg-creme/5 px-4 py-3 transition hover:border-dourado/40"
+                    className="flex items-center justify-between gap-4 rounded-lg border border-linha bg-cartao px-4 py-3 transition hover:border-linha"
                   >
                     <span className="min-w-0">
-                      <span className="block truncate font-sans text-sm text-creme/90">
+                      <span className="block truncate font-sans text-sm text-tinta">
                         {checkin.patients?.full_name ?? "Paciente removido"}
                       </span>
-                      <span className="block font-sans text-xs text-creme/40">
+                      <span className="block font-sans text-xs text-neutro">
                         {formatarData(checkin.created_at)}
                       </span>
                     </span>
-                    <span className="shrink-0 font-sans text-sm tabular-nums text-creme/70">
+                    <span className="shrink-0 font-sans text-sm tabular-nums text-neutro">
                       {formatarPeso(checkin.peso_kg) ?? "sem peso"}
                     </span>
                   </Link>
@@ -239,7 +239,7 @@ export default async function VisaoGeralPage() {
         </section>
       </div>
 
-      <p className="mt-10 font-sans text-xs text-creme/30">
+      <p className="mt-10 font-sans text-xs text-neutro">
         Os indicadores de vendas e financeiro entram aqui quando essas áreas
         forem construídas.
       </p>

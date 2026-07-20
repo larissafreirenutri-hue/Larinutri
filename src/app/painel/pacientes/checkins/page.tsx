@@ -58,11 +58,11 @@ export default async function CheckinsPage({
 
       <section className="mt-10">
         <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-xl text-dourado">
+          <h2 className="font-display text-xl text-vital-fundo">
             Check-ins recebidos
           </h2>
           {checkins.length > 0 ? (
-            <span className="font-sans text-xs text-creme/50">
+            <span className="font-sans text-xs text-neutro">
               {checkins.length}{" "}
               {checkins.length === 1 ? "resposta" : "respostas"}
             </span>
@@ -75,18 +75,18 @@ export default async function CheckinsPage({
       {error ? (
         <p
           role="alert"
-          className="mt-8 rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="mt-8 rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           Não foi possível carregar os check-ins. {error.message}
         </p>
       ) : checkins.length === 0 ? (
-        <div className="mt-8 rounded-lg border border-dashed border-dourado/25 px-6 py-12 text-center">
-          <p className="font-display text-lg text-creme/70">
+        <div className="mt-8 rounded-lg border border-dashed border-linha px-6 py-12 text-center">
+          <p className="font-display text-lg text-neutro">
             {periodo === "tudo"
               ? "Nenhum check-in recebido ainda"
               : "Nenhum check-in neste período"}
           </p>
-          <p className="mt-2 font-sans text-sm text-creme/50">
+          <p className="mt-2 font-sans text-sm text-neutro">
             {periodo === "tudo"
               ? "Copie o link de check-in de um paciente e envie para ele."
               : "Experimente ampliar o período acima."}

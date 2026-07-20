@@ -24,7 +24,7 @@ export function Filtros({
       <div className="min-w-56">
         <label
           htmlFor="paciente"
-          className="block font-sans text-sm text-creme/80"
+          className="block font-sans text-sm text-tinta"
         >
           Paciente
         </label>
@@ -36,11 +36,11 @@ export function Filtros({
           onChange={(e) => {
             if (e.target.value) router.push(`/painel/pacientes/${e.target.value}`);
           }}
-          className="mt-2 w-full rounded-md border border-dourado/30 bg-creme/5 px-4 py-2.5 font-sans text-sm text-creme outline-none focus:border-dourado focus:ring-1 focus:ring-dourado"
+          className="mt-2 w-full rounded-md border border-linha bg-cartao px-4 py-2.5 font-sans text-sm text-tinta outline-none focus:border-vital focus:ring-1 focus:ring-vital"
         >
           <option value="">Todos os pacientes</option>
           {pacientes.map((p) => (
-            <option key={p.id} value={p.id} className="bg-marrom">
+            <option key={p.id} value={p.id} className="bg-cartao">
               {p.full_name}
             </option>
           ))}
@@ -48,7 +48,7 @@ export function Filtros({
       </div>
 
       <div>
-        <span className="block font-sans text-sm text-creme/80">Período</span>
+        <span className="block font-sans text-sm text-tinta">Período</span>
         <div className="mt-2 flex gap-1">
           {PERIODOS.map((p) => (
             <Link
@@ -57,8 +57,8 @@ export function Filtros({
               aria-current={periodo === p.chave ? "true" : undefined}
               className={`rounded-md border px-3 py-2 font-sans text-xs transition ${
                 periodo === p.chave
-                  ? "border-dourado bg-dourado/15 text-dourado"
-                  : "border-dourado/25 text-creme/60 hover:text-creme"
+                  ? "border-vital bg-vital/10 text-vital-fundo"
+                  : "border-linha text-neutro hover:text-tinta"
               }`}
             >
               {p.rotulo}

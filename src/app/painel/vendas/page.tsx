@@ -41,7 +41,7 @@ export default async function VendasPage() {
       {error ? (
         <p
           role="alert"
-          className="mt-8 rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="mt-8 rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           Não foi possível carregar os leads. {error.message}
         </p>
@@ -89,11 +89,11 @@ export default async function VendasPage() {
       <NovoLead />
 
       {leads.length === 0 ? (
-        <div className="mt-8 rounded-xl border border-dashed border-dourado/25 px-6 py-14 text-center">
-          <p className="font-display text-xl text-creme/70">
+        <div className="mt-8 rounded-xl border border-dashed border-linha px-6 py-14 text-center">
+          <p className="font-display text-xl text-neutro">
             Nenhum lead cadastrado ainda
           </p>
-          <p className="mx-auto mt-3 max-w-sm font-sans text-sm leading-relaxed text-creme/50">
+          <p className="mx-auto mt-3 max-w-sm font-sans text-sm leading-relaxed text-neutro">
             Use o botão Adicionar lead para registrar o primeiro contato. Depois
             é só arrastar o cartão entre as etapas conforme a conversa avança.
           </p>
@@ -103,10 +103,10 @@ export default async function VendasPage() {
           <Quadro leads={leads} />
 
           <section className="mt-12">
-            <h2 className="font-display text-xl text-dourado">
+            <h2 className="font-display text-xl text-vital-fundo">
               Desempenho por etapa
             </h2>
-            <p className="mt-1 font-sans text-xs text-creme/40">
+            <p className="mt-1 font-sans text-xs text-neutro">
               Quantidade e valor acumulado em cada etapa do funil
             </p>
 
@@ -121,12 +121,12 @@ export default async function VendasPage() {
                     <div className="flex items-baseline justify-between gap-4">
                       <span
                         className={`font-sans text-sm ${
-                          final ? "text-creme/55" : "text-creme/85"
+                          final ? "text-neutro" : "text-tinta"
                         }`}
                       >
                         {linha.etapa}
                       </span>
-                      <span className="shrink-0 font-sans text-xs tabular-nums text-creme/45">
+                      <span className="shrink-0 font-sans text-xs tabular-nums text-neutro">
                         {linha.quantidade}{" "}
                         {linha.quantidade === 1 ? "lead" : "leads"}
                         {linha.valor > 0
@@ -134,10 +134,10 @@ export default async function VendasPage() {
                           : ""}
                       </span>
                     </div>
-                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-creme/10">
+                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-areia">
                       <div
                         className={`h-full rounded-full ${
-                          ganho ? "bg-emerald-300/70" : "bg-dourado/70"
+                          ganho ? "bg-emerald-600" : "bg-vital/10"
                         }`}
                         style={{ width: `${largura}%` }}
                       />

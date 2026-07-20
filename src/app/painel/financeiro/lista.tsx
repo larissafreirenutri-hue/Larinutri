@@ -13,7 +13,7 @@ type FiltroPeriodo = "mes" | "90" | "tudo";
 const DIA = 24 * 60 * 60 * 1000;
 
 const seletor =
-  "mt-2 rounded-md border border-dourado/30 bg-creme/5 px-3 py-2 font-sans text-sm text-creme outline-none focus:border-dourado";
+  "mt-2 rounded-md border border-linha bg-cartao px-3 py-2 font-sans text-sm text-tinta outline-none focus:border-vital";
 
 export function Lista({
   lancamentos,
@@ -66,45 +66,45 @@ export function Lista({
     <>
       <div className="mt-6 flex flex-wrap items-end gap-4">
         <div>
-          <span className="block font-sans text-sm text-creme/80">Tipo</span>
+          <span className="block font-sans text-sm text-tinta">Tipo</span>
           <select
             value={tipo}
             onChange={(e) => setTipo(e.target.value as FiltroTipo)}
             className={seletor}
             aria-label="Filtrar por tipo"
           >
-            <option value="todos" className="bg-marrom">Todos</option>
-            <option value="receita" className="bg-marrom">Receitas</option>
-            <option value="despesa" className="bg-marrom">Despesas</option>
+            <option value="todos" className="bg-cartao">Todos</option>
+            <option value="receita" className="bg-cartao">Receitas</option>
+            <option value="despesa" className="bg-cartao">Despesas</option>
           </select>
         </div>
 
         <div>
-          <span className="block font-sans text-sm text-creme/80">Situação</span>
+          <span className="block font-sans text-sm text-tinta">Situação</span>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as FiltroStatus)}
             className={seletor}
             aria-label="Filtrar por situação"
           >
-            <option value="todos" className="bg-marrom">Todas</option>
-            <option value="pago" className="bg-marrom">Pagos</option>
-            <option value="pendente" className="bg-marrom">Pendentes</option>
-            <option value="atrasado" className="bg-marrom">Atrasados</option>
+            <option value="todos" className="bg-cartao">Todas</option>
+            <option value="pago" className="bg-cartao">Pagos</option>
+            <option value="pendente" className="bg-cartao">Pendentes</option>
+            <option value="atrasado" className="bg-cartao">Atrasados</option>
           </select>
         </div>
 
         <div>
-          <span className="block font-sans text-sm text-creme/80">Período</span>
+          <span className="block font-sans text-sm text-tinta">Período</span>
           <select
             value={periodo}
             onChange={(e) => setPeriodo(e.target.value as FiltroPeriodo)}
             className={seletor}
             aria-label="Filtrar por período"
           >
-            <option value="mes" className="bg-marrom">Mês atual</option>
-            <option value="90" className="bg-marrom">90 dias</option>
-            <option value="tudo" className="bg-marrom">Tudo</option>
+            <option value="mes" className="bg-cartao">Mês atual</option>
+            <option value="90" className="bg-cartao">90 dias</option>
+            <option value="tudo" className="bg-cartao">Tudo</option>
           </select>
         </div>
 
@@ -116,21 +116,21 @@ export function Lista({
               setTipo("todos");
               setPeriodo("tudo");
             }}
-            className="rounded-md border border-red-300/40 px-4 py-2 font-sans text-sm text-red-200 transition hover:bg-red-900/25"
+            className="rounded-md border border-argila/35 px-4 py-2 font-sans text-sm text-argila transition hover:bg-argila-suave"
           >
             Ver {atrasadosQtd} {atrasadosQtd === 1 ? "atrasado" : "atrasados"}
           </button>
         ) : null}
       </div>
 
-      <p className="mt-4 font-sans text-xs text-creme/45" aria-live="polite">
+      <p className="mt-4 font-sans text-xs text-neutro" aria-live="polite">
         {visiveis.length} {visiveis.length === 1 ? "lançamento" : "lançamentos"}
         {visiveis.length > 0 ? `  ·  saldo ${formatarMoeda(soma)}` : ""}
       </p>
 
       {visiveis.length === 0 ? (
-        <div className="mt-5 rounded-xl border border-dashed border-dourado/25 px-6 py-10 text-center">
-          <p className="font-sans text-sm text-creme/55">
+        <div className="mt-5 rounded-xl border border-dashed border-linha px-6 py-10 text-center">
+          <p className="font-sans text-sm text-neutro">
             Nenhum lançamento com esses filtros.
           </p>
         </div>
@@ -141,14 +141,14 @@ export function Lista({
               key={l.id}
               className={`rounded-xl border px-5 py-4 ${
                 l.atrasado
-                  ? "border-red-300/40 bg-red-900/15"
-                  : "border-dourado/20 bg-creme/5"
+                  ? "border-argila/35 bg-argila-suave"
+                  : "border-linha bg-cartao"
               }`}
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-sans text-sm text-creme">{l.descricao}</p>
-                  <p className="mt-1 flex flex-wrap items-center gap-x-3 font-sans text-xs text-creme/45">
+                  <p className="font-sans text-sm text-tinta">{l.descricao}</p>
+                  <p className="mt-1 flex flex-wrap items-center gap-x-3 font-sans text-xs text-neutro">
                     <span>
                       {l.status === "pendente" && l.vencimento
                         ? `vence ${formatarData(l.vencimento)}`
@@ -163,8 +163,8 @@ export function Lista({
                   <span
                     className={`font-sans text-sm font-medium tabular-nums ${
                       l.tipo === "receita"
-                        ? "text-emerald-200"
-                        : "text-amber-200"
+                        ? "text-emerald-700"
+                        : "text-mel-tinta"
                     }`}
                   >
                     {l.tipo === "receita" ? "+" : "−"} {formatarMoeda(l.valor)}
@@ -173,10 +173,10 @@ export function Lista({
                   <span
                     className={`rounded px-2 py-0.5 font-sans text-[10px] uppercase tracking-wider ${
                       l.atrasado
-                        ? "bg-red-400/20 text-red-200"
+                        ? "bg-argila-suave text-argila"
                         : l.status === "pendente"
-                          ? "bg-dourado/20 text-dourado"
-                          : "bg-creme/10 text-creme/50"
+                          ? "bg-vital/10 text-vital-fundo"
+                          : "bg-areia text-neutro"
                     }`}
                   >
                     {l.atrasado ? "atrasado" : l.status}
@@ -184,13 +184,13 @@ export function Lista({
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-dourado/10 pt-3">
+              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-linha pt-3">
                 {l.status === "pendente" ? (
                   <form action={marcarComoPago}>
                     <input type="hidden" name="id" value={l.id} />
                     <button
                       type="submit"
-                      className="rounded-md border border-emerald-300/40 px-3 py-1.5 font-sans text-xs text-emerald-200 transition hover:bg-emerald-400/10"
+                      className="rounded-md border border-emerald-600/40 px-3 py-1.5 font-sans text-xs text-emerald-700 transition hover:bg-emerald-50"
                     >
                       Marcar como pago
                     </button>
@@ -200,7 +200,7 @@ export function Lista({
                 <button
                   type="button"
                   onClick={() => setEditando(editando === l.id ? null : l.id)}
-                  className="rounded-md border border-dourado/40 px-3 py-1.5 font-sans text-xs text-dourado transition hover:bg-dourado/10"
+                  className="rounded-md border border-linha px-3 py-1.5 font-sans text-xs text-vital-fundo transition hover:bg-vital/10"
                 >
                   {editando === l.id ? "Fechar" : "Editar"}
                 </button>
@@ -215,7 +215,7 @@ export function Lista({
                       );
                       if (!ok) e.preventDefault();
                     }}
-                    className="rounded-md border border-red-300/30 px-3 py-1.5 font-sans text-xs text-red-200 transition hover:bg-red-900/25"
+                    className="rounded-md border border-argila/35 px-3 py-1.5 font-sans text-xs text-argila transition hover:bg-argila-suave"
                   >
                     Excluir
                   </button>
@@ -223,7 +223,7 @@ export function Lista({
               </div>
 
               {editando === l.id ? (
-                <div className="mt-4 border-t border-dourado/15 pt-4">
+                <div className="mt-4 border-t border-linha pt-4">
                   <FormularioLancamento
                     lancamento={l}
                     pacientes={pacientes}

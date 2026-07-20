@@ -34,32 +34,32 @@ function CartaoLead({
         onArrastar(lead.id);
       }}
       onDragEnd={() => onArrastar(null)}
-      className={`rounded-lg border bg-creme/5 px-3.5 py-3 transition ${
+      className={`rounded-lg border bg-cartao px-3.5 py-3 transition ${
         arrastando
-          ? "border-dourado opacity-50"
-          : "border-dourado/20 hover:border-dourado/45"
+          ? "border-vital opacity-50"
+          : "border-linha hover:border-linha"
       } ${ocupado ? "opacity-60" : ""}`}
     >
       <Link
         href={`/painel/vendas/${lead.id}`}
-        className="block font-sans text-sm text-creme transition hover:text-dourado"
+        className="block font-sans text-sm text-tinta transition hover:text-vital-fundo"
       >
         {lead.nome}
       </Link>
 
       <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
         {lead.valor !== null ? (
-          <span className="font-sans text-xs tabular-nums text-dourado">
+          <span className="font-sans text-xs tabular-nums text-vital-fundo">
             {formatarMoeda(lead.valor)}
           </span>
         ) : null}
         {lead.origem ? (
-          <span className="font-sans text-xs text-creme/40">{lead.origem}</span>
+          <span className="font-sans text-xs text-neutro">{lead.origem}</span>
         ) : null}
       </div>
 
       {lead.patient_id ? (
-        <span className="mt-2 inline-block rounded bg-emerald-400/15 px-2 py-0.5 font-sans text-[10px] uppercase tracking-wider text-emerald-200">
+        <span className="mt-2 inline-block rounded bg-emerald-50 px-2 py-0.5 font-sans text-[10px] uppercase tracking-wider text-emerald-700">
           já é paciente
         </span>
       ) : null}
@@ -72,10 +72,10 @@ function CartaoLead({
           value={lead.etapa}
           disabled={ocupado}
           onChange={(e) => onMover(lead.id, e.target.value)}
-          className="w-full rounded border border-dourado/25 bg-marrom px-2 py-1.5 font-sans text-xs text-creme/70 outline-none focus:border-dourado"
+          className="w-full rounded border border-linha bg-cartao px-2 py-1.5 font-sans text-xs text-neutro outline-none focus:border-vital"
         >
           {ETAPAS.map((etapa) => (
-            <option key={etapa} value={etapa} className="bg-marrom">
+            <option key={etapa} value={etapa} className="bg-cartao">
               {etapa}
             </option>
           ))}
@@ -104,7 +104,7 @@ export function Quadro({ leads }: { leads: Lead[] }) {
       {erro ? (
         <p
           role="alert"
-          className="mt-6 rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="mt-6 rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           {erro}
         </p>
@@ -134,31 +134,31 @@ export function Quadro({ leads }: { leads: Lead[] }) {
               }}
               className={`rounded-xl border p-3 transition ${
                 alvo === etapa
-                  ? "border-dourado bg-dourado/10"
+                  ? "border-vital bg-vital/10"
                   : final
-                    ? "border-dourado/15 bg-creme/[0.02]"
-                    : "border-dourado/20 bg-creme/5"
+                    ? "border-linha bg-areia-clara/40"
+                    : "border-linha bg-cartao"
               }`}
             >
               <header className="flex items-baseline justify-between px-1 pb-3">
                 <h3
                   className={`font-sans text-xs font-semibold uppercase tracking-wider ${
                     ganho
-                      ? "text-emerald-200"
+                      ? "text-emerald-700"
                       : final
-                        ? "text-creme/35"
-                        : "text-dourado"
+                        ? "text-neutro"
+                        : "text-vital-fundo"
                   }`}
                 >
                   {etapa}
                 </h3>
-                <span className="font-sans text-xs tabular-nums text-creme/40">
+                <span className="font-sans text-xs tabular-nums text-neutro">
                   {doGrupo.length}
                 </span>
               </header>
 
               {doGrupo.length === 0 ? (
-                <p className="px-1 pb-2 font-sans text-xs text-creme/25">
+                <p className="px-1 pb-2 font-sans text-xs text-neutro">
                   Vazio
                 </p>
               ) : (

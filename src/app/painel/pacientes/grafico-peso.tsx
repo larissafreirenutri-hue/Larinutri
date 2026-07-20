@@ -43,50 +43,50 @@ export function GraficoPeso({ pontos }: { pontos: PontoPeso[] }) {
   },${M.topo + altura}`;
 
   const corDelta =
-    delta > 0 ? "text-amber-200" : delta < 0 ? "text-emerald-200" : "text-creme/70";
+    delta > 0 ? "text-mel-tinta" : delta < 0 ? "text-emerald-700" : "text-neutro";
 
   return (
-    <div className="rounded-lg border border-dourado/25 bg-creme/5 px-6 py-6">
+    <div className="rounded-lg border border-linha bg-cartao px-6 py-6">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h3 className="font-display text-lg text-dourado">Evolução do peso</h3>
-        <span className="font-sans text-xs text-creme/45">
+        <h3 className="font-display text-lg text-vital-fundo">Evolução do peso</h3>
+        <span className="font-sans text-xs text-neutro">
           {pontos.length} {pontos.length === 1 ? "registro" : "registros"}
         </span>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-8">
         <div>
-          <p className="font-sans text-[11px] uppercase tracking-wider text-creme/40">
+          <p className="font-sans text-[11px] uppercase tracking-wider text-neutro">
             Primeiro
           </p>
-          <p className="mt-1 font-sans text-sm text-creme/90">
+          <p className="mt-1 font-sans text-sm text-tinta">
             {formatarPeso(primeiro.peso)}
           </p>
-          <p className="font-sans text-xs text-creme/40">
+          <p className="font-sans text-xs text-neutro">
             {formatarData(primeiro.data)}
           </p>
         </div>
 
         <div>
-          <p className="font-sans text-[11px] uppercase tracking-wider text-creme/40">
+          <p className="font-sans text-[11px] uppercase tracking-wider text-neutro">
             Atual
           </p>
-          <p className="mt-1 font-sans text-sm text-creme/90">
+          <p className="mt-1 font-sans text-sm text-tinta">
             {formatarPeso(ultimo.peso)}
           </p>
-          <p className="font-sans text-xs text-creme/40">
+          <p className="font-sans text-xs text-neutro">
             {formatarData(ultimo.data)}
           </p>
         </div>
 
         <div>
-          <p className="font-sans text-[11px] uppercase tracking-wider text-creme/40">
+          <p className="font-sans text-[11px] uppercase tracking-wider text-neutro">
             Variação
           </p>
           <p className={`mt-1 font-sans text-sm font-medium ${corDelta}`}>
             {pontos.length === 1 ? "Sem comparação" : formatarVariacao(delta)}
           </p>
-          <p className="font-sans text-xs text-creme/40">
+          <p className="font-sans text-xs text-neutro">
             {pontos.length === 1 ? "só um registro" : "do primeiro ao atual"}
           </p>
         </div>

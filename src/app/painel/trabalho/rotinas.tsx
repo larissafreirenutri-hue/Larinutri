@@ -13,9 +13,9 @@ import {
   type EstadoTrabalho,
 } from "./actions";
 
-const rotulo = "block font-sans text-sm text-creme/80";
+const rotulo = "block font-sans text-sm text-tinta";
 const controle =
-  "mt-2 w-full rounded-md border border-dourado/30 bg-creme/5 px-4 py-2.5 font-sans text-sm text-creme placeholder:text-creme/35 outline-none focus:border-dourado focus:ring-1 focus:ring-dourado";
+  "mt-2 w-full rounded-md border border-linha bg-cartao px-4 py-2.5 font-sans text-sm text-tinta placeholder:text-neutro outline-none focus:border-vital focus:ring-1 focus:ring-vital";
 
 function BotaoSalvar({ texto }: { texto: string }) {
   const { pending } = useFormStatus();
@@ -23,7 +23,7 @@ function BotaoSalvar({ texto }: { texto: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-dourado px-5 py-2.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90 disabled:opacity-60"
+      className="rounded-md bg-vital px-5 py-2.5 font-sans text-sm font-semibold text-white transition hover:bg-vital/10 disabled:opacity-60"
     >
       {pending ? "Salvando..." : texto}
     </button>
@@ -51,7 +51,7 @@ function FormularioRotina({
 
       <div>
         <label htmlFor={`rt-${rotina?.id ?? "novo"}`} className={rotulo}>
-          Título <span className="text-dourado">*</span>
+          Título <span className="text-vital-fundo">*</span>
         </label>
         <input
           id={`rt-${rotina?.id ?? "novo"}`}
@@ -66,7 +66,7 @@ function FormularioRotina({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor={`rf-${rotina?.id ?? "novo"}`} className={rotulo}>
-            Frequência <span className="text-dourado">*</span>
+            Frequência <span className="text-vital-fundo">*</span>
           </label>
           <select
             id={`rf-${rotina?.id ?? "novo"}`}
@@ -75,7 +75,7 @@ function FormularioRotina({
             className={controle}
           >
             {FREQUENCIAS.map((f) => (
-              <option key={f} value={f} className="bg-marrom">
+              <option key={f} value={f} className="bg-cartao">
                 {f}
               </option>
             ))}
@@ -99,7 +99,7 @@ function FormularioRotina({
       {estado.erro ? (
         <p
           role="alert"
-          className="rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
+          className="rounded-md border border-argila/35 bg-argila-suave px-4 py-3 font-sans text-sm text-argila"
         >
           {estado.erro}
         </p>
@@ -111,7 +111,7 @@ function FormularioRotina({
           <button
             type="button"
             onClick={onPronto}
-            className="font-sans text-sm text-creme/60 transition hover:text-creme"
+            className="font-sans text-sm text-neutro transition hover:text-tinta"
           >
             Cancelar
           </button>
@@ -138,22 +138,22 @@ export function Rotinas({
   return (
     <section className="mt-14">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-display text-xl text-dourado">Rotinas</h2>
+        <h2 className="font-display text-xl text-vital-fundo">Rotinas</h2>
         <button
           type="button"
           onClick={() => setNovaAberta((a) => !a)}
           aria-expanded={novaAberta}
-          className="rounded-md border border-dourado/40 px-5 py-2.5 font-sans text-sm text-dourado transition hover:bg-dourado/10"
+          className="rounded-md border border-linha px-5 py-2.5 font-sans text-sm text-vital-fundo transition hover:bg-vital/10"
         >
           {novaAberta ? "Fechar" : "Adicionar rotina"}
         </button>
       </div>
-      <p className="mt-1 font-sans text-xs text-creme/40">
+      <p className="mt-1 font-sans text-xs text-neutro">
         O que se repete, para não depender da memória
       </p>
 
       {novaAberta ? (
-        <div className="mt-5 rounded-xl border border-dourado/25 bg-creme/5 px-6 py-6">
+        <div className="mt-5 rounded-xl border border-linha bg-cartao px-6 py-6">
           <FormularioRotina hoje={hoje} onPronto={() => setNovaAberta(false)} />
         </div>
       ) : null}
@@ -162,7 +162,7 @@ export function Rotinas({
         <button
           type="button"
           onClick={() => setMostrarInativas((m) => !m)}
-          className="mt-5 font-sans text-xs text-dourado transition hover:text-dourado/80"
+          className="mt-5 font-sans text-xs text-vital-fundo transition hover:text-vital"
         >
           {mostrarInativas
             ? "Ocultar as pausadas"
@@ -171,11 +171,11 @@ export function Rotinas({
       ) : null}
 
       {visiveis.length === 0 ? (
-        <div className="mt-5 rounded-xl border border-dashed border-dourado/25 px-6 py-12 text-center">
-          <p className="font-display text-lg text-creme/70">
+        <div className="mt-5 rounded-xl border border-dashed border-linha px-6 py-12 text-center">
+          <p className="font-display text-lg text-neutro">
             Nenhuma rotina ativa
           </p>
-          <p className="mt-2 font-sans text-sm text-creme/50">
+          <p className="mt-2 font-sans text-sm text-neutro">
             Cadastre o que você repete toda semana, como revisar os check-ins.
           </p>
         </div>
@@ -186,19 +186,19 @@ export function Rotinas({
               key={r.id}
               className={`rounded-xl border px-5 py-4 ${
                 r.vencida
-                  ? "border-dourado/50 bg-dourado/[0.08]"
-                  : "border-dourado/20 bg-creme/5"
+                  ? "border-linha bg-vital/[0.08]"
+                  : "border-linha bg-cartao"
               } ${r.ativa ? "" : "opacity-55"}`}
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-sans text-sm text-creme">{r.titulo}</p>
+                  <p className="font-sans text-sm text-tinta">{r.titulo}</p>
                   <p className="mt-1 flex flex-wrap items-center gap-x-3 font-sans text-xs">
-                    <span className="text-creme/45">{r.frequencia}</span>
+                    <span className="text-neutro">{r.frequencia}</span>
                     {r.next_due ? (
                       <span
                         className={
-                          r.vencida ? "text-dourado" : "text-creme/45"
+                          r.vencida ? "text-vital-fundo" : "text-neutro"
                         }
                       >
                         {r.vencida ? "vence hoje ou antes, " : "próxima em "}
@@ -206,7 +206,7 @@ export function Rotinas({
                       </span>
                     ) : null}
                     {!r.ativa ? (
-                      <span className="text-creme/40">pausada</span>
+                      <span className="text-neutro">pausada</span>
                     ) : null}
                   </p>
                 </div>
@@ -227,7 +227,7 @@ export function Rotinas({
                       />
                       <button
                         type="submit"
-                        className="rounded-md border border-emerald-300/40 px-3 py-1.5 font-sans text-xs text-emerald-200 transition hover:bg-emerald-400/10"
+                        className="rounded-md border border-emerald-600/40 px-3 py-1.5 font-sans text-xs text-emerald-700 transition hover:bg-emerald-50"
                       >
                         Marcar como feita
                       </button>
@@ -243,7 +243,7 @@ export function Rotinas({
                     />
                     <button
                       type="submit"
-                      className="rounded-md border border-dourado/40 px-3 py-1.5 font-sans text-xs text-dourado transition hover:bg-dourado/10"
+                      className="rounded-md border border-linha px-3 py-1.5 font-sans text-xs text-vital-fundo transition hover:bg-vital/10"
                     >
                       {r.ativa ? "Pausar" : "Retomar"}
                     </button>
@@ -252,7 +252,7 @@ export function Rotinas({
                   <button
                     type="button"
                     onClick={() => setEditando(editando === r.id ? null : r.id)}
-                    className="rounded-md border border-dourado/40 px-3 py-1.5 font-sans text-xs text-dourado transition hover:bg-dourado/10"
+                    className="rounded-md border border-linha px-3 py-1.5 font-sans text-xs text-vital-fundo transition hover:bg-vital/10"
                   >
                     {editando === r.id ? "Fechar" : "Editar"}
                   </button>
@@ -267,7 +267,7 @@ export function Rotinas({
                         );
                         if (!ok) e.preventDefault();
                       }}
-                      className="rounded-md border border-red-300/30 px-3 py-1.5 font-sans text-xs text-red-200 transition hover:bg-red-900/25"
+                      className="rounded-md border border-argila/35 px-3 py-1.5 font-sans text-xs text-argila transition hover:bg-argila-suave"
                     >
                       Excluir
                     </button>
@@ -276,7 +276,7 @@ export function Rotinas({
               </div>
 
               {editando === r.id ? (
-                <div className="mt-4 border-t border-dourado/15 pt-4">
+                <div className="mt-4 border-t border-linha pt-4">
                   <FormularioRotina
                     rotina={r}
                     hoje={hoje}

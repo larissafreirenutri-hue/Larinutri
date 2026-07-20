@@ -6,9 +6,9 @@ import { formatarVariacao } from "@/lib/formato";
  * bom para todo paciente, tem quem esteja em ganho de massa.
  */
 const CORES: Record<Tendencia, string> = {
-  desceu: "text-emerald-200",
-  subiu: "text-amber-200",
-  estavel: "text-creme/70",
+  desceu: "text-emerald-700",
+  subiu: "text-mel-tinta",
+  estavel: "text-neutro",
 };
 
 const SETAS: Record<Tendencia, string> = {
@@ -27,7 +27,7 @@ export function Variacao({
   className?: string;
 }) {
   if (valor === null || tendencia === null) {
-    return <span className="font-sans text-sm text-creme/35">sem medida</span>;
+    return <span className="font-sans text-sm text-neutro">sem medida</span>;
   }
 
   return (
@@ -42,7 +42,7 @@ export function Variacao({
 
 export function SeloNovo() {
   return (
-    <span className="rounded-full bg-dourado/20 px-2.5 py-0.5 font-sans text-[10px] font-semibold uppercase tracking-wider text-dourado">
+    <span className="rounded-full bg-vital/10 px-2.5 py-0.5 font-sans text-[10px] font-semibold uppercase tracking-wider text-vital-fundo">
       Novo
     </span>
   );
@@ -61,33 +61,33 @@ export function Kpi({
   destaque?: string;
 }) {
   return (
-    <div className="rounded-xl border border-dourado/20 bg-creme/5 px-5 py-5 transition hover:border-dourado/40">
-      <p className="font-sans text-[11px] uppercase tracking-wider text-creme/40">
+    <div className="rounded-xl border border-linha bg-cartao px-5 py-5 transition hover:border-linha">
+      <p className="font-sans text-[11px] uppercase tracking-wider text-neutro">
         {rotulo}
       </p>
       <p
-        className={`mt-2 font-display text-2xl ${destaque ?? "text-creme"}`}
+        className={`mt-2 font-display text-2xl ${destaque ?? "text-tinta"}`}
       >
         {valor}
       </p>
       {rodape ? (
-        <p className="mt-1 font-sans text-xs text-creme/40">{rodape}</p>
+        <p className="mt-1 font-sans text-xs text-neutro">{rodape}</p>
       ) : null}
     </div>
   );
 }
 
 const CORES_ADESAO: Record<string, string> = {
-  Alta: "border-emerald-300/40 text-emerald-200",
-  Média: "border-dourado/40 text-dourado",
-  Baixa: "border-red-300/40 text-red-200",
+  Alta: "border-emerald-600/40 text-emerald-700",
+  Média: "border-linha text-vital-fundo",
+  Baixa: "border-argila/35 text-argila",
 };
 
 export function SeloAdesao({ valor }: { valor: string }) {
   return (
     <span
       className={`rounded-md border px-2.5 py-1 font-sans text-xs ${
-        CORES_ADESAO[valor] ?? "border-creme/20 text-creme/70"
+        CORES_ADESAO[valor] ?? "border-linha text-neutro"
       }`}
     >
       {valor}

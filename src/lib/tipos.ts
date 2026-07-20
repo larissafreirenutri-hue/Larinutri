@@ -7,6 +7,18 @@ export type Paciente = {
   notes: string | null;
   access_token: string;
   created_at: string;
+  // Campos do modelo rico, acrescentados na migração 0007.
+  objetivo?: string | null;
+  plano_nome?: string | null;
+  plano_duracao?: string | null;
+  plano_vence?: string | null;
+  restricao?: string | null;
+  status?: string | null;
+  peso_inicial?: number | null;
+  altura?: number | null;
+  sono_habitual?: string | null;
+  treino_planejado?: string | null;
+  meta_agua?: string | null;
 };
 
 export type Checkin = {

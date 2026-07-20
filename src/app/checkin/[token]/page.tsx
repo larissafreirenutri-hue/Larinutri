@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { FormularioCheckin } from "./formulario";
+import { FormularioRico } from "./rico";
+import { Folha } from "@/app/painel/marca";
 
 export const metadata: Metadata = {
   title: "Check-in, Larissa Freire Nutricionista",
@@ -11,20 +13,41 @@ export const metadata: Metadata = {
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+function Barra() {
+  return (
+    <div className="bg-barra/[0.97]">
+      <div className="mx-auto flex max-w-[640px] items-center gap-2.5 px-5 py-3">
+        <Folha />
+        <span className="leading-none">
+          <span className="block font-display text-[19px] font-semibold text-sobre-escuro-forte">
+            Larissa Freire
+          </span>
+          <span className="mt-[3px] block font-mono text-[9px] uppercase tracking-[0.14em] text-dourado">
+            Nutricionista
+          </span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function LinkInvalido() {
   return (
-    <main className="flex flex-1 items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md text-center">
-        <h1 className="font-display text-3xl text-creme">
-          Link inválido ou expirado
-        </h1>
-        <div className="mx-auto my-8 h-px w-16 bg-dourado/40" />
-        <p className="font-sans text-sm leading-relaxed text-creme/70">
-          Não encontramos um check-in para este endereço. Confira se o link foi
-          copiado por inteiro, ou peça um novo para a sua nutricionista.
-        </p>
-      </div>
-    </main>
+    <>
+      <Barra />
+      <main className="mx-auto my-12 max-w-[520px] px-5">
+        <div className="rounded-[20px] border border-linha bg-cartao px-8 py-10 text-center shadow-cartao">
+          <h1 className="font-display text-[26px] text-barra">
+            Link inválido ou expirado
+          </h1>
+          <p className="mt-3 font-sans text-[15px] leading-relaxed text-neutro">
+            Não encontramos um check-in aberto para este endereço. O link pode
+            já ter sido respondido, ter passado dos 7 dias, ou ter sido copiado
+            pela metade. Peça um novo para a sua nutricionista.
+          </p>
+        </div>
+      </main>
+    </>
   );
 }
 
@@ -34,40 +57,46 @@ export default async function CheckinPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-
-  // Formato conferido antes de ir ao banco, senão o Postgres devolve
-  // erro de cast em vez de uma página amigável.
-  if (!UUID.test(token)) {
-    return <LinkInvalido />;
-  }
-
   const supabase = await createClient();
-  const { data: primeiroNome, error } = await supabase.rpc(
-    "get_checkin_patient",
-    { p_token: token },
-  );
 
-  if (error || !primeiroNome) {
-    return <LinkInvalido />;
+  // Dois formatos convivem. UUID é o link antigo, preso ao paciente e
+  // sem prazo. O formato pt_..._s12_... é o link semanal da etapa 2.
+  // Manter os dois evita quebrar links já enviados a pacientes.
+  if (UUID.test(token)) {
+    const { data: primeiroNome, error } = await supabase.rpc(
+      "get_checkin_patient",
+      { p_token: token },
+    );
+
+    if (error || !primeiroNome) return <LinkInvalido />;
+
+    return (
+      <>
+        <Barra />
+        <main className="mx-auto w-full max-w-[640px] flex-1 px-5 py-6">
+          <FormularioCheckin token={token} primeiroNome={primeiroNome} />
+        </main>
+      </>
+    );
   }
+
+  const { data, error } = await supabase.rpc("get_checkin_link", {
+    p_token: token,
+  });
+
+  const linha = Array.isArray(data) ? data[0] : null;
+  if (error || !linha?.primeiro_nome) return <LinkInvalido />;
 
   return (
-    <main className="mx-auto w-full max-w-lg flex-1 px-6 py-12">
-      <header className="text-center">
-        <p className="font-sans text-xs uppercase tracking-[0.3em] text-dourado">
-          Check-in
-        </p>
-        <h1 className="mt-5 font-display text-3xl text-creme">
-          Olá, {primeiroNome}
-        </h1>
-        <div className="mx-auto my-7 h-px w-16 bg-dourado/40" />
-      </header>
-
-      <FormularioCheckin token={token} primeiroNome={primeiroNome} />
-
-      <p className="mt-10 text-center font-sans text-xs text-creme/40">
-        Larissa Freire, Nutricionista
-      </p>
-    </main>
+    <>
+      <Barra />
+      <main className="mx-auto w-full max-w-[640px] flex-1 px-5 py-6">
+        <FormularioRico
+          token={token}
+          primeiroNome={linha.primeiro_nome}
+          semana={linha.semana ?? null}
+        />
+      </main>
+    </>
   );
 }

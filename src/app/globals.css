@@ -136,7 +136,37 @@ html {
 }
 
 body {
-  background: var(--marrom);
-  color: var(--creme);
+  background: var(--papel);
+  color: var(--tinta);
   font-family: var(--font-sans);
+}
+
+/* Deslizante do check-in, com o polegar redondo das referências. */
+.deslizante {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 6px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.deslizante::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--vital);
+  box-shadow: 0 2px 6px rgba(46, 34, 22, 0.2);
+  cursor: pointer;
+}
+.deslizante::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--vital);
+  cursor: pointer;
 }

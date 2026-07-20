@@ -1,5 +1,5 @@
 const baseInput =
-  "mt-2 w-full rounded-md border border-dourado/30 bg-creme/5 px-4 py-2.5 font-sans text-sm text-creme placeholder:text-creme/35 outline-none focus:border-dourado focus:ring-1 focus:ring-dourado";
+  "mt-2 w-full rounded-md border border-linha bg-cartao px-4 py-2.5 font-sans text-sm text-tinta placeholder:text-neutro outline-none focus:border-vital focus:ring-1 focus:ring-vital";
 
 export function Campo({
   id,
@@ -18,9 +18,9 @@ export function Campo({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block font-sans text-sm text-creme/80">
+      <label htmlFor={id} className="block font-sans text-sm text-tinta">
         {rotulo}
-        {obrigatorio ? <span className="text-dourado"> *</span> : null}
+        {obrigatorio ? <span className="text-vital-fundo"> *</span> : null}
       </label>
       <input
         id={id}
@@ -48,7 +48,7 @@ export function CampoTexto({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block font-sans text-sm text-creme/80">
+      <label htmlFor={id} className="block font-sans text-sm text-tinta">
         {rotulo}
       </label>
       <textarea

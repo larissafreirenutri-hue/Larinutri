@@ -2,14 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { CheckinComPaciente, Paciente } from "@/lib/tipos";
-import { resumir, marcarRecentes } from "@/lib/pacientes";
-import { formatarData, formatarPeso } from "@/lib/formato";
-import { CartaoCheckin } from "../cartao-checkin";
-import { BotaoCopiarLink } from "../botao-copiar-link";
-import { BotaoExcluir } from "../botao-excluir";
-import { GraficoPeso, type PontoPeso } from "../grafico-peso";
-import { Kpi, Variacao, SeloAdesao } from "../indicadores";
+import { formatarData } from "@/lib/formato";
+import { agora } from "@/lib/visao-geral";
+import { statusEfetivo, proximaSemana, type CheckinLink } from "@/lib/links";
+import type { Checkin, Paciente } from "@/lib/tipos";
+import { gerarLinkDoPaciente } from "../../links/actions";
+import { Avatar } from "../../marca";
+import {
+  Cartao,
+  SeloLink,
+  SeloStatusPaciente,
+  CLASSE_BOTAO_SECUNDARIO,
+} from "../../ui";
+import { Ficha } from "./ficha";
+import { arquivarPaciente } from "../actions";
 
 export const metadata: Metadata = {
   title: "Ficha do paciente, Larissa Freire Nutricionista",
@@ -22,6 +28,7 @@ export default async function PacientePage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
+  const momento = agora();
 
   const { data: dadosPaciente } = await supabase
     .from("patients")
@@ -37,170 +44,126 @@ export default async function PacientePage({
 
   const paciente = dadosPaciente as Paciente;
 
-  const { data: dadosCheckins, error } = await supabase
-    .from("checkins")
-    .select("*, patients(id, full_name)")
-    .eq("patient_id", id)
-    .order("created_at", { ascending: false });
+  const [checkinsRes, linksRes] = await Promise.all([
+    supabase
+      .from("checkins")
+      .select("*")
+      .eq("patient_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("checkin_links")
+      .select("*")
+      .eq("patient_id", id)
+      .order("gerado_em", { ascending: false }),
+  ]);
 
-  const checkins = (dadosCheckins ?? []) as CheckinComPaciente[];
-  const resumo = resumir(checkins);
+  const checkins = (checkinsRes.data ?? []) as Checkin[];
+  const links = (linksRes.data ?? []) as CheckinLink[];
+  const linkAtual = links[0] ?? null;
 
-  // O gráfico lê da esquerda para a direita, então precisa da ordem
-  // inversa da lista, que mostra o mais recente primeiro.
-  const pontosPeso: PontoPeso[] = [...checkins]
-    .reverse()
-    .filter((c) => c.peso_kg !== null)
-    .map((c) => ({ data: c.created_at, peso: c.peso_kg as number }));
+  const subtitulo = [
+    paciente.objetivo,
+    paciente.plano_nome
+      ? [paciente.plano_nome, paciente.plano_duracao].filter(Boolean).join(" ")
+      : null,
+    paciente.plano_vence ? `vence ${formatarData(paciente.plano_vence)}` : null,
+  ]
+    .filter(Boolean)
+    .join("  ·  ");
 
-  const comRecencia = marcarRecentes(checkins);
+  const arquivado = paciente.status === "arquivado";
 
   return (
     <>
-      <header className="border-b border-dourado/15 pb-6">
-        <Link
-          href="/painel/pacientes"
-          className="font-sans text-sm text-dourado transition hover:text-dourado/80"
-        >
-          ← Voltar aos pacientes
-        </Link>
+      <Link
+        href="/painel/pacientes"
+        className="font-sans text-[14px] text-vital-fundo transition hover:text-vital"
+      >
+        ← voltar para pacientes
+      </Link>
 
-        <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h1 className="font-display text-3xl text-creme">
-              {paciente.full_name}
-            </h1>
-            <p className="mt-2 font-sans text-sm text-creme/55">
-              {[paciente.phone, paciente.email].filter(Boolean).join("  ·  ") ||
-                "Sem contato cadastrado"}
-            </p>
+      <Cartao className="mt-4 px-6 py-5">
+        <div className="flex flex-wrap items-start justify-between gap-5">
+          <div className="flex min-w-0 items-center gap-4">
+            <Avatar nome={paciente.full_name} tamanho="lg" />
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="font-display text-[28px] leading-tight text-barra">
+                  {paciente.full_name}
+                </h1>
+                <SeloStatusPaciente status={paciente.status ?? "ativo"} />
+              </div>
+
+              <p className="mt-1 font-sans text-[15px] text-neutro">
+                {subtitulo || "Sem plano cadastrado"}
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <BotaoCopiarLink token={paciente.access_token} />
-            <Link
-              href={`/painel/pacientes/${paciente.id}/editar`}
-              className="rounded-md border border-dourado/40 px-3 py-1.5 font-sans text-xs text-dourado transition hover:bg-dourado/10"
-            >
-              Editar
-            </Link>
-            <BotaoExcluir id={paciente.id} nome={paciente.full_name} />
-          </div>
-        </div>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href={`/painel/pacientes/${paciente.id}/editar`}
+                className={CLASSE_BOTAO_SECUNDARIO}
+              >
+                Editar
+              </Link>
 
-        {paciente.notes ? (
-          <div className="mt-5 rounded-lg border border-dourado/20 bg-creme/5 px-5 py-4">
-            <p className="font-sans text-[11px] uppercase tracking-wider text-creme/40">
-              Observações da nutricionista
-            </p>
-            <p className="mt-2 whitespace-pre-wrap font-sans text-sm leading-relaxed text-creme/80">
-              {paciente.notes}
-            </p>
-          </div>
-        ) : null}
-      </header>
-
-      {error ? (
-        <p
-          role="alert"
-          className="mt-8 rounded-md border border-red-300/40 bg-red-900/20 px-4 py-3 font-sans text-sm text-red-100"
-        >
-          Não foi possível carregar os check-ins. {error.message}
-        </p>
-      ) : null}
-
-      {checkins.length === 0 ? (
-        <div className="mt-10 rounded-xl border border-dashed border-dourado/25 px-6 py-16 text-center">
-          <p className="font-display text-xl text-creme/70">
-            Nenhum check-in recebido ainda
-          </p>
-          <p className="mx-auto mt-3 max-w-sm font-sans text-sm leading-relaxed text-creme/50">
-            Copie o link de check-in acima e envie para{" "}
-            {paciente.full_name.split(" ")[0]}. Assim que a primeira resposta
-            chegar, o histórico e a evolução aparecem aqui.
-          </p>
-        </div>
-      ) : (
-        <>
-          <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Kpi
-              rotulo="Peso atual"
-              valor={formatarPeso(resumo.pesoAtual) ?? "sem medida"}
-              rodape={
-                resumo.ultimoEm
-                  ? `medido em ${formatarData(resumo.ultimoEm)}`
-                  : undefined
-              }
-            />
-            <Kpi
-              rotulo="Variação total"
-              valor={
-                <Variacao
-                  valor={resumo.variacao}
-                  tendencia={resumo.tendencia}
-                  className="text-2xl"
+              <form action={arquivarPaciente}>
+                <input type="hidden" name="id" value={paciente.id} />
+                <input
+                  type="hidden"
+                  name="status"
+                  value={arquivado ? "ativo" : "arquivado"}
                 />
-              }
-              rodape={
-                resumo.pesoInicial !== null
-                  ? `desde ${formatarPeso(resumo.pesoInicial)}`
-                  : "sem comparação"
-              }
-            />
-            <Kpi
-              rotulo="Atividade física"
-              valor={
-                resumo.mediaDiasAtividade === null
-                  ? "sem registro"
-                  : `${resumo.mediaDiasAtividade.toLocaleString("pt-BR", {
-                      maximumFractionDigits: 1,
-                    })} dias`
-              }
-              rodape="média por semana"
-            />
-            <Kpi
-              rotulo="Adesão recente"
-              valor={
-                resumo.adesaoRecente ? (
-                  <SeloAdesao valor={resumo.adesaoRecente} />
-                ) : (
-                  "sem registro"
-                )
-              }
-              rodape={`${resumo.totalCheckins} ${
-                resumo.totalCheckins === 1 ? "check-in" : "check-ins"
-              } no total`}
-            />
-          </section>
+                <button type="submit" className={CLASSE_BOTAO_SECUNDARIO}>
+                  {arquivado ? "Reativar" : "Arquivar"}
+                </button>
+              </form>
 
-          {pontosPeso.length > 0 ? (
-            <section className="mt-8">
-              <GraficoPeso pontos={pontosPeso} />
-            </section>
-          ) : null}
-
-          <section className="mt-10">
-            <div className="flex items-baseline justify-between">
-              <h2 className="font-display text-xl text-dourado">
-                Histórico de check-ins
-              </h2>
-              <span className="font-sans text-xs text-creme/45">
-                do mais recente ao mais antigo
-              </span>
+              <form action={gerarLinkDoPaciente}>
+                <input type="hidden" name="patient_id" value={paciente.id} />
+                <input
+                  type="hidden"
+                  name="semana"
+                  value={proximaSemana(links.map((l) => l.semana))}
+                />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-2 rounded-xl bg-vital px-5 py-2.5 font-sans text-[15px] font-semibold text-white shadow-acao transition hover:brightness-105"
+                >
+                  Gerar check-in
+                </button>
+              </form>
             </div>
 
-            <ul className="mt-5 space-y-3">
-              {comRecencia.map((checkin) => (
-                <CartaoCheckin
-                  key={checkin.id}
-                  checkin={checkin}
-                  destacado={checkin.recente}
-                />
-              ))}
-            </ul>
-          </section>
-        </>
-      )}
+            {linkAtual ? (
+              <p className="flex items-center gap-2 font-sans text-[13px] text-neutro">
+                link atual:{" "}
+                <SeloLink status={statusEfetivo(linkAtual, momento)} />
+              </p>
+            ) : (
+              <p className="font-sans text-[13px] text-tenue">
+                nenhum link gerado ainda
+              </p>
+            )}
+          </div>
+        </div>
+      </Cartao>
+
+      <Ficha
+        paciente={paciente}
+        checkins={checkins}
+        botaoEditarDados={
+          <Link
+            href={`/painel/pacientes/${paciente.id}/editar`}
+            className={CLASSE_BOTAO_SECUNDARIO}
+          >
+            Editar
+          </Link>
+        }
+      />
     </>
   );
 }

@@ -64,7 +64,7 @@ export function FormularioCheckin({
   // não existe botão para reenviar sem recarregar a página.
   if (estado.ok) {
     return (
-      <div className="rounded-lg border border-dourado/30 bg-creme/5 px-6 py-12 text-center">
+      <div className="rounded-2xl border border-dourado/30 bg-marrom px-6 py-12 text-center text-creme">
         <p className="font-display text-2xl text-dourado">
           Check-in enviado, obrigado
         </p>
@@ -77,7 +77,7 @@ export function FormularioCheckin({
   }
 
   return (
-    <form action={acao} className="space-y-5">
+    <form action={acao} className="space-y-5 rounded-2xl bg-marrom p-6 text-creme">
       <input type="hidden" name="token" value={token} />
 
       <p className="font-sans text-sm leading-relaxed text-creme/65">

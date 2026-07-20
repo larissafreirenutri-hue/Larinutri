@@ -13,7 +13,7 @@ export default async function LoginPage({
   const { redirecionar } = await searchParams;
 
   return (
-    <main className="flex flex-1 items-center justify-center px-6 py-16">
+    <main className="flex flex-1 items-center justify-center bg-marrom px-6 py-16 text-creme">
       <div className="w-full max-w-sm text-center">
         <h1 className="font-display text-3xl text-creme">Larissa Freire</h1>
         <p className="mt-2 font-display text-lg italic text-dourado">
