@@ -62,15 +62,18 @@ export const CONTEUDO = {
     titulo: "Sobre mim",
     // Escreva em primeira pessoa, de 2 a 4 parágrafos.
     // Separe os parágrafos com uma linha em branco.
-    texto: `Me formei em nutrição em 2026, movida por uma convicção simples. A alimentação muda a vida das pessoas, e ela não precisa ser sofrimento para funcionar.
+    texto: `Me formei em nutrição pela UFRN em 2026, movida por uma convicção simples. A alimentação muda a vida das pessoas, e ela não precisa ser sofrimento para funcionar.
 
 O que me trouxe para cá foi enxergar o quanto uma dieta impossível de seguir atrapalha mais do que ajuda. Um plano que não cabe na sua rotina você abandona na terceira semana, e ainda fica com a sensação de ter falhado. Eu trabalho no contrário disso, montando um plano que conversa com a sua vida real, com o seu trabalho, a sua casa e as suas vontades.
 
 Acompanho pessoas que querem mudar de verdade, se sentir melhor consigo mesmas e manter uma rotina equilibrada. Sem neurose, sem lista de alimentos proibidos, e com resultado que aparece justamente porque você consegue sustentar.
 
 Se é isso que você procura, vamos conversar.`,
-    crn: pendente("número do CRN, no formato CRN-6 12345"),
-    especialidades: ["Nutrição Clínica"] as string[],
+    // O registro sai depois da colação de grau, em 30 de julho de 2026.
+    // Enquanto estiver pendente, o selo simplesmente não aparece no
+    // site, em vez de mostrar um aviso de campo vazio ao visitante.
+    crn: pendente("número do CRN-6, disponível após a colação"),
+    especialidades: ["Nutrição Clínica", "Nutrição Esportiva"] as string[],
     foto: "/larissa.jpg",
     // A foto original é paisagem. Este ajuste centraliza a Larissa
     // no corte vertical, senão ela fica deslocada para a direita.

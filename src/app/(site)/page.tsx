@@ -75,9 +75,9 @@ export default function Home() {
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              {ehPendente(sobre.crn) ? (
-                <Falta o={sobre.crn.__pendente} />
-              ) : (
+              {/* Sem registro ainda, o selo some em vez de virar aviso.
+                  A cobrança continua visível na tela de Ajustes. */}
+              {ehPendente(sobre.crn) ? null : (
                 <span className="rounded-md border border-dourado/30 px-3 py-1.5 font-sans text-xs text-dourado">
                   {sobre.crn}
                 </span>
