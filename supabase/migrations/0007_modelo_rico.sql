@@ -164,6 +164,68 @@ create policy "links: excluir os proprios"
   using (owner = auth.uid());
 
 -- ------------------------------------------------------------
+-- 3b. Conserta a funcao publica antiga
+--
+-- submit_checkin gravava texto em adesao_plano. Depois do rename
+-- acima, essa coluna e inteira, e a funcao quebraria o formulario que
+-- esta no ar. Aqui ela passa a gravar em adesao_plano_texto. A funcao
+-- inteira e recriada para o comportamento ficar explicito.
+-- ------------------------------------------------------------
+create or replace function public.submit_checkin(
+  p_token  uuid,
+  p_peso   numeric default null,
+  p_adesao text    default null,
+  p_sono   text    default null,
+  p_fome   text    default null,
+  p_dias   int     default null,
+  p_obs    text    default null
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_patient_id uuid;
+  v_checkin_id uuid;
+begin
+  select p.id into v_patient_id
+  from public.patients p
+  where p.access_token = p_token;
+
+  if v_patient_id is null then
+    raise exception 'Link de check-in invalido.'
+      using errcode = '22023';
+  end if;
+
+  insert into public.checkins (
+    patient_id,
+    peso_kg,
+    adesao_plano_texto,
+    qualidade_sono,
+    nivel_fome,
+    dias_atividade_fisica,
+    observacoes
+  )
+  values (
+    v_patient_id,
+    p_peso,
+    nullif(btrim(p_adesao), ''),
+    nullif(btrim(p_sono), ''),
+    nullif(btrim(p_fome), ''),
+    p_dias,
+    nullif(btrim(p_obs), '')
+  )
+  returning id into v_checkin_id;
+
+  return v_checkin_id;
+end;
+$$;
+
+revoke all on function public.submit_checkin(uuid, numeric, text, text, text, int, text) from public;
+grant execute on function public.submit_checkin(uuid, numeric, text, text, text, int, text) to anon, authenticated;
+
+-- ------------------------------------------------------------
 -- 4. Funcoes publicas por token do link
 --
 -- Nomes novos, para nao derrubar get_checkin_patient e submit_checkin,

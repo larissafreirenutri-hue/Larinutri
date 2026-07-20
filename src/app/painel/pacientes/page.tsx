@@ -22,7 +22,7 @@ export default async function PacientesPage() {
     supabase
       .from("checkins")
       .select(
-        "id, patient_id, created_at, peso_kg, adesao_plano, dias_atividade_fisica",
+        "id, patient_id, created_at, peso_kg, adesao_plano, adesao_plano_texto, dias_atividade_fisica",
       ),
   ]);
 

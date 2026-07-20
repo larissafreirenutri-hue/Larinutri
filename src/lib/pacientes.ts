@@ -1,4 +1,5 @@
 import type { Checkin, Paciente } from "./tipos";
+import { adesaoDoCheckin, normalizarAdesao } from "./notas";
 
 /** Abaixo disso o peso é considerado estável, é oscilação normal. */
 const LIMIAR_ESTAVEL = 0.5;
@@ -68,7 +69,10 @@ export function resumir(
     .map((c) => c.dias_atividade_fisica)
     .filter((d): d is number => d !== null);
 
-  const adesoes = ordenados.filter((c) => c.adesao_plano !== null);
+  // Aceita o formato novo e o legado enquanto os dois convivem.
+  const adesoes = ordenados
+    .map((c) => normalizarAdesao(adesaoDoCheckin(c)))
+    .filter((a): a is NonNullable<typeof a> => a !== null);
 
   const ultimo = ordenados[ordenados.length - 1];
   const idadeEmDias =
@@ -85,8 +89,7 @@ export function resumir(
       dias.length > 0
         ? dias.reduce((soma, d) => soma + d, 0) / dias.length
         : null,
-    adesaoRecente:
-      adesoes.length > 0 ? adesoes[adesoes.length - 1].adesao_plano : null,
+    adesaoRecente: adesoes.length > 0 ? adesoes[adesoes.length - 1] : null,
     recente: idadeEmDias <= DIAS_RECENTE,
   };
 }

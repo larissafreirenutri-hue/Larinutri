@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { sair } from "@/app/login/actions";
-import { BarraLateral } from "./barra-lateral";
+import { BarraTopo } from "./barra-topo";
 
 export default async function PainelLayout({
   children,
@@ -23,7 +23,8 @@ export default async function PainelLayout({
     <form action={sair}>
       <button
         type="submit"
-        className="w-full rounded-md border border-dourado/40 px-4 py-2 font-sans text-sm text-dourado transition hover:bg-dourado/10"
+        title={user.email ?? undefined}
+        className="rounded-full border border-sobre-escuro/25 px-4 py-1.5 font-sans text-xs text-sobre-escuro/80 transition hover:border-sobre-escuro/50 hover:text-sobre-escuro-forte"
       >
         Sair
       </button>
@@ -31,11 +32,11 @@ export default async function PainelLayout({
   );
 
   return (
-    <div className="flex flex-1 flex-col md:flex-row">
-      <BarraLateral email={user.email ?? ""} botaoSair={botaoSair} />
+    <div className="flex flex-1 flex-col">
+      <BarraTopo botaoSair={botaoSair} />
 
-      <main className="min-w-0 flex-1 px-6 py-10 md:px-10">
-        <div className="mx-auto w-full max-w-4xl">{children}</div>
+      <main className="min-w-0 flex-1 px-5 py-10">
+        <div className="mx-auto w-full max-w-6xl">{children}</div>
       </main>
     </div>
   );

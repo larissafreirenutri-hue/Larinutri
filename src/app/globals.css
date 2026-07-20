@@ -1,9 +1,59 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Sistema de design, extraído das referências.
+   Os tokens antigos (marrom, creme, dourado) continuam aqui
+   porque as telas das fases anteriores dependem deles. Os novos
+   convivem ao lado até a etapa 2 migrar tela por tela.
+   ============================================================ */
 :root {
+  /* Legado, ainda em uso pelas telas atuais */
   --marrom: #4a3220;
   --creme: #f6f1e7;
   --dourado: #e0c7a0;
+
+  /* Superfícies */
+  --papel: #f6f1e7;
+  --cartao: #fffdf8;
+  --linha: #eae0ce;
+  --areia: #e4d8c2;
+  --areia-clara: #efe7d6;
+
+  /* Texto */
+  --tinta: #2a2117;
+  --neutro: #8a7b65;
+  --tenue: #c6b296;
+  --sobre-escuro: #f4ecdd;
+  --sobre-escuro-forte: #fffdf8;
+  --sobre-escuro-suave: #e3d6be;
+
+  /* Marca e ações */
+  --barra: #4a3220;
+  --barra-alta: #5e4028;
+  --vital: #a9723f;
+  --vital-fundo: #84532b;
+
+  /* Sinais */
+  --mel: #e0a32e;
+  --mel-suave: #fbf1dc;
+  --mel-tinta: #7a5c0e;
+  --argila: #bc5443;
+  --argila-suave: #f7e6e2;
+
+  /* Cores por dimensão, uma por medidor da ficha */
+  --dim-adesao: #a9723f;
+  --dim-saciedade: #3fa9c4;
+  --dim-controle: #7c6bd1;
+  --dim-hidratacao: #2fa3b8;
+  --dim-digestao: #c99a3a;
+  --dim-sono: #4c7cc9;
+  --dim-recuperacao: #5fae5a;
+  --dim-humor: #e0812e;
+  --dim-tranquilidade: #8aa24a;
+  --dim-geral: #4a3220;
+
+  --sombra-cartao: 0 12px 30px -18px rgba(46, 34, 22, 0.22);
+  --sombra-acao: 0 10px 22px -12px rgba(169, 114, 63, 0.7);
 }
 
 @theme inline {
@@ -11,8 +61,60 @@
   --color-creme: var(--creme);
   --color-dourado: var(--dourado);
 
-  --font-display: Georgia, "Times New Roman", serif;
+  --color-papel: var(--papel);
+  --color-cartao: var(--cartao);
+  --color-linha: var(--linha);
+  --color-areia: var(--areia);
+  --color-areia-clara: var(--areia-clara);
+
+  --color-tinta: var(--tinta);
+  --color-neutro: var(--neutro);
+  --color-tenue: var(--tenue);
+  --color-sobre-escuro: var(--sobre-escuro);
+  --color-sobre-escuro-forte: var(--sobre-escuro-forte);
+  --color-sobre-escuro-suave: var(--sobre-escuro-suave);
+
+  --color-barra: var(--barra);
+  --color-barra-alta: var(--barra-alta);
+  --color-vital: var(--vital);
+  --color-vital-fundo: var(--vital-fundo);
+
+  --color-mel: var(--mel);
+  --color-mel-suave: var(--mel-suave);
+  --color-mel-tinta: var(--mel-tinta);
+  --color-argila: var(--argila);
+  --color-argila-suave: var(--argila-suave);
+
+  --color-dim-adesao: var(--dim-adesao);
+  --color-dim-saciedade: var(--dim-saciedade);
+  --color-dim-controle: var(--dim-controle);
+  --color-dim-hidratacao: var(--dim-hidratacao);
+  --color-dim-digestao: var(--dim-digestao);
+  --color-dim-sono: var(--dim-sono);
+  --color-dim-recuperacao: var(--dim-recuperacao);
+  --color-dim-humor: var(--dim-humor);
+  --color-dim-tranquilidade: var(--dim-tranquilidade);
+  --color-dim-geral: var(--dim-geral);
+
+  --font-display: var(--font-fraunces), Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+
+  --radius-cartao: 18px;
+  --radius-bloco: 20px;
+
+  --shadow-cartao: var(--sombra-cartao);
+  --shadow-acao: var(--sombra-acao);
+}
+
+/* Rótulo pequeno em maiúsculas espaçadas, o "olho de seção" das
+   referências. Vira classe porque se repete em todas as telas. */
+@utility olho {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vital-fundo);
 }
 
 html {

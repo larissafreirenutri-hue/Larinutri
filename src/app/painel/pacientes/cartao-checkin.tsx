@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CheckinComPaciente } from "@/lib/tipos";
 import { formatarDataHora, formatarPeso } from "@/lib/formato";
+import { adesaoDoCheckin, normalizarAdesao } from "@/lib/notas";
 
 function Medida({ rotulo, valor }: { rotulo: string; valor: string | null }) {
   if (!valor) return null;
@@ -27,7 +28,7 @@ export function CartaoCheckin({
 }) {
   const medidas = [
     { rotulo: "Peso", valor: formatarPeso(checkin.peso_kg) },
-    { rotulo: "Adesão", valor: checkin.adesao_plano },
+    { rotulo: "Adesão", valor: normalizarAdesao(adesaoDoCheckin(checkin)) },
     { rotulo: "Sono", valor: checkin.qualidade_sono },
     { rotulo: "Fome", valor: checkin.nivel_fome },
     {

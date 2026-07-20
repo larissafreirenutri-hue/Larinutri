@@ -54,9 +54,8 @@ export default async function VisaoGeralPage() {
         .gte("created_at", desde7),
       supabase
         .from("checkins")
-        .select("adesao_plano")
-        .gte("created_at", desde30)
-        .not("adesao_plano", "is", null),
+        .select("adesao_plano, adesao_plano_texto")
+        .gte("created_at", desde30),
       supabase
         .from("checkins")
         .select("id, patient_id, created_at, peso_kg, patients(full_name)")
@@ -80,7 +79,9 @@ export default async function VisaoGeralPage() {
 
   const atencao = pacientesEmAtencao(pacientes, atividade, momento);
   const adesao = calcularAdesao(
-    (adesaoRes.data ?? []).map((l) => l.adesao_plano as string | null),
+    (adesaoRes.data ?? []).map(
+      (l) => (l.adesao_plano ?? l.adesao_plano_texto) as number | string | null,
+    ),
   );
 
   return (
@@ -140,7 +141,7 @@ export default async function VisaoGeralPage() {
             adesao
               ? `${adesao.media.toLocaleString("pt-BR", {
                   maximumFractionDigits: 1,
-                })} de 3, em ${adesao.base} ${
+                })} de 10, em ${adesao.base} ${
                   adesao.base === 1 ? "resposta" : "respostas"
                 }`
               : "nenhuma resposta em 30 dias"

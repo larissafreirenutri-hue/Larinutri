@@ -1,4 +1,5 @@
 import type { Paciente } from "./tipos";
+import { notaDaAdesao, rotuloDaNota } from "./notas";
 
 const DIA = 24 * 60 * 60 * 1000;
 
@@ -30,14 +31,6 @@ export type AtividadePaciente = {
   total_checkins: number;
 };
 
-/** Baixa, Média e Alta viram números para poder tirar média. */
-const PESO_ADESAO: Record<string, number> = { Baixa: 1, Média: 2, Alta: 3 };
-
-function rotuloAdesao(media: number) {
-  if (media < 1.67) return "Baixa";
-  if (media < 2.34) return "Média";
-  return "Alta";
-}
 
 export type PacienteEmAtencao = {
   id: string;
@@ -45,15 +38,17 @@ export type PacienteEmAtencao = {
   diasSemCheckin: number | null;
 };
 
-export function calcularAdesao(valores: (string | null)[]) {
+export function calcularAdesao(valores: (number | string | null)[]) {
+  // Tudo vira nota de 0 a 10, para o formato novo e o legado poderem
+  // entrar na mesma media.
   const notas = valores
-    .map((v) => (v ? PESO_ADESAO[v] : undefined))
-    .filter((n): n is number => n !== undefined);
+    .map(notaDaAdesao)
+    .filter((n): n is number => n !== null);
 
   if (notas.length === 0) return null;
 
   const media = notas.reduce((soma, n) => soma + n, 0) / notas.length;
-  return { rotulo: rotuloAdesao(media), media, base: notas.length };
+  return { rotulo: rotuloDaNota(media), media, base: notas.length };
 }
 
 /** Quem está sem check-in há mais de DIAS_ATENCAO, ou nunca respondeu. */
