@@ -116,12 +116,17 @@ export function Quadro({
               </header>
 
               {coluna.chave === "a_responder" ? (
-                pendentes.length === 0 ? (
-                  <p className="px-1 pb-2 font-sans text-[13.5px] text-tenue">
-                    Ninguém pendente. Todos responderam.
+                <>
+                  <p className="mb-3 rounded-lg bg-cartao/70 px-3 py-2 font-sans text-[12.5px] leading-snug text-neutro">
+                    Sai daqui quando o paciente responder. Não dá para
+                    arrastar.
                   </p>
-                ) : (
-                  <ul className="space-y-3">
+                  {pendentes.length === 0 ? (
+                    <p className="px-1 pb-2 font-sans text-[13.5px] text-tenue">
+                      Ninguém pendente. Todos responderam.
+                    </p>
+                  ) : (
+                    <ul className="space-y-3">
                     {pendentes.map((p) => (
                       <li
                         key={p.id}
@@ -145,15 +150,19 @@ export function Quadro({
                             {formatarData(p.data)}
                           </span>
                           <Selo tom={p.status === "enviado" ? "mel" : "neutro"}>
-                            {p.status === "enviado"
-                              ? "aguardando"
-                              : "não enviado"}
+                            não respondido
                           </Selo>
+                          {p.status === "gerado" ? (
+                            <span className="font-sans text-[12px] text-tenue">
+                              ainda não enviado
+                            </span>
+                          ) : null}
                         </p>
                       </li>
-                    ))}
-                  </ul>
-                )
+                      ))}
+                    </ul>
+                  )}
+                </>
               ) : (
                 <ListaCheckins
                   cartoes={checkins.filter((c) => c.triagem === coluna.chave)}
