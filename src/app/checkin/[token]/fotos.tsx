@@ -18,7 +18,11 @@ type Foto = {
 export function FotosDaSemana({ token }: { token: string }) {
   const [fotos, setFotos] = useState<Foto[]>([]);
   const [aviso, setAviso] = useState<string | null>(null);
-  const entradaRef = useRef<HTMLInputElement>(null);
+  // Dois inputs: um para a galeria, sem capture, e um para a câmera,
+  // com capture. Sem o capture no da galeria, o celular oferece o menu
+  // nativo com Galeria, Câmera e Arquivos.
+  const galeriaRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
 
   // As prévias são URLs de objeto e precisam ser liberadas, senão
   // ficam ocupando memória do navegador até a aba fechar.
@@ -116,9 +120,10 @@ export function FotosDaSemana({ token }: { token: string }) {
     setFotos((atual) => [...atual, ...aceitas]);
     aceitas.forEach((f, i) => enviarUma(f, base + i));
 
-    // Limpa a entrada para a mesma foto poder ser escolhida de novo
+    // Limpa as entradas para a mesma foto poder ser escolhida de novo
     // depois de removida.
-    if (entradaRef.current) entradaRef.current.value = "";
+    if (galeriaRef.current) galeriaRef.current.value = "";
+    if (cameraRef.current) cameraRef.current.value = "";
   }
 
   function remover(id: string) {
@@ -185,25 +190,55 @@ export function FotosDaSemana({ token }: { token: string }) {
 
       {fotos.length < MAX_FOTOS ? (
         <>
+          {/* Galeria: sem capture, abre o seletor de fotos do celular. */}
           <input
-            ref={entradaRef}
-            id="fotos-entrada"
+            ref={galeriaRef}
+            id="fotos-galeria"
             type="file"
             accept="image/jpeg,image/png,image/webp"
             multiple
+            onChange={(e) => escolher(e.target.files)}
+            className="sr-only"
+          />
+          {/* Câmera: com capture, abre direto a câmera para tirar na hora. */}
+          <input
+            ref={cameraRef}
+            id="fotos-camera"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
             capture="environment"
             onChange={(e) => escolher(e.target.files)}
             className="sr-only"
           />
-          <label
-            htmlFor="fotos-entrada"
-            className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-linha bg-white px-4 py-2.5 font-sans text-[14.5px] text-tinta transition hover:border-vital/50"
-          >
-            {fotos.length === 0 ? "Anexar fotos" : "Anexar mais"}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <label
+              htmlFor="fotos-galeria"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-linha bg-white px-4 py-2.5 font-sans text-[14.5px] text-tinta transition hover:border-vital/50"
+            >
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden>
+                <rect x="3" y="4" width="18" height="15" rx="2" />
+                <path d="M3 15l5-4 4 3 3-3 6 5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="8.5" cy="9" r="1.4" />
+              </svg>
+              Escolher da galeria
+            </label>
+
+            <label
+              htmlFor="fotos-camera"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-linha bg-white px-4 py-2.5 font-sans text-[14.5px] text-tinta transition hover:border-vital/50"
+            >
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden>
+                <path d="M4 8h3l1.5-2h7L18 8h2a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" strokeLinejoin="round" />
+                <circle cx="12" cy="13" r="3.2" />
+              </svg>
+              Tirar foto
+            </label>
+
             <span className="font-mono text-[12px] text-neutro">
               {fotos.length} de {MAX_FOTOS}
             </span>
-          </label>
+          </div>
         </>
       ) : (
         <p className="font-mono text-[12.5px] text-neutro">
