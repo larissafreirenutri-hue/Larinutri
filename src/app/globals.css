@@ -58,6 +58,7 @@
 
 @theme inline {
   --color-marrom: var(--marrom);
+  --color-marrom-alta: var(--barra-alta);
   --color-creme: var(--creme);
   --color-dourado: var(--dourado);
 

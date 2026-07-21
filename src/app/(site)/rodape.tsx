@@ -3,10 +3,11 @@ import { CONTEUDO, ehPendente } from "@/lib/conteudo";
 
 export function Rodape() {
   const crn = CONTEUDO.sobre.crn;
+  const insta = CONTEUDO.contato.instagram;
 
   return (
-    <footer className="mt-24 border-t border-dourado/15 px-6 py-10">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-6">
+    <footer className="border-t border-dourado/15 bg-marrom px-6 py-12">
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-6">
         <div>
           <p className="font-display text-base text-creme">
             {CONTEUDO.marca.nome}
@@ -18,6 +19,16 @@ export function Rodape() {
         </div>
 
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          {!ehPendente(insta) ? (
+            <a
+              href={`https://instagram.com/${insta}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-sans text-xs text-creme/55 transition hover:text-dourado"
+            >
+              @{insta}
+            </a>
+          ) : null}
           <Link
             href="/privacidade"
             className="font-sans text-xs text-creme/55 transition hover:text-dourado"

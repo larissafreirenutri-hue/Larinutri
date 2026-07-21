@@ -1,36 +1,43 @@
 import Link from "next/link";
-import { CONTEUDO } from "@/lib/conteudo";
-
-const SECOES = [
-  { href: "/#sobre", rotulo: "Sobre" },
-  { href: "/#servicos", rotulo: "Acompanhamento" },
-  { href: "/#contato", rotulo: "Contato" },
-];
+import { CONTEUDO, ehPendente } from "@/lib/conteudo";
+import { BotaoWhatsApp } from "./whatsapp";
 
 export function Cabecalho() {
+  const insta = CONTEUDO.contato.instagram;
+
   return (
-    <header className="sticky top-0 z-50 border-b border-dourado/15 bg-marrom/90 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-4">
-        <Link href="/#inicio" className="group">
-          <span className="block font-display text-lg leading-tight text-creme transition group-hover:text-dourado">
+    <header className="sticky top-0 z-40 border-b border-dourado/10 bg-marrom/90 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-4">
+        <Link href="/#inicio" className="group min-w-0 leading-none">
+          <span className="block font-display text-lg text-creme transition group-hover:text-dourado">
             {CONTEUDO.marca.nome}
           </span>
-          <span className="block font-sans text-[10px] uppercase tracking-[0.25em] text-dourado">
+          <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.25em] text-dourado">
             {CONTEUDO.marca.profissao}
           </span>
         </Link>
 
-        <nav className="flex flex-wrap items-center gap-x-6 gap-y-1">
-          {SECOES.map((s) => (
-            <Link
-              key={s.href}
-              href={s.href}
-              className="font-sans text-sm text-creme/70 transition hover:text-dourado"
+        <div className="flex shrink-0 items-center gap-4 sm:gap-5">
+          {!ehPendente(insta) ? (
+            <a
+              href={`https://instagram.com/${insta}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden font-sans text-sm text-creme/70 transition hover:text-dourado sm:block"
             >
-              {s.rotulo}
-            </Link>
-          ))}
-        </nav>
+              @{insta}
+            </a>
+          ) : null}
+          {/* Rótulo curto no celular, para o header não estourar a largura. */}
+          <BotaoWhatsApp
+            rotulo="Agendar"
+            className="whitespace-nowrap px-4 py-2.5 text-sm sm:hidden"
+          />
+          <BotaoWhatsApp
+            rotulo="Agendar avaliação"
+            className="hidden whitespace-nowrap px-5 py-2.5 text-sm sm:inline-block"
+          />
+        </div>
       </div>
     </header>
   );

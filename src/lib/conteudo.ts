@@ -52,10 +52,86 @@ export const CONTEUDO = {
   },
 
   hero: {
-    // Frase recuperada do protótipo antigo, é a voz dela.
-    frase: "Peso é contexto, não veredito.",
+    // O título é montado em três partes para uma palavra sair em
+    // itálico dourado, como nas referências editoriais.
+    tituloAntes: "Uma nova relação com a",
+    tituloDestaque: "comida",
+    tituloDepois: "começa aqui.",
     apoio:
-      "Acompanhamento nutricional que olha o conjunto, sua adesão, seu sono, sua digestão e sua rotina, não só o número da balança.",
+      "Acompanhamento nutricional que olha o conjunto, sua rotina, seu sono, a sua vida real, não só o número da balança.",
+    selo: "Atendimento on-line e domiciliar",
+    // Frase antiga, mantida na aba do navegador e como reserva.
+    frase: "Peso é contexto, não veredito.",
+  },
+
+  // Três passos do "como funciona".
+  passos: [
+    {
+      titulo: "Entre em contato",
+      texto:
+        "Me chame no WhatsApp e conte um pouco sobre o seu momento e o que você busca.",
+    },
+    {
+      titulo: "Avaliação inicial",
+      texto:
+        "Preenchemos juntos a sua anamnese, entendendo rotina, histórico, sono e preferências.",
+    },
+    {
+      titulo: "Seu plano começa",
+      texto:
+        "Você recebe um plano que cabe na sua vida, e a gente ajusta toda semana pelo check-in.",
+    },
+  ],
+
+  // Grade de especialidades da seção de serviços.
+  especialidadesCards: [
+    {
+      nome: "Emagrecimento",
+      texto: "Perder gordura sem passar fome nem viver de restrição.",
+    },
+    {
+      nome: "Hipertrofia",
+      texto: "Comer para construir massa e sustentar o seu treino.",
+    },
+    {
+      nome: "Reeducação alimentar",
+      texto: "Trocar a dieta que não dura por hábitos que ficam.",
+    },
+    {
+      nome: "Saúde e qualidade de vida",
+      texto: "Mais energia, sono melhor e uma relação leve com a comida.",
+    },
+  ],
+
+  depoimento: {
+    texto:
+      "Pela primeira vez segui um plano sem sentir que estava de dieta. Comecei a entender o que o meu corpo pedia, e o resultado veio quase sem eu perceber.",
+    atribuicao: "Paciente, identidade preservada",
+  },
+
+  praticas: [
+    {
+      titulo: "Onde e como",
+      texto:
+        "Atendimento on-line para qualquer lugar, e domiciliar no formato home care.",
+    },
+    {
+      titulo: "Como agendar",
+      texto:
+        "O primeiro contato é pelo WhatsApp. Combinamos horário e formato pela conversa.",
+    },
+    {
+      titulo: "O que esperar",
+      texto:
+        "Um plano feito para a sua rotina, com acompanhamento de verdade toda semana.",
+    },
+  ],
+
+  chamadaFinal: {
+    antes: "Pronta para começar a sua",
+    destaque: "mudança",
+    depois: "?",
+    apoio: "O primeiro passo é uma conversa. Sem compromisso.",
   },
 
   sobre: {
