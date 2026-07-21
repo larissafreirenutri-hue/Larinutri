@@ -23,26 +23,26 @@ function Olho({ children }: { children: React.ReactNode }) {
 }
 
 /** Foto em moldura de arco, com selinho flutuante opcional. */
-function FotoArco({ selo }: { selo?: React.ReactNode }) {
-  if (ehPendente(sobre.foto)) {
-    return (
-      <div className="flex aspect-[4/5] w-full items-center justify-center rounded-[200px_200px_28px_28px] border border-dashed border-dourado/40 bg-creme/5 px-6 text-center font-sans text-sm text-creme/50">
-        Foto da Larissa
-      </div>
-    );
-  }
-
+function FotoArco({
+  src,
+  selo,
+  priority = false,
+}: {
+  src: string;
+  selo?: React.ReactNode;
+  priority?: boolean;
+}) {
   return (
     <div className="relative">
       <div className="overflow-hidden rounded-[200px_200px_28px_28px] border border-dourado/20 shadow-2xl">
         <Image
-          src={sobre.foto}
+          src={src}
           alt={`Foto de ${CONTEUDO.marca.nome}`}
-          width={640}
-          height={800}
+          width={733}
+          height={1100}
           className="aspect-[4/5] w-full object-cover"
           style={{ objectPosition: sobre.fotoPosicao }}
-          priority
+          priority={priority}
         />
       </div>
       {selo}
@@ -98,6 +98,8 @@ export default function Home() {
 
           <Reveal delay={120}>
             <FotoArco
+              src={sobre.foto}
+              priority
               selo={
                 <div className="absolute -bottom-4 -left-4 rounded-2xl border border-dourado/20 bg-marrom/95 px-5 py-3 shadow-xl backdrop-blur sm:-left-6">
                   <p className="font-display text-lg text-dourado">
@@ -118,6 +120,7 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-6xl gap-12 px-6 py-20 sm:py-28 md:grid-cols-[0.85fr_1.15fr] md:items-start lg:gap-16">
           <Reveal className="relative">
             <FotoArco
+              src={sobre.fotoSobre}
               selo={
                 <div className="absolute -bottom-4 left-1/2 w-[85%] -translate-x-1/2 rounded-2xl border border-dourado/20 bg-marrom-alta/95 px-5 py-3 text-center shadow-xl">
                   <p className="font-display text-lg text-creme">

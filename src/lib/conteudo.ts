@@ -105,7 +105,7 @@ export const CONTEUDO = {
 
   depoimento: {
     texto:
-      "Pela primeira vez segui um plano sem sentir que estava de dieta. Comecei a entender o que o meu corpo pedia, e o resultado veio quase sem eu perceber.",
+      "Consegui emagrecer 15 quilos sem deixar de ter momentos sociais com a minha família e sem deixar de comer o que eu gosto.",
     atribuicao: "Paciente, identidade preservada",
   },
 
@@ -150,10 +150,11 @@ Se é isso que você procura, vamos conversar.`,
     // site, em vez de mostrar um aviso de campo vazio ao visitante.
     crn: pendente("número do CRN-6, disponível após a colação"),
     especialidades: ["Nutrição Clínica", "Nutrição Esportiva"] as string[],
-    foto: "/larissa.jpg",
-    // A foto original é paisagem. Este ajuste centraliza a Larissa
-    // no corte vertical, senão ela fica deslocada para a direita.
-    fotoPosicao: "57% center",
+    // Retratos verticais de verdade, então o enquadramento fica no
+    // centro, sem o corte lateral que a foto paisagem antiga exigia.
+    foto: "/larissa-hero.jpg",
+    fotoSobre: "/larissa-sobre.jpg",
+    fotoPosicao: "center top",
   },
 
   servicos: {
