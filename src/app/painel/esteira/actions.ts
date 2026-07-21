@@ -12,15 +12,31 @@ export async function moverTriagem(id: string, destino: string) {
 
   // analisado_em marca quando a Larissa fechou a análise, e é limpo se
   // ela devolver o cartão para a coluna anterior.
-  const { error } = await supabase
+  //
+  // O select devolve as linhas de fato alteradas. Sem ele, um update
+  // barrado pelo RLS afeta zero linhas e mesmo assim retorna sem erro,
+  // que foi o que escondeu este bug por tanto tempo.
+  const { data, error } = await supabase
     .from("checkins")
     .update({
       triagem: destino,
       analisado_em: destino === "analisado" ? new Date().toISOString() : null,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id");
 
-  if (error) return { erro: "Não foi possível mover o check-in." };
+  if (error) {
+    console.error("[esteira] moverTriagem falhou:", error.message);
+    return { erro: "Não foi possível mover o check-in." };
+  }
+
+  if (!data || data.length === 0) {
+    // Sem erro e sem linha alterada quase sempre é o RLS negando.
+    console.error("[esteira] moverTriagem não alterou nenhuma linha, id:", id);
+    return {
+      erro: "Não foi possível mover o check-in. Tente novamente.",
+    };
+  }
 
   revalidatePath("/painel/esteira");
   revalidatePath("/painel");

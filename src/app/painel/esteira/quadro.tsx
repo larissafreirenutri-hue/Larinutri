@@ -46,18 +46,47 @@ export function Quadro({
   const [erro, setErro] = useState<string | null>(null);
   const [ocupado, iniciar] = useTransition();
 
+  // Cópia local dos cartões, para o movimento aparecer na hora e ser
+  // revertido se o servidor recusar. Quando o servidor revalida e traz
+  // props novas, esta cópia se realinha com elas. A sincronização é
+  // feita durante o render, comparando uma assinatura das props, que é
+  // o padrão recomendado em vez de um efeito que chama setState.
+  const [locais, setLocais] = useState<CartaoCheckin[]>(checkins);
+  const assinatura = checkins.map((c) => `${c.id}:${c.triagem}`).join("|");
+  const [assinaturaVista, setAssinaturaVista] = useState(assinatura);
+  if (assinatura !== assinaturaVista) {
+    setLocais(checkins);
+    setAssinaturaVista(assinatura);
+  }
+
   function mover(id: string, destino: string) {
+    const atual = locais.find((c) => c.id === id);
+    if (!atual || atual.triagem === destino) return;
+
+    const anterior = atual.triagem;
     setErro(null);
+
+    // Otimista: move já. Se a action falhar, volta para a coluna de
+    // origem e mostra a mensagem.
+    setLocais((lista) =>
+      lista.map((c) => (c.id === id ? { ...c, triagem: destino } : c)),
+    );
+
     iniciar(async () => {
       const r = await moverTriagem(id, destino);
-      if (r?.erro) setErro(r.erro);
+      if (r?.erro) {
+        setLocais((lista) =>
+          lista.map((c) => (c.id === id ? { ...c, triagem: anterior } : c)),
+        );
+        setErro(r.erro);
+      }
     });
   }
 
   const contagem = (chave: string) =>
     chave === "a_responder"
       ? pendentes.length
-      : checkins.filter((c) => c.triagem === chave).length;
+      : locais.filter((c) => c.triagem === chave).length;
 
   return (
     <>
@@ -165,7 +194,7 @@ export function Quadro({
                 </>
               ) : (
                 <ListaCheckins
-                  cartoes={checkins.filter((c) => c.triagem === coluna.chave)}
+                  cartoes={locais.filter((c) => c.triagem === coluna.chave)}
                   arrastando={arrastando}
                   onArrastar={setArrastando}
                   onMover={mover}
