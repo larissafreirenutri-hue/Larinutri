@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { agora } from "@/lib/visao-geral";
 import {
   diaDeHoje,
-  marcarAtrasadas,
   marcarRotinasVencidas,
   resumirTrabalho,
   type Rotina,
@@ -11,7 +10,7 @@ import {
 } from "@/lib/trabalho";
 import { CabecalhoArea } from "../cabecalho-area";
 import { Kpi } from "../pacientes/indicadores";
-import { Tarefas } from "./tarefas";
+import { Hoje } from "./hoje";
 import { Rotinas } from "./rotinas";
 
 export const metadata: Metadata = {
@@ -90,11 +89,7 @@ export default async function TrabalhoPage() {
         />
       </section>
 
-      <Tarefas
-        tarefas={marcarAtrasadas(tarefas, momento)}
-        pacientes={pacientes}
-        atrasadas={resumo.atrasadas}
-      />
+      <Hoje tarefas={tarefas} pacientes={pacientes} agora={momento} />
 
       <Rotinas
         rotinas={marcarRotinasVencidas(rotinas, momento)}

@@ -265,3 +265,159 @@ export async function excluirRotina(formData: FormData) {
 
   revalidatePath(CAMINHO);
 }
+
+// ------------------------------------------------------------
+// Visão "Hoje": adição rápida, alternar com retorno, adiar, subitens
+// ------------------------------------------------------------
+
+export type EstadoTarefaRapida = { erro?: string; id?: string };
+
+/** Cria uma tarefa pelo campo de adição rápida, já com prazo escolhido. */
+export async function adicionarRapida(
+  titulo: string,
+  prioridade: string | null,
+  patientId: string | null,
+  dueDate: string,
+): Promise<EstadoTarefaRapida> {
+  const texto = titulo.trim();
+  if (!texto) return { erro: "Escreva a tarefa." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data, error } = await supabase
+    .from("tasks")
+    .insert({
+      titulo: texto,
+      prioridade: ehPrioridade(prioridade ?? "") ? prioridade : null,
+      patient_id: patientId || null,
+      due_date: dueDate || null,
+      status: "pendente",
+      owner: user.id,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data) {
+    return { erro: `Não foi possível criar a tarefa. ${error?.message ?? ""}` };
+  }
+
+  revalidatePath(CAMINHO);
+  return { id: data.id };
+}
+
+/** Alterna concluída, devolvendo o resultado para o check dar feedback. */
+export async function alternarTarefaRapida(id: string, concluir: boolean) {
+  if (!id) return { erro: "Tarefa não identificada." };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("tasks")
+    .update(
+      concluir
+        ? { status: "concluída", completed_at: new Date().toISOString() }
+        : { status: "pendente", completed_at: null },
+    )
+    .eq("id", id)
+    .select("id");
+
+  if (error) {
+    console.error("[trabalho] alternarTarefa falhou:", error.message);
+    return { erro: "Não foi possível salvar." };
+  }
+  if (!data || data.length === 0) {
+    return { erro: "Não foi possível salvar. Tente novamente." };
+  }
+
+  revalidatePath(CAMINHO);
+  return {};
+}
+
+/** Empurra o prazo da tarefa para outra data. */
+export async function adiarTarefa(id: string, novaData: string) {
+  if (!id || !novaData) return { erro: "Dados inválidos." };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("tasks")
+    .update({ due_date: novaData })
+    .eq("id", id)
+    .select("id");
+
+  if (error || !data || data.length === 0) {
+    return { erro: "Não foi possível adiar a tarefa." };
+  }
+
+  revalidatePath(CAMINHO);
+  return {};
+}
+
+/** Edita o título da tarefa. */
+export async function renomearTarefa(id: string, titulo: string) {
+  const texto = titulo.trim();
+  if (!id || !texto) return { erro: "O título não pode ficar vazio." };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("tasks")
+    .update({ titulo: texto })
+    .eq("id", id)
+    .select("id");
+
+  if (error || !data || data.length === 0) {
+    return { erro: "Não foi possível salvar o texto." };
+  }
+
+  revalidatePath(CAMINHO);
+  return {};
+}
+
+/** Muda a prioridade da tarefa. */
+export async function mudarPrioridade(id: string, prioridade: string | null) {
+  if (!id) return { erro: "Tarefa não identificada." };
+  const valor = ehPrioridade(prioridade ?? "") ? prioridade : null;
+
+  const supabase = await createClient();
+  await supabase.from("tasks").update({ prioridade: valor }).eq("id", id);
+
+  revalidatePath(CAMINHO);
+  return {};
+}
+
+/**
+ * Salva a lista inteira de subitens. O cliente manipula o array e manda
+ * o resultado, o que é mais simples que operar dentro do jsonb no banco
+ * e evita condição de corrida entre subitens.
+ */
+export async function salvarSubitens(
+  id: string,
+  itens: { texto: string; feito: boolean }[],
+) {
+  if (!id) return { erro: "Tarefa não identificada." };
+
+  // Higieniza: só texto e feito, texto aparado e não vazio, no máximo 50.
+  const limpos = (Array.isArray(itens) ? itens : [])
+    .map((i) => ({
+      texto: String(i?.texto ?? "").trim().slice(0, 300),
+      feito: Boolean(i?.feito),
+    }))
+    .filter((i) => i.texto.length > 0)
+    .slice(0, 50);
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("tasks")
+    .update({ itens: limpos })
+    .eq("id", id)
+    .select("id");
+
+  if (error || !data || data.length === 0) {
+    return { erro: "Não foi possível salvar o checklist." };
+  }
+
+  revalidatePath(CAMINHO);
+  return {};
+}

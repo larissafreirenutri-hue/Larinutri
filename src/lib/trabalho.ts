@@ -16,8 +16,11 @@ export function ehFrequencia(v: string): v is Frequencia {
   return (FREQUENCIAS as readonly string[]).includes(v);
 }
 
+export type Subitem = { texto: string; feito: boolean };
+
 export type Tarefa = {
   id: string;
+  itens?: Subitem[] | null;
   owner: string;
   titulo: string;
   descricao: string | null;
@@ -133,3 +136,44 @@ export function marcarRotinasVencidas(rotinas: Rotina[], agora = Date.now()) {
 }
 
 export type RotinaNaLista = ReturnType<typeof marcarRotinasVencidas>[number];
+
+
+export type GrupoDia = "atrasadas" | "hoje" | "amanha" | "proximos" | "sem_data";
+
+/** Em qual bloco a tarefa cai, comparando due_date com hoje. */
+export function grupoDaTarefa(
+  t: Pick<Tarefa, "due_date" | "status">,
+  agora = Date.now(),
+): GrupoDia {
+  if (!t.due_date) return "sem_data";
+  const hoje = diaDeHoje(agora);
+  const amanha = diaDeHoje(agora + 24 * 60 * 60 * 1000);
+
+  // Tarefa concluída nunca é atrasada, senão o bloco vermelho encheria
+  // de coisa que já foi feita.
+  if (t.due_date < hoje) {
+    return t.status === "concluída" ? "hoje" : "atrasadas";
+  }
+  if (t.due_date === hoje) return "hoje";
+  if (t.due_date === amanha) return "amanha";
+  return "proximos";
+}
+
+/** Data de hoje e de amanhã no formato do input date, fuso de Brasília. */
+export function hojeEAmanha(agora = Date.now()) {
+  return {
+    hoje: diaDeHoje(agora),
+    amanha: diaDeHoje(agora + 24 * 60 * 60 * 1000),
+  };
+}
+
+/** Soma um dia a uma data YYYY-MM-DD. */
+export function maisUmDia(data: string) {
+  const [a, m, d] = data.split("-").map(Number);
+  return new Date(Date.UTC(a, m - 1, d + 1)).toISOString().slice(0, 10);
+}
+
+export function contarFeitos(itens: Subitem[] | null | undefined) {
+  const lista = itens ?? [];
+  return { feitos: lista.filter((i) => i.feito).length, total: lista.length };
+}
