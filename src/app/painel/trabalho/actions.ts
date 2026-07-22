@@ -278,9 +278,13 @@ export async function adicionarRapida(
   prioridade: string | null,
   patientId: string | null,
   dueDate: string,
+  dueTime: string | null = null,
 ): Promise<EstadoTarefaRapida> {
   const texto = titulo.trim();
   if (!texto) return { erro: "Escreva a tarefa." };
+
+  // Aceita só HH:MM, senão grava sem hora, tarefa do dia inteiro.
+  const hora = /^\d{2}:\d{2}$/.test(String(dueTime ?? "")) ? dueTime : null;
 
   const supabase = await createClient();
   const {
@@ -295,6 +299,7 @@ export async function adicionarRapida(
       prioridade: ehPrioridade(prioridade ?? "") ? prioridade : null,
       patient_id: patientId || null,
       due_date: dueDate || null,
+      due_time: hora,
       status: "pendente",
       owner: user.id,
     })

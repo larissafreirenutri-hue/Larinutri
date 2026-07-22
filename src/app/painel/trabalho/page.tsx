@@ -10,7 +10,7 @@ import {
 } from "@/lib/trabalho";
 import { CabecalhoArea } from "../cabecalho-area";
 import { Kpi } from "../pacientes/indicadores";
-import { Hoje } from "./hoje";
+import { Agenda } from "./agenda";
 import { Rotinas } from "./rotinas";
 
 export const metadata: Metadata = {
@@ -21,8 +21,10 @@ export default async function TrabalhoPage() {
   const supabase = await createClient();
   const momento = agora();
 
-  // O RLS limita as três consultas às linhas desta nutricionista.
-  const [tarefasRes, rotinasRes, pacientesRes] = await Promise.all([
+  const hoje = diaDeHoje(momento);
+
+  // O RLS limita as consultas às linhas desta nutricionista.
+  const [tarefasRes, rotinasRes, pacientesRes, planosRes] = await Promise.all([
     supabase
       .from("tasks")
       .select("*, patients(id, full_name)")
@@ -33,15 +35,27 @@ export default async function TrabalhoPage() {
       .select("*")
       .order("next_due", { ascending: true, nullsFirst: false }),
     supabase.from("patients").select("id, full_name").order("full_name"),
+    supabase
+      .from("patients")
+      .select("id, full_name, plano_vence")
+      .not("plano_vence", "is", null)
+      .order("plano_vence"),
   ]);
 
-  const erro = tarefasRes.error ?? rotinasRes.error ?? pacientesRes.error;
+  const erro =
+    tarefasRes.error ?? rotinasRes.error ?? pacientesRes.error ?? planosRes.error;
 
   const tarefas = (tarefasRes.data ?? []) as unknown as Tarefa[];
   const rotinas = (rotinasRes.data ?? []) as Rotina[];
   const pacientes = (pacientesRes.data ?? []) as {
     id: string;
     full_name: string;
+  }[];
+
+  const planos = (planosRes.data ?? []) as {
+    id: string;
+    full_name: string;
+    plano_vence: string;
   }[];
 
   const resumo = resumirTrabalho(tarefas, rotinas, momento);
@@ -89,7 +103,14 @@ export default async function TrabalhoPage() {
         />
       </section>
 
-      <Hoje tarefas={tarefas} pacientes={pacientes} agora={momento} />
+      <Agenda
+        tarefas={tarefas}
+        rotinas={rotinas.filter((r) => r.ativa)}
+        planos={planos}
+        pacientes={pacientes}
+        hoje={hoje}
+        agora={momento}
+      />
 
       <Rotinas
         rotinas={marcarRotinasVencidas(rotinas, momento)}

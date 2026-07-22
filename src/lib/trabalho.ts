@@ -21,6 +21,7 @@ export type Subitem = { texto: string; feito: boolean };
 export type Tarefa = {
   id: string;
   itens?: Subitem[] | null;
+  due_time?: string | null;
   owner: string;
   titulo: string;
   descricao: string | null;
