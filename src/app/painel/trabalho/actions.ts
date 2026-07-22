@@ -200,27 +200,49 @@ export async function atualizarRotina(
   return {};
 }
 
-/** Marca a rotina como feita e empurra a próxima ocorrência. */
-export async function concluirRotina(formData: FormData) {
-  const id = String(formData.get("id") ?? "");
-  const frequenciaBruta = String(formData.get("frequencia") ?? "");
-  if (!id || !ehFrequencia(frequenciaBruta)) return;
+export type EstadoConclusao = { erro?: string; next_due?: string };
+
+/**
+ * Marca a rotina como feita e empurra a próxima ocorrência. Recebe os
+ * dados direto, para o botão poder chamar com estado otimista, e
+ * devolve a nova data ou um erro. O select detecta zero linhas, que
+ * antes falharia em silêncio.
+ */
+export async function concluirRotina(
+  id: string,
+  frequenciaBruta: string,
+  nextDueAtual: string | null,
+): Promise<EstadoConclusao> {
+  if (!id) return { erro: "Rotina não identificada." };
+  if (!ehFrequencia(frequenciaBruta)) return { erro: "Frequência inválida." };
 
   const hoje = diaDeHoje(Date.now());
-  const atual = String(formData.get("next_due") ?? "") || hoje;
+  const atual = (nextDueAtual ?? "").trim() || hoje;
 
   // Parte da data de hoje quando a rotina está atrasada, senão uma
   // rotina diária esquecida por um mês precisaria de trinta cliques
   // para voltar ao presente.
   const base = atual < hoje ? hoje : atual;
+  const proxima = proximaData(base, frequenciaBruta as Frequencia);
 
   const supabase = await createClient();
-  await supabase
+  const { data, error } = await supabase
     .from("routines")
-    .update({ next_due: proximaData(base, frequenciaBruta as Frequencia) })
-    .eq("id", id);
+    .update({ next_due: proxima })
+    .eq("id", id)
+    .select("id");
+
+  if (error) {
+    console.error("[trabalho] concluirRotina falhou:", error.message);
+    return { erro: "Não foi possível marcar como feita." };
+  }
+  if (!data || data.length === 0) {
+    console.error("[trabalho] concluirRotina não alterou nenhuma linha:", id);
+    return { erro: "Não foi possível marcar como feita. Tente novamente." };
+  }
 
   revalidatePath(CAMINHO);
+  return { next_due: proxima };
 }
 
 export async function alternarRotina(formData: FormData) {

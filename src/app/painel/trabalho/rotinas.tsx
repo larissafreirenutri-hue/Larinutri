@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState, useTransition } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { formatarData } from "@/lib/formato";
 import { FREQUENCIAS, type Rotina, type RotinaNaLista } from "@/lib/trabalho";
@@ -12,6 +13,57 @@ import {
   excluirRotina,
   type EstadoTrabalho,
 } from "./actions";
+
+/**
+ * Botão de marcar rotina como feita, com estado otimista. A data da
+ * próxima ocorrência já vem calculada do servidor. Enquanto salva, o
+ * botão mostra "Feito!" e, se falhar, aparece a mensagem de erro. O
+ * feedback é o que faltava: sem ele, a data avançava mas parecia que
+ * nada tinha acontecido.
+ */
+function BotaoConcluir({
+  id,
+  frequencia,
+  nextDue,
+}: {
+  id: string;
+  frequencia: string;
+  nextDue: string | null;
+}) {
+  const [ocupado, iniciar] = useTransition();
+  const [feito, setFeito] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
+  function concluir() {
+    setErro(null);
+    iniciar(async () => {
+      const r = await concluirRotina(id, frequencia, nextDue);
+      if (r.erro) {
+        setErro(r.erro);
+        return;
+      }
+      // Confirmação breve. A revalidação do servidor traz a data nova.
+      setFeito(true);
+      setTimeout(() => setFeito(false), 2500);
+    });
+  }
+
+  return (
+    <span className="inline-flex flex-col items-start gap-1">
+      <button
+        type="button"
+        onClick={concluir}
+        disabled={ocupado}
+        className="rounded-md border border-emerald-600/40 px-3 py-1.5 font-sans text-xs text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-60"
+      >
+        {ocupado ? "Salvando..." : feito ? "Feito!" : "Marcar como feita"}
+      </button>
+      {erro ? (
+        <span className="font-sans text-[11px] text-argila">{erro}</span>
+      ) : null}
+    </span>
+  );
+}
 
 const rotulo = "block font-sans text-sm text-tinta";
 const controle =
@@ -213,25 +265,11 @@ export function Rotinas({
 
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
                   {r.ativa ? (
-                    <form action={concluirRotina}>
-                      <input type="hidden" name="id" value={r.id} />
-                      <input
-                        type="hidden"
-                        name="frequencia"
-                        value={r.frequencia}
-                      />
-                      <input
-                        type="hidden"
-                        name="next_due"
-                        value={r.next_due ?? ""}
-                      />
-                      <button
-                        type="submit"
-                        className="rounded-md border border-emerald-600/40 px-3 py-1.5 font-sans text-xs text-emerald-700 transition hover:bg-emerald-50"
-                      >
-                        Marcar como feita
-                      </button>
-                    </form>
+                    <BotaoConcluir
+                      id={r.id}
+                      frequencia={r.frequencia}
+                      nextDue={r.next_due}
+                    />
                   ) : null}
 
                   <form action={alternarRotina}>
