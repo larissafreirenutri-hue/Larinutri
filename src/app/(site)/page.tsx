@@ -5,15 +5,23 @@ import { CONTEUDO, ehPendente } from "@/lib/conteudo";
 import { Paragrafos } from "./marcador";
 import { BotaoWhatsApp } from "./whatsapp";
 import { Reveal } from "./reveal";
-import { Planos } from "./planos";
 
 export const metadata: Metadata = {
   title: `${CONTEUDO.marca.nome}, ${CONTEUDO.marca.profissao}`,
   description: CONTEUDO.marca.descricaoSite,
 };
 
-const { hero, sobre, passos, especialidadesCards, depoimento, praticas, chamadaFinal, contato } =
-  CONTEUDO;
+const {
+  hero,
+  sobre,
+  passos,
+  especialidadesCards,
+  modalidades,
+  depoimento,
+  praticas,
+  chamadaFinal,
+  contato,
+} = CONTEUDO;
 
 function Olho({ children }: { children: React.ReactNode }) {
   return (
@@ -151,7 +159,7 @@ export default function Home() {
               {[
                 "Nutrição pela UFRN, 2026",
                 ...sobre.especialidades,
-                "Atendimento on-line e domiciliar",
+                "Atendimento on-line, presencial e domiciliar",
               ].map((c) => (
                 <li
                   key={c}
@@ -225,8 +233,39 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Planos */}
-      <Planos />
+      {/* Modalidades de atendimento, institucional e sem preço */}
+      <section id="modalidades" className="border-t border-dourado/10 bg-marrom">
+        <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:py-28">
+          <Reveal className="text-center">
+            <Olho>Modalidades de atendimento</Olho>
+            <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl text-creme sm:text-4xl">
+              Três formas de ser acompanhada.
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl font-sans text-base leading-relaxed text-creme/70">
+              Escolha o formato que combina com a sua rotina. O cuidado é o
+              mesmo nos três.
+            </p>
+          </Reveal>
+
+          <div className="mt-14 grid gap-4 sm:grid-cols-3">
+            {modalidades.map((m, i) => (
+              <Reveal key={m.nome} delay={i * 100}>
+                <div className="flex h-full flex-col rounded-2xl border border-dourado/15 bg-creme/[0.03] px-7 py-8 transition hover:border-dourado/40">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-dourado/15 font-display text-lg text-dourado">
+                    {i + 1}
+                  </span>
+                  <h3 className="mt-5 font-display text-xl text-creme">
+                    {m.nome}
+                  </h3>
+                  <p className="mt-2 font-sans text-sm leading-relaxed text-creme/70">
+                    {m.texto}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* 6. Depoimento */}
       <section className="bg-marrom-alta">

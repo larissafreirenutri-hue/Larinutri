@@ -59,7 +59,7 @@ export const CONTEUDO = {
     tituloDepois: "começa aqui.",
     apoio:
       "Acompanhamento nutricional que olha o conjunto, sua rotina, seu sono, a sua vida real, não só o número da balança.",
-    selo: "Atendimento on-line e domiciliar",
+    selo: "Atendimento on-line, presencial e domiciliar",
     // Frase antiga, mantida na aba do navegador e como reserva.
     frase: "Peso é contexto, não veredito.",
   },
@@ -103,73 +103,24 @@ export const CONTEUDO = {
     },
   ],
 
-  // Planos de consultoria. Textos, itens e valores copiados do arquivo
-  // referencias/site/planos.html, que é a fonte da verdade. As linhas
-  // de descrição curta não existiam no arquivo e foram redigidas aqui.
-  planos: [
+  // Formas de atendimento. Apenas institucional, sem preço, sem
+  // pacote e sem lista de itens. O site cita que a Larissa atende
+  // nessas três modalidades e nada além disso.
+  modalidades: [
     {
-      nome: "Gold",
-      modalidade: "Online",
-      descricao: "Acompanhamento à distância, de qualquer lugar.",
-      base: [
-        "1h de consulta online",
-        "Suporte 24h no WhatsApp",
-        "Ajustes ilimitados na dieta",
-        "Check-in semanal",
-      ],
-      d3: { mensal: 220, parcela: "ou 3× de R$ 200 no cartão", retorno: null },
-      d6: {
-        mensal: 180,
-        parcela: "ou 6× de R$ 160 no cartão",
-        retorno: "1 retorno online no meio do plano",
-      },
-      destaque: false,
+      nome: "On-line",
+      texto:
+        "Acompanhamento por vídeo, de qualquer lugar do país, com o mesmo cuidado do presencial.",
     },
     {
-      nome: "Premium",
-      modalidade: "No consultório",
-      descricao: "Atendimento presencial no consultório.",
-      base: [
-        "2h de consulta presencial no consultório",
-        "Avaliação física",
-        "Suporte 24h no WhatsApp",
-        "Ajustes ilimitados na dieta",
-        "Check-in semanal",
-      ],
-      d3: {
-        mensal: 300,
-        parcela: "ou 3× de R$ 280 no cartão",
-        retorno: "1 retorno presencial",
-      },
-      d6: {
-        mensal: 260,
-        parcela: "ou 6× de R$ 240 no cartão",
-        retorno: "2 retornos presenciais de reavaliação",
-      },
-      destaque: false,
+      nome: "Presencial no consultório",
+      texto:
+        "Para quem prefere a conversa perto e a avaliação feita ali, olho no olho.",
     },
     {
-      nome: "Diamond",
-      modalidade: "Domiciliar",
-      descricao: "A Larissa vai até a sua casa, no formato home care.",
-      base: [
-        "2h de consulta presencial domiciliar",
-        "Avaliação física",
-        "Suporte 24h no WhatsApp",
-        "Ajustes ilimitados na dieta",
-        "Check-in semanal",
-      ],
-      d3: {
-        mensal: 380,
-        parcela: "ou 3× de R$ 360 no cartão",
-        retorno: "1 retorno presencial domiciliar",
-      },
-      d6: {
-        mensal: 340,
-        parcela: "ou 6× de R$ 320 no cartão",
-        retorno: "2 retornos domiciliares de reavaliação",
-      },
-      destaque: true,
+      nome: "Domiciliar",
+      texto:
+        "No formato home care, a Larissa vai até você, no conforto da sua casa.",
     },
   ],
 
@@ -183,7 +134,7 @@ export const CONTEUDO = {
     {
       titulo: "Onde e como",
       texto:
-        "Atendimento on-line para qualquer lugar, e domiciliar no formato home care.",
+        "Atendimento on-line para qualquer lugar, presencial no consultório e domiciliar no formato home care.",
     },
     {
       titulo: "Como agendar",
@@ -257,7 +208,7 @@ Se é isso que você procura, vamos conversar.`,
     whatsapp: "5584999480167",
     instagram: "larissafreirep",
     email: "larissafreirenutri@gmail.com",
-    atendimento: "On-line e domiciliar, no formato home care",
+    atendimento: "On-line, presencial no consultório e domiciliar no formato home care",
   },
 
   privacidade: {
