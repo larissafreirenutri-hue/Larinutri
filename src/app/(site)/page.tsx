@@ -5,6 +5,7 @@ import { CONTEUDO, ehPendente } from "@/lib/conteudo";
 import { Paragrafos } from "./marcador";
 import { BotaoWhatsApp } from "./whatsapp";
 import { Reveal } from "./reveal";
+import { Planos } from "./planos";
 
 export const metadata: Metadata = {
   title: `${CONTEUDO.marca.nome}, ${CONTEUDO.marca.profissao}`,
@@ -223,6 +224,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Planos */}
+      <Planos />
 
       {/* 6. Depoimento */}
       <section className="bg-marrom-alta">

@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Larissa Freire · Planos de Consultoria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --creme:#F4ECDE; --paper:#FBF6EE; --areia:#E4D6C2; --mocha:#A47864;
+  --nogueira:#7A5C48; --cafe:#4A3626; --sec:#8A6A54; --espresso:#2E2119;
+  --serif:'Playfair Display',Georgia,serif; --sans:'Jost',system-ui,sans-serif;
+  --maxw:1140px; --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:88px}
+body{
+  margin:0; background:var(--creme); color:var(--cafe); font-family:var(--sans);
+  font-weight:400; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+body::before{ /* paper grain */
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
+img,svg{display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:1}
+
+/* progress */
+.progress{position:fixed; top:0; left:0; height:3px; width:0; background:var(--mocha); z-index:60; transition:width .1s linear}
+
+/* seal */
+.seal{display:inline-flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid var(--mocha); flex:0 0 auto}
+.seal span{font-family:var(--serif); font-weight:500; color:var(--cafe); line-height:1; letter-spacing:.06em; padding-left:.06em}
+
+/* nav */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; transition:background .4s var(--ease), box-shadow .4s var(--ease), padding .4s var(--ease); padding:20px 0}
+.nav.solid{background:rgba(244,236,222,.86); backdrop-filter:blur(10px); box-shadow:0 1px 0 rgba(122,92,72,.14); padding:12px 0}
+.nav .row{display:flex; align-items:center; justify-content:space-between; gap:24px}
+.brand{display:flex; align-items:center; gap:12px}
+.brand .seal{width:38px; height:38px}
+.brand .seal span{font-size:16px}
+.brand b{font-family:var(--serif); font-weight:500; font-size:18px; color:var(--cafe)}
+.brand small{display:block; font-size:9.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--sec); margin-top:1px}
+.links{display:flex; align-items:center; gap:30px}
+.links a{font-size:12.5px; letter-spacing:.06em; color:var(--nogueira); position:relative; padding:4px 0; transition:color .25s}
+.links a::after{content:""; position:absolute; left:0; bottom:0; height:1px; width:0; background:var(--mocha); transition:width .3s var(--ease)}
+.links a:hover,.links a.active{color:var(--cafe)}
+.links a.active::after,.links a:hover::after{width:100%}
+.btn{display:inline-flex; align-items:center; gap:9px; font-family:var(--sans); font-size:13px; letter-spacing:.03em; font-weight:400; padding:11px 22px; border-radius:100px; border:1px solid transparent; cursor:pointer; transition:transform .25s var(--ease), background .25s, color .25s, box-shadow .25s}
+.btn-solid{background:var(--cafe); color:var(--creme)}
+.btn-solid:hover{background:var(--espresso); transform:translateY(-2px); box-shadow:0 8px 22px rgba(46,33,25,.22)}
+.btn-ghost{background:transparent; color:var(--cafe); border-color:var(--mocha)}
+.btn-ghost:hover{background:var(--mocha); color:var(--creme); transform:translateY(-2px)}
+.btn svg{width:15px; height:15px}
+
+/* hero */
+.hero{position:relative; min-height:100vh; display:flex; align-items:center; padding:120px 0 80px}
+.hero .grid{display:grid; grid-template-columns:1.15fr .85fr; align-items:center; gap:40px}
+.eyebrow{font-size:12px; letter-spacing:.34em; text-transform:uppercase; color:var(--mocha)}
+.hero h1{font-family:var(--serif); font-weight:500; color:var(--cafe); font-size:clamp(46px,8vw,92px); line-height:1.02; margin:20px 0 0; letter-spacing:-.01em}
+.hero .lead{font-family:var(--serif); font-style:italic; font-size:clamp(17px,2.4vw,21px); color:var(--nogueira); max-width:30ch; line-height:1.5; margin:26px 0 34px}
+.hero .cta-row{display:flex; gap:14px; flex-wrap:wrap}
+.hero-art{position:relative; height:420px; display:flex; align-items:center; justify-content:center}
+.hero-art .bigseal{width:190px; height:190px; border-width:1.5px; position:relative; z-index:2; background:var(--creme)}
+.hero-art .bigseal span{font-size:92px}
+.ring{position:absolute; border:1px solid var(--mocha); border-radius:50%; left:50%; top:50%; translate:-50% -50%; opacity:.34}
+.ring.r1{width:280px; height:280px; opacity:.5; animation:spin 44s linear infinite}
+.ring.r2{width:360px; height:360px; opacity:.28; animation:spin 66s linear infinite reverse}
+.ring.r3{width:440px; height:440px; opacity:.16; animation:spin 90s linear infinite}
+.ring::before{content:""; position:absolute; width:7px; height:7px; border-radius:50%; background:var(--mocha); top:-4px; left:50%; translate:-50% 0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scrollcue{position:absolute; bottom:30px; left:50%; translate:-50% 0; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--sec); display:flex; flex-direction:column; align-items:center; gap:8px}
+.scrollcue i{width:1px; height:34px; background:linear-gradient(var(--mocha),transparent); display:block; animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%,100%{opacity:.3; transform:scaleY(.6)}50%{opacity:1; transform:scaleY(1)}}
+
+/* generic section */
+section{position:relative; padding:96px 0}
+.sec-head{max-width:620px; margin-bottom:42px}
+.sec-head h2{font-family:var(--serif); font-weight:500; color:var(--cafe); font-size:clamp(30px,4.6vw,50px); line-height:1.08; margin:14px 0 0; letter-spacing:-.01em}
+.flourish{display:flex; align-items:center; gap:9px; margin-top:16px}
+.flourish i{width:44px; height:2px; background:var(--mocha)}
+.flourish b{width:5px; height:5px; border-radius:50%; background:var(--mocha)}
+.sub{color:var(--sec); font-size:15.5px; line-height:1.7; margin-top:18px; max-width:52ch}
+
+/* manifesto */
+.manifesto{background:var(--paper); border-top:1px solid var(--areia); border-bottom:1px solid var(--areia)}
+.manifesto .grid{display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center}
+.manifesto p{font-size:16px; line-height:1.85; color:var(--cafe); margin:0 0 16px; max-width:46ch}
+.pull{font-family:var(--serif); font-style:italic; font-size:clamp(22px,3vw,30px); line-height:1.4; color:var(--nogueira); border-left:2px solid var(--mocha); padding-left:26px}
+
+/* metodo */
+.phases{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
+.phase{background:var(--paper); border:1px solid var(--areia); border-radius:16px; padding:30px 28px; transition:transform .4s var(--ease), box-shadow .4s var(--ease), border-color .4s}
+.phase:hover{transform:translateY(-6px); box-shadow:0 18px 40px rgba(74,54,38,.10); border-color:var(--mocha)}
+.phase .num{font-family:var(--serif); font-size:40px; color:var(--mocha); line-height:1}
+.phase h3{font-family:var(--serif); font-weight:500; font-size:22px; color:var(--cafe); margin:14px 0 10px}
+.phase p{font-size:14px; line-height:1.65; color:var(--sec); margin:0}
+
+/* ritmo */
+.ritmo{background:var(--paper); border-top:1px solid var(--areia); border-bottom:1px solid var(--areia)}
+.days{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:26px}
+.day{font-family:var(--sans); font-size:14px; letter-spacing:.02em; color:var(--nogueira); background:transparent; border:1px solid var(--areia); border-radius:100px; padding:10px 20px; cursor:pointer; transition:all .3s var(--ease)}
+.day:hover{border-color:var(--mocha); color:var(--cafe)}
+.day.active{background:var(--cafe); color:var(--creme); border-color:var(--cafe)}
+.day-panel{background:var(--creme); border:1px solid var(--areia); border-left:3px solid var(--mocha); border-radius:16px; padding:34px 36px; min-height:150px}
+.day-panel .dlabel{font-family:var(--serif); font-weight:500; font-size:28px; color:var(--cafe)}
+.day-panel .dtext{font-size:16px; line-height:1.75; color:var(--cafe); margin-top:12px; max-width:60ch}
+.fade-swap{transition:opacity .3s var(--ease), transform .3s var(--ease)}
+.fade-swap.out{opacity:0; transform:translateY(6px)}
+
+/* planos */
+.toggle-wrap{display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:44px}
+.toggle{position:relative; display:inline-flex; background:var(--paper); border:1px solid var(--areia); border-radius:100px; padding:5px}
+.toggle button{position:relative; z-index:2; font-family:var(--sans); font-size:14px; letter-spacing:.02em; color:var(--nogueira); background:transparent; border:0; padding:11px 30px; border-radius:100px; cursor:pointer; transition:color .3s}
+.toggle button.on{color:var(--creme)}
+.toggle .thumb{position:absolute; z-index:1; top:5px; bottom:5px; left:5px; width:calc(50% - 5px); background:var(--cafe); border-radius:100px; transition:transform .4s var(--ease)}
+.toggle.six .thumb{transform:translateX(100%)}
+.save{align-self:center; font-size:12.5px; color:var(--nogueira); background:rgba(164,120,100,.13); border:1px solid rgba(164,120,100,.32); border-radius:100px; padding:8px 15px; line-height:1.2}
+.save b{color:var(--cafe); font-weight:600}
+.plans{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; align-items:stretch}
+.plan{background:var(--paper); border:1px solid var(--areia); border-radius:20px; padding:32px 30px; display:flex; flex-direction:column; transition:transform .4s var(--ease), box-shadow .4s var(--ease)}
+.plan:hover{transform:translateY(-8px); box-shadow:0 22px 50px rgba(74,54,38,.12)}
+.plan.feat{background:var(--cafe); border-color:var(--cafe); color:var(--creme); box-shadow:0 20px 46px rgba(46,33,25,.24)}
+.plan .badge{align-self:flex-start; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--creme); background:var(--mocha); border-radius:100px; padding:5px 12px; margin-bottom:16px}
+.plan .pname{font-family:var(--serif); font-weight:500; font-size:30px; line-height:1}
+.plan .ptier{font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--mocha); margin-top:8px}
+.plan.feat .ptier{color:var(--areia)}
+.plan .divide{height:1px; background:var(--areia); margin:22px 0}
+.plan.feat .divide{background:rgba(228,214,194,.25)}
+.plan ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px}
+.plan li{display:flex; gap:11px; align-items:flex-start; font-size:14px; line-height:1.5}
+.plan li .dot{flex:0 0 auto; width:6px; height:6px; border-radius:50%; background:var(--mocha); margin-top:7px}
+.plan li.ret{color:var(--mocha); font-weight:500}
+.plan.feat li.ret{color:#E7C9B4}
+.price{margin-top:auto; padding-top:24px}
+.price .amount{font-family:var(--serif); font-weight:500; font-size:44px; line-height:1; color:var(--cafe)}
+.plan.feat .price .amount{color:var(--creme)}
+.price .amount small{font-family:var(--sans); font-size:15px; color:var(--sec); font-weight:400}
+.plan.feat .price .amount small{color:var(--areia)}
+.price .parc{font-size:13px; color:var(--mocha); margin-top:6px}
+.price .was{font-family:var(--sans); font-size:13.5px; color:var(--sec); margin-bottom:5px}
+.price .was s{color:var(--mocha); text-decoration-thickness:1px}
+.saveline{margin-top:14px}
+.savepill{display:inline-flex; align-items:center; gap:8px; background:rgba(164,120,100,.14); color:var(--nogueira); border:1px solid rgba(164,120,100,.34); border-radius:100px; padding:9px 15px; font-size:12.5px; line-height:1.25}
+.savepill b{color:var(--cafe); font-weight:600}
+.savepill svg{width:15px; height:15px; flex:0 0 auto; color:var(--mocha)}
+.nudge{display:flex; gap:9px; align-items:flex-start; font-size:12.5px; color:var(--nogueira); line-height:1.5; background:var(--creme); border:1px dashed var(--mocha); border-radius:12px; padding:11px 14px}
+.nudge b{color:var(--cafe); font-weight:600}
+.nudge svg{width:15px; height:15px; flex:0 0 auto; color:var(--mocha); margin-top:1px}
+.plan.feat .price .was{color:var(--areia)} .plan.feat .price .was s{color:#E7C9B4}
+.plan.feat .savepill{background:rgba(231,201,180,.16); color:var(--areia); border-color:rgba(231,201,180,.42)}
+.plan.feat .savepill b{color:#fff} .plan.feat .savepill svg{color:#E7C9B4}
+.plan.feat .nudge{background:rgba(255,255,255,.06); border-color:rgba(231,201,180,.45); color:var(--areia)}
+.plan.feat .nudge b{color:#fff} .plan.feat .nudge svg{color:#E7C9B4}
+.plan .choose{margin-top:22px; width:100%; justify-content:center}
+.plan.feat .choose{background:var(--creme); color:var(--cafe); border-color:var(--creme)}
+.plan.feat .choose:hover{background:#fff}
+
+/* materiais */
+.mats{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+.mat{background:var(--paper); border:1px solid var(--areia); border-radius:14px; padding:22px 20px; border-top:2px solid transparent; transition:border-color .35s var(--ease), transform .35s var(--ease)}
+.mat:hover{border-top-color:var(--mocha); transform:translateY(-4px)}
+.mat h4{font-family:var(--serif); font-weight:500; font-size:16px; color:var(--cafe); margin:0 0 8px; line-height:1.2}
+.mat p{font-size:12.5px; line-height:1.55; color:var(--sec); margin:0}
+
+/* cta */
+.cta{text-align:center; background:var(--cafe); color:var(--creme); border-radius:0}
+.cta .bigseal{width:96px; height:96px; margin:0 auto 26px; border-color:var(--mocha); background:transparent}
+.cta .bigseal span{font-size:46px; color:var(--creme)}
+.cta h2{font-family:var(--serif); font-weight:500; font-size:clamp(30px,5vw,52px); line-height:1.1; color:var(--creme); margin:0}
+.cta p{color:var(--areia); font-size:16px; line-height:1.7; max-width:44ch; margin:22px auto 34px}
+.cta .btn-solid{background:var(--creme); color:var(--cafe)}
+.cta .btn-solid:hover{background:#fff}
+
+/* footer */
+footer{padding:44px 0; border-top:1px solid var(--areia)}
+footer .row{display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap}
+footer .brand small{color:var(--sec)}
+footer .meta{font-size:12px; color:var(--sec); letter-spacing:.03em}
+
+/* reveal */
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .8s var(--ease), transform .8s var(--ease)}
+.reveal.in{opacity:1; transform:none}
+.reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}
+
+/* responsive */
+@media(max-width:900px){
+  .hero .grid{grid-template-columns:1fr}
+  .hero-art{display:none}
+  .manifesto .grid{grid-template-columns:1fr; gap:28px}
+  .phases{grid-template-columns:1fr}
+  .plans{grid-template-columns:1fr}
+  .mats{grid-template-columns:1fr 1fr}
+  .links{display:none}
+}
+@media(max-width:560px){
+  .wrap{padding:0 20px}
+  section{padding:70px 0}
+  .mats{grid-template-columns:1fr}
+  .day-panel{padding:26px 24px}
+  .nav .brand small{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important; scroll-behavior:auto}
+  .reveal{opacity:1; transform:none}
+}
+:focus-visible{outline:2px solid var(--mocha); outline-offset:3px; border-radius:4px}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<nav class="nav" id="nav">
+  <div class="wrap row">
+    <a class="brand" href="#top" aria-label="Larissa Freire, início">
+      <span class="seal"><span>LF</span></span>
+      <span><b>Larissa Freire</b><small>Nutricionista clínica</small></span>
+    </a>
+    <div class="links" id="links">
+      <a href="#metodo">Método</a>
+      <a href="#ritmo">Ritmo</a>
+      <a href="#planos">Planos</a>
+      <a href="#recebe">O que recebe</a>
+    </div>
+    <a class="btn btn-solid" id="waNav" href="#" target="_blank" rel="noopener noreferrer">Falar comigo</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap grid">
+    <div>
+      <div class="eyebrow reveal in">Acompanhamento nutricional</div>
+      <h1 class="reveal in d1">Planos de<br>Consultoria</h1>
+      <p class="lead reveal in d2">Nutrição com leveza, resultados e sem neurose. Um acompanhamento pensado pra sua vida real.</p>
+      <div class="cta-row reveal in d3">
+        <a class="btn btn-ghost" href="#planos">Ver os planos</a>
+        <a class="btn btn-solid" id="waHero" href="#" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.5 14.2c-.2.6-1.2 1.1-1.7 1.2-.4.1-1 .1-1.6-.1-.4-.1-.9-.3-1.5-.5-2.6-1.1-4.3-3.7-4.4-3.9-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2 0 .4 0 .5l-.4.5c-.2.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.2.1.4.1.6-.1l.7-.9c.2-.2.4-.2.6-.1l1.8.9c.3.1.4.2.5.3.1.2.1.7-.1 1.2Z"/></svg>
+          Começar agora
+        </a>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+      <div class="seal bigseal"><span>LF</span></div>
+    </div>
+  </div>
+  <div class="scrollcue" aria-hidden="true">rolar<i></i></div>
+</header>
+
+<section class="manifesto" id="sobre">
+  <div class="wrap grid">
+    <div class="reveal">
+      <div class="eyebrow">Boas-vindas</div>
+      <h2 style="font-family:var(--serif);font-weight:500;color:var(--cafe);font-size:clamp(28px,4vw,42px);line-height:1.1;margin:14px 0 22px;">A nutrição feita pra sua vida real</h2>
+      <p>Meu trabalho parte de uma ideia simples. Dá pra chegar aos seus objetivos sem viver de restrição, sem terrorismo nutricional e sem abrir mão da sua rotina.</p>
+      <p>Aqui o acompanhamento é individual de verdade. Um plano pensado pra sua realidade, contato próximo toda semana e ajustes sempre que a sua vida pedir. Você não caminha sozinho em nenhuma etapa.</p>
+    </div>
+    <div class="reveal d1">
+      <p class="pull">O acompanhamento certo transforma a sua rotina, não a sua vida inteira de uma vez.</p>
+    </div>
+  </div>
+</section>
+
+<section id="metodo">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Como funciona</div>
+      <h2>O método em três fases</h2>
+      <div class="flourish"><i></i><b></b></div>
+      <p class="sub">Do primeiro contato ao encerramento, todo plano segue a mesma estrutura, ajustada ao seu objetivo e ao tempo de acompanhamento.</p>
+    </div>
+    <div class="phases">
+      <div class="phase reveal"><div class="num">01</div><h3>Entrada</h3><p>Questionário investigativo, montagem do seu dossiê inicial, a consulta, o plano alimentar individualizado e o alinhamento das suas metas.</p></div>
+      <div class="phase reveal d1"><div class="num">02</div><h3>Acompanhamento</h3><p>O coração do plano. Toda semana tem um ritmo definido de contato, do check-in de domingo à revisão de metas na sexta, com ajustes sempre que a rotina pede.</p></div>
+      <div class="phase reveal d2"><div class="num">03</div><h3>Encerramento</h3><p>Fechamos comparando o seu ponto de partida com onde você chegou, no dossiê final, e apontamos os próximos passos pra manter o resultado.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="ritmo" id="ritmo">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">O diferencial</div>
+      <h2>O ritmo semanal</h2>
+      <div class="flourish"><i></i><b></b></div>
+      <p class="sub">Suporte de verdade não é só estar disponível. É ter um plano de contato pra cada dia. Toque num dia pra ver o que acontece.</p>
+    </div>
+    <div class="days reveal" id="days"></div>
+    <div class="day-panel reveal d1">
+      <div class="fade-swap" id="dayContent">
+        <div class="dlabel" id="dayLabel"></div>
+        <div class="dtext" id="dayText"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="planos">
+  <div class="wrap">
+    <div class="sec-head reveal" style="max-width:none;text-align:center;margin:0 auto 20px;">
+      <div class="eyebrow">Os planos</div>
+      <h2>Escolha o seu acompanhamento</h2>
+      <div class="flourish" style="justify-content:center"><i></i><b></b></div>
+      <p class="sub" style="margin-left:auto;margin-right:auto;">Três formas de ser acompanhado, online, no consultório ou na sua casa. O plano de 6 meses aprofunda o acompanhamento e tem o melhor valor por mês.</p>
+    </div>
+    <div class="toggle-wrap reveal">
+      <div class="toggle six" id="toggle">
+        <span class="thumb"></span>
+        <button data-d="3">3 meses</button>
+        <button data-d="6" class="on">6 meses</button>
+      </div>
+      <span class="save" id="save"></span>
+    </div>
+    <div class="plans reveal d1" id="plans"></div>
+  </div>
+</section>
+
+<section class="ritmo" id="recebe">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">O que você recebe</div>
+      <h2>Muito além da dieta</h2>
+      <div class="flourish"><i></i><b></b></div>
+      <p class="sub">Materiais e recursos que acompanham o seu plano e deixam o processo mais leve, prático e completo.</p>
+    </div>
+    <div class="mats" id="mats"></div>
+  </div>
+</section>
+
+<section class="cta" id="comecar">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="seal bigseal"><span>LF</span></div>
+      <h2>Vamos começar<br>o seu processo</h2>
+      <p>Escolher o plano, preencher o questionário de entrada e agendar a sua primeira consulta. A partir daí, o acompanhamento começa a rodar já na primeira semana.</p>
+      <a class="btn btn-solid" id="waFinal" href="#" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.5 14.2c-.2.6-1.2 1.1-1.7 1.2-.4.1-1 .1-1.6-.1-.4-.1-.9-.3-1.5-.5-2.6-1.1-4.3-3.7-4.4-3.9-.1-.2-1-1.4-1-2.6 0-1.2.6-1.8.9-2.1.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2 0 .4 0 .5l-.4.5c-.2.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.2.1.4.1.6-.1l.7-.9c.2-.2.4-.2.6-.1l1.8.9c.3.1.4.2.5.3.1.2.1.7-.1 1.2Z"/></svg>
+        Falar comigo no WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap row">
+    <div class="brand">
+      <span class="seal" style="width:34px;height:34px"><span style="font-size:14px">LF</span></span>
+      <span><b style="font-family:var(--serif);font-size:16px;color:var(--cafe)">Larissa Freire</b><small style="display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;">Nutricionista clínica</small></span>
+    </div>
+    <div class="meta">@larissafreirep · Nutrição com leveza, resultados e sem neurose</div>
+  </div>
+</footer>
+
+<script>
+const WA="https://wa.me/5584999480167";
+const reduce=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+function waLink(msg){return WA+"?text="+encodeURIComponent(msg);}
+document.getElementById("waNav").href=waLink("Olá, Larissa! Vim pela página de planos e gostaria de saber mais.");
+document.getElementById("waHero").href=waLink("Olá, Larissa! Vim pela página de planos e gostaria de começar meu acompanhamento.");
+document.getElementById("waFinal").href=waLink("Olá, Larissa! Quero começar o meu processo. Pode me orientar?");
+
+/* ---- data ---- */
+const plans=[
+ {key:"gold",name:"Gold",tier:"Online",
+  base:["1h de consulta online","Suporte 24h no WhatsApp","Ajustes ilimitados na dieta","Check-in semanal"],
+  d3:{mens:220,parc:"ou 3× de R$ 200 no cartão",ret:null},
+  d6:{mens:180,parc:"ou 6× de R$ 160 no cartão",ret:"1 retorno online no meio do plano"}},
+ {key:"premium",name:"Premium",tier:"No consultório",
+  base:["2h de consulta presencial no consultório","Avaliação física","Suporte 24h no WhatsApp","Ajustes ilimitados na dieta","Check-in semanal"],
+  d3:{mens:300,parc:"ou 3× de R$ 280 no cartão",ret:"1 retorno presencial"},
+  d6:{mens:260,parc:"ou 6× de R$ 240 no cartão",ret:"2 retornos presenciais de reavaliação"}},
+ {key:"diamond",name:"Diamond",tier:"Domiciliar",feat:true,
+  base:["2h de consulta presencial domiciliar","Avaliação física","Suporte 24h no WhatsApp","Ajustes ilimitados na dieta","Check-in semanal"],
+  d3:{mens:380,parc:"ou 3× de R$ 360 no cartão",ret:"1 retorno presencial domiciliar"},
+  d6:{mens:340,parc:"ou 6× de R$ 320 no cartão",ret:"2 retornos domiciliares de reavaliação"}}
+];
+let dur=6;
+const plansEl=document.getElementById("plans");
+
+function planCard(p){
+  const badge=p.feat?'<span class="badge">Mais exclusivo</span>':'';
+  return `<div class="plan ${p.feat?'feat':''}">
+    ${badge}
+    <div class="pname">${p.name}</div>
+    <div class="ptier">${p.tier}</div>
+    <div class="divide"></div>
+    <ul data-key="${p.key}"></ul>
+    <div class="price">
+      <div class="was"></div>
+      <div class="amount">R$ <span class="num">0</span><small> /mês</small></div>
+      <div class="parc"></div>
+      <div class="saveline"></div>
+    </div>
+    <a class="btn btn-solid choose" href="#" target="_blank" rel="noopener noreferrer">Escolher no WhatsApp</a>
+  </div>`;
+}
+plansEl.innerHTML=plans.map(planCard).join("");
+const cardEls=[...plansEl.children];
+
+function animateNum(el,to){
+  if(reduce){el.textContent=to;return;}
+  const from=parseInt(el.textContent)||to; const t0=performance.now(); const dt=420;
+  function step(t){const k=Math.min(1,(t-t0)/dt); const e=1-Math.pow(1-k,3);
+    el.textContent=Math.round(from+(to-from)*e); if(k<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+function fillList(ul,p){
+  const dd=dur===3?p.d3:p.d6;
+  let html=p.base.map(b=>`<li><span class="dot"></span><span>${b}</span></li>`).join("");
+  if(dd.ret) html+=`<li class="ret"><span class="dot"></span><span>${dd.ret}</span></li>`;
+  ul.innerHTML=html;
+}
+function fmt(n){return n.toLocaleString('pt-BR');}
+const TAG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 22l-9-9V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>';
+function render(){
+  const maxSem=Math.max(...plans.map(p=>(p.d3.mens-p.d6.mens)*6));
+  plans.forEach((p,i)=>{
+    const el=cardEls[i]; const dd=dur===3?p.d3:p.d6;
+    const save=p.d3.mens-p.d6.mens; const sem=save*6;
+    fillList(el.querySelector("ul"),p);
+    animateNum(el.querySelector(".num"),dd.mens);
+    el.querySelector(".parc").textContent=dd.parc;
+    const was=el.querySelector(".was"); const sl=el.querySelector(".saveline");
+    if(dur===6){
+      was.style.display=''; was.innerHTML='No plano de 3 meses: <s>R$ '+fmt(p.d3.mens)+' /mês</s>';
+      sl.innerHTML='<span class="savepill">'+TAG+'<span>R$ '+fmt(save)+'/mês a menos, <b>economize R$ '+fmt(sem)+'</b></span></span>';
+    }else{
+      was.style.display='none'; was.innerHTML='';
+      sl.innerHTML='<div class="nudge">'+TAG+'<span>Fechando 6 meses você paga <b>R$ '+fmt(p.d6.mens)+' /mês</b> e economiza <b>R$ '+fmt(sem)+'</b>.</span></div>';
+    }
+    el.querySelector(".choose").href=waLink('Olá, Larissa! Tenho interesse no plano '+p.name+' ('+dur+' meses). Pode me passar mais detalhes?');
+  });
+  const saveEl=document.getElementById("save");
+  if(saveEl) saveEl.innerHTML = dur===6 ? 'Melhor valor por mês, <b>economize até R$ '+fmt(maxSem)+'</b>' : 'Veja o melhor valor no plano de 6 meses';
+}
+render();
+
+/* toggle */
+const toggle=document.getElementById("toggle");
+toggle.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+  dur=+b.dataset.d;
+  toggle.classList.toggle("six",dur===6);
+  toggle.querySelectorAll("button").forEach(x=>x.classList.toggle("on",+x.dataset.d===dur));
+  render();
+}));
+
+/* ritmo */
+const week=[
+ ["Domingo","Check-in da semana. Você conta como foi cada aspecto da semana. É acompanhamento e autoavaliação ao mesmo tempo."],
+ ["Segunda","Devolutiva. Eu leio o seu check-in e retorno com orientações e ajustes pro que vem pela frente."],
+ ["Terça","Suporte e ajustes. Dia de tirar dúvidas no WhatsApp e ajustar a dieta se a rotina pedir."],
+ ["Quarta","Meio da semana. Um ponto de virada pra revisar o que já foi feito e aproveitar bem os dias que faltam."],
+ ["Quinta","Planejamento do fim de semana. A gente organiza onde você vai, o que pedir e como conter os danos."],
+ ["Sexta","Fotos e metas. Atualização das fotos de acompanhamento e alinhamento das metas da próxima semana."]
+];
+const daysEl=document.getElementById("days");
+const dayContent=document.getElementById("dayContent");
+const dayLabel=document.getElementById("dayLabel");
+const dayText=document.getElementById("dayText");
+week.forEach(([d],i)=>{
+  const b=document.createElement("button");
+  b.className="day"+(i===0?" active":""); b.textContent=d;
+  b.addEventListener("click",()=>selectDay(i,b));
+  daysEl.appendChild(b);
+});
+function selectDay(i,btn){
+  daysEl.querySelectorAll(".day").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+  dayContent.classList.add("out");
+  setTimeout(()=>{dayLabel.textContent=week[i][0]; dayText.textContent=week[i][1]; dayContent.classList.remove("out");}, reduce?0:220);
+}
+dayLabel.textContent=week[0][0]; dayText.textContent=week[0][1];
+
+/* materiais */
+const mats=[
+ ["Dossiê inicial e final","Seu ponto de partida documentado e a sua evolução comparada no fim."],
+ ["Plano alimentar individualizado","Montado pra sua rotina, suas preferências e o seu objetivo."],
+ ["Ebooks e guias","Receitas, leitura de rótulos, comer fora, sono e mais."],
+ ["Guia de substituições","Autonomia pra montar refeições e fazer as compras certas."],
+ ["Aplicativo de acompanhamento","Seu plano, registro de refeições e lembretes num só lugar."],
+ ["Kit de boas-vindas","Pra você começar organizado desde o primeiro dia."],
+ ["Relatório de progresso mensal","Uma leitura da sua evolução além do check-in semanal."],
+ ["Programa de indicação","Benefícios pra você indicar quem também quer cuidar da saúde."]
+];
+document.getElementById("mats").innerHTML=mats.map(m=>`<div class="mat"><h4>${m[0]}</h4><p>${m[1]}</p></div>`).join("");
+
+/* nav solid + progress + active link */
+const nav=document.getElementById("nav");
+const progress=document.getElementById("progress");
+const links=[...document.querySelectorAll("#links a")];
+function onScroll(){
+  const y=window.scrollY;
+  nav.classList.toggle("solid",y>40);
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  progress.style.width=(h>0?(y/h*100):0)+"%";
+}
+window.addEventListener("scroll",onScroll,{passive:true}); onScroll();
+
+/* reveal + active section */
+const io=new IntersectionObserver((es)=>{
+  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target);} });
+},{threshold:.14, rootMargin:"0px 0px -8% 0px"});
+document.querySelectorAll(".reveal").forEach(el=>{ if(!el.classList.contains("in")) io.observe(el); });
+
+const sections=["metodo","ritmo","planos","recebe"].map(id=>document.getElementById(id));
+const spy=new IntersectionObserver((es)=>{
+  es.forEach(e=>{ if(e.isIntersecting){ const id=e.target.id;
+    links.forEach(l=>l.classList.toggle("active", l.getAttribute("href")==="#"+id)); } });
+},{threshold:.4});
+sections.forEach(s=>s&&spy.observe(s));
+</script>
+</body>
+</html>
