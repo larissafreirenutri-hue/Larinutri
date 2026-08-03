@@ -22,7 +22,7 @@ export function BotaoWhatsApp({
       href={`https://wa.me/${numero}?text=${encodeURIComponent(MENSAGEM)}`}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-block rounded-md bg-dourado px-7 py-3.5 font-sans text-sm font-semibold text-marrom transition hover:bg-dourado/90 ${className}`}
+      className={`inline-block rounded-full bg-[#4a3626] px-7 py-3.5 font-sans text-sm font-semibold text-[#f4ecde] transition hover:bg-[#2e2119] ${className}`}
     >
       {rotulo}
     </a>

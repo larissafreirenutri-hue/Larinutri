@@ -87,7 +87,7 @@ export default function Home() {
               <BotaoWhatsApp rotulo="Agendar avaliação" />
               <Link
                 href="/#sobre"
-                className="inline-block rounded-md border border-dourado/40 px-7 py-3.5 font-sans text-sm text-dourado transition hover:bg-dourado/10"
+                className="inline-block rounded-full border border-dourado/50 px-7 py-3.5 font-sans text-sm text-dourado transition hover:bg-dourado hover:text-marrom"
               >
                 Conheça a Larissa
               </Link>
@@ -325,7 +325,7 @@ export default function Home() {
             {!ehPendente(contato.email) ? (
               <a
                 href={`mailto:${contato.email}`}
-                className="inline-block rounded-md border border-dourado/40 px-7 py-3.5 font-sans text-sm text-dourado transition hover:bg-dourado/10"
+                className="inline-block rounded-full border border-dourado/50 px-7 py-3.5 font-sans text-sm text-dourado transition hover:bg-dourado hover:text-marrom"
               >
                 Enviar um e-mail
               </a>

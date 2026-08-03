@@ -109,22 +109,27 @@
 }
 
 /* ============================================================
-   Refino do site público. A paleta abaixo vale apenas dentro de
+   Site público, tema claro. A paleta abaixo vale apenas dentro de
    .sitio, o wrapper do site institucional, então o painel
    autenticado (que fica fora de .sitio) permanece intocado.
-   As cores seguem a referência referencias/site/planos.html:
-   marrom profundo #2E2119, superfície elevada #4A3626, creme
-   #F4ECDE e um acento pêssego #E7C9B4 no lugar do dourado antigo.
-   Como bg-marrom, text-creme e afins resolvem var(--marrom) etc.
-   em tempo de uso, sobrescrever os tokens aqui reveste todo o
-   site sem tocar em uma linha dos componentes.
+
+   Cores exatas de referencias/site/planos.html: fundo creme
+   #F4ECDE, superfície elevada paper #FBF6EE, texto café #4A3626 e
+   acento mocha #A47864. Como bg-marrom, text-creme e text-dourado
+   resolvem var(--marrom), var(--creme) e var(--dourado) em tempo
+   de uso, o remapeamento aqui inverte o site inteiro para o claro
+   sem tocar nas classes dos componentes:
+     bg-marrom  -> fundo creme
+     text-creme -> texto café
+     text/bg-dourado -> acento mocha
+     bg-marrom-alta  -> superfície paper
    ============================================================ */
 .sitio {
-  --marrom: #2e2119;
-  --barra: #2e2119;
-  --barra-alta: #4a3626;
-  --creme: #f4ecde;
-  --dourado: #e7c9b4;
+  --marrom: #f4ecde; /* fundo creme */
+  --barra: #f4ecde;
+  --barra-alta: #fbf6ee; /* paper, superfície elevada */
+  --creme: #4a3626; /* café, cor do texto */
+  --dourado: #a47864; /* mocha, acento */
 }
 
 /* Rótulo pequeno em maiúsculas espaçadas, o "olho de seção" das
