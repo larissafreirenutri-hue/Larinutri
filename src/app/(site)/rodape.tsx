@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { CONTEUDO, ehPendente } from "@/lib/conteudo";
+import { linkWhatsApp } from "./whatsapp";
 
 export function Rodape() {
   const crn = CONTEUDO.sobre.crn;
   const insta = CONTEUDO.contato.instagram;
+  const parcerias = linkWhatsApp(CONTEUDO.contato.whatsappParcerias);
 
   return (
     <footer className="border-t border-dourado/15 bg-marrom px-6 py-12">
@@ -27,6 +29,16 @@ export function Rodape() {
               className="font-sans text-xs text-creme/55 transition hover:text-dourado"
             >
               @{insta}
+            </a>
+          ) : null}
+          {parcerias ? (
+            <a
+              href={parcerias}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-sans text-xs text-creme/55 transition hover:text-dourado"
+            >
+              Parcerias e publicidade
             </a>
           ) : null}
           <Link

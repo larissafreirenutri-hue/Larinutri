@@ -205,7 +205,13 @@ Se é isso que você procura, vamos conversar.`,
     titulo: "Vamos conversar",
     apoio:
       "Me conte um pouco sobre o seu momento e o que você busca. Respondo pessoalmente.",
-    whatsapp: "5584999480167",
+    whatsapp: "5584999543976",
+    // Duas conversas com propósitos distintos, cada uma com a sua
+    // mensagem já preenchida. Consultoria é o caminho de quem quer
+    // virar paciente, parcerias é para publicidade e colaborações.
+    whatsappConsultoria:
+      "Oi Larissa, quero saber mais sobre a consultoria nutricional.",
+    whatsappParcerias: "Oi Larissa, é sobre uma parceria ou publicidade.",
     instagram: "larissafreirep",
     email: "larissafreirenutri@gmail.com",
     atendimento: "On-line, presencial no consultório e domiciliar no formato home care",

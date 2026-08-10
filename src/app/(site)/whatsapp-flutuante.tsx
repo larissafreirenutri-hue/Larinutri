@@ -1,16 +1,15 @@
-import { CONTEUDO, ehPendente } from "@/lib/conteudo";
+import { CONTEUDO } from "@/lib/conteudo";
+import { linkWhatsApp } from "./whatsapp";
 
-const MENSAGEM =
-  "Olá, Larissa. Vim pelo site e gostaria de saber mais sobre o acompanhamento nutricional.";
-
-/** Botão fixo no canto, visível durante toda a rolagem. */
+/** Botão fixo no canto, visível durante toda a rolagem. Leva à mesma
+ * conversa de consultoria do CTA principal. */
 export function WhatsAppFlutuante() {
-  const numero = CONTEUDO.contato.whatsapp;
-  if (ehPendente(numero)) return null;
+  const href = linkWhatsApp(CONTEUDO.contato.whatsappConsultoria);
+  if (!href) return null;
 
   return (
     <a
-      href={`https://wa.me/${numero}?text=${encodeURIComponent(MENSAGEM)}`}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp"
