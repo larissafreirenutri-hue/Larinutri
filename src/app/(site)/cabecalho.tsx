@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CONTEUDO, ehPendente } from "@/lib/conteudo";
-import { BotaoWhatsApp } from "./whatsapp";
+import { CtaConsultoria } from "./cta-consultoria";
 
 export function Cabecalho() {
   const insta = CONTEUDO.contato.instagram;
@@ -29,11 +29,11 @@ export function Cabecalho() {
             </a>
           ) : null}
           {/* Rótulo curto no celular, para o header não estourar a largura. */}
-          <BotaoWhatsApp
+          <CtaConsultoria
             rotulo="Agendar"
             className="whitespace-nowrap px-4 py-2.5 text-sm sm:hidden"
           />
-          <BotaoWhatsApp
+          <CtaConsultoria
             rotulo="Agendar avaliação"
             className="hidden whitespace-nowrap px-5 py-2.5 text-sm sm:inline-block"
           />

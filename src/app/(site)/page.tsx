@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CONTEUDO, ehPendente } from "@/lib/conteudo";
 import { Paragrafos } from "./marcador";
-import { BotaoWhatsApp } from "./whatsapp";
+import { CtaConsultoria } from "./cta-consultoria";
 import { Reveal } from "./reveal";
 
 export const metadata: Metadata = {
@@ -84,7 +84,7 @@ export default function Home() {
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <BotaoWhatsApp rotulo="Agendar avaliação" />
+              <CtaConsultoria rotulo="Agendar avaliação" />
               <Link
                 href="/#sobre"
                 className="inline-block rounded-full border border-dourado/50 px-7 py-3.5 font-sans text-sm text-dourado transition hover:bg-dourado hover:text-marrom"
@@ -321,7 +321,7 @@ export default function Home() {
             {chamadaFinal.apoio}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <BotaoWhatsApp rotulo="Agendar avaliação" />
+            <CtaConsultoria rotulo="Agendar avaliação" />
             {!ehPendente(contato.email) ? (
               <a
                 href={`mailto:${contato.email}`}
