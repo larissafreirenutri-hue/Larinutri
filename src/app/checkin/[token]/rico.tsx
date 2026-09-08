@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { DIMENSOES, corDaNota } from "@/lib/dimensoes";
 import { enviarCheckinRico, type EstadoCheckin } from "./actions";
@@ -277,6 +277,23 @@ export function FormularioRico({
     {},
   );
   const [temAlerta, setTemAlerta] = useState(false);
+  const [consentiu, setConsentiu] = useState(false);
+  const [faltaConsentimento, setFaltaConsentimento] = useState(false);
+  const refConsentimento = useRef<HTMLDivElement>(null);
+
+  // O consentimento é conferido aqui antes de tentar enviar. Sem ele, o
+  // envio nem sai, e a tela rola até a caixa com um aviso claro, em vez
+  // de deixar a paciente com uma mensagem vaga sem saber o que fazer.
+  function aoEnviar(e: React.FormEvent<HTMLFormElement>) {
+    if (!consentiu) {
+      e.preventDefault();
+      setFaltaConsentimento(true);
+      refConsentimento.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }
 
   if (estado.ok) {
     return (
@@ -306,7 +323,7 @@ export function FormularioRico({
   }
 
   return (
-    <form action={acao}>
+    <form action={acao} onSubmit={aoEnviar}>
       <input type="hidden" name="token" value={token} />
 
       <div className="mb-[18px] rounded-[20px] bg-gradient-to-br from-barra to-barra-alta p-[26px]">
@@ -444,12 +461,21 @@ export function FormularioRico({
         </p>
       ) : null}
 
-      <div className="mb-4 rounded-[18px] border border-linha bg-cartao px-[22px] py-5 shadow-cartao">
+      <div
+        ref={refConsentimento}
+        className={`mb-4 rounded-[18px] border bg-cartao px-[22px] py-5 shadow-cartao transition ${
+          faltaConsentimento ? "border-argila bg-argila-suave" : "border-linha"
+        }`}
+      >
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
             name="consentimento"
-            required
+            checked={consentiu}
+            onChange={(e) => {
+              setConsentiu(e.target.checked);
+              if (e.target.checked) setFaltaConsentimento(false);
+            }}
             className="mt-0.5 h-4 w-4 shrink-0 accent-[#A9723F]"
           />
           <span className="font-sans text-[13px] leading-relaxed text-neutro">
@@ -468,6 +494,11 @@ export function FormularioRico({
             .
           </span>
         </label>
+        {faltaConsentimento ? (
+          <p role="alert" className="mt-3 font-sans text-[13px] font-semibold text-argila">
+            Para enviar, marque a autorização acima.
+          </p>
+        ) : null}
       </div>
 
       <div className="mb-8 flex justify-end">

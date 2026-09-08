@@ -4,6 +4,60 @@ import { createClient } from "@/lib/supabase/server";
 
 export type EstadoCheckin = { ok?: boolean; erro?: string };
 
+type ErroPostgrest = {
+  message?: string;
+  code?: string;
+  details?: string;
+  hint?: string;
+};
+
+/**
+ * Loga o erro completo no servidor (aparece nos logs da Vercel) e
+ * devolve uma mensagem específica em português, nunca a genérica quando
+ * a causa é conhecida. É por aqui que paramos de adivinhar: o log diz
+ * exatamente em que passo e por quê falhou.
+ */
+function interpretarErroCheckin(erro: ErroPostgrest, onde: string): string {
+  console.error(`[checkin] falha ao gravar em ${onde}:`, {
+    message: erro?.message,
+    code: erro?.code,
+    details: erro?.details,
+    hint: erro?.hint,
+  });
+
+  const msg = `${erro?.message ?? ""} ${erro?.details ?? ""}`.toLowerCase();
+  const code = erro?.code ?? "";
+
+  // Link resolvido pela função, o raise de dentro do banco.
+  if (/inválido|invalido|expirado|respondido/.test(msg)) {
+    return "Este link não é mais válido, expirou ou já foi respondido. Peça um novo para a sua nutricionista.";
+  }
+
+  // A função não foi encontrada, ou existe em mais de uma versão. Isso
+  // aponta para a migração que corrige a sobrecarga ainda não rodada.
+  if (
+    code === "PGRST202" ||
+    code === "PGRST203" ||
+    /could not choose|is not unique|does not exist|não encontrada|nao encontrada|no function matches/.test(
+      msg,
+    )
+  ) {
+    return "Não foi possível registrar o seu check-in por um ajuste técnico pendente no sistema. Avise a Larissa que ela resolve rapidinho.";
+  }
+
+  // Este check-in já foi gravado, violação de unicidade.
+  if (code === "23505") {
+    return "Este check-in já foi registrado. Se você respondeu duas vezes, pode ignorar esta tela.";
+  }
+
+  // Algum valor fora do aceito pelo banco, uma restrição de coluna.
+  if (code?.startsWith("23")) {
+    return "Algum campo ficou com um valor fora do esperado. Revise as respostas e tente enviar de novo.";
+  }
+
+  return "Não foi possível enviar o seu check-in agora. Tente de novo em instantes. Se persistir, avise a Larissa.";
+}
+
 const ADESAO = ["Baixa", "Média", "Alta"];
 const SONO = ["Ruim", "Regular", "Boa", "Ótima"];
 const FOME = ["Baixa", "Moderada", "Alta"];
@@ -67,14 +121,7 @@ export async function enviarCheckin(
   });
 
   if (error) {
-    if (error.message.includes("inválido")) {
-      return {
-        erro: "Este link não é mais válido. Peça um novo para a sua nutricionista.",
-      };
-    }
-    return {
-      erro: "Não foi possível enviar o seu check-in. Tente novamente em instantes.",
-    };
+    return { erro: interpretarErroCheckin(error, "submit_checkin") };
   }
 
   return { ok: true };
@@ -168,20 +215,16 @@ export async function enviarCheckinRico(
     p_refeicao_livre: refeicaoLivre,
     p_refeicao_qtd: refeicaoQtd,
     p_refeicao_oque: refeicaoOque,
-    p_fotos: fotos.length > 0 ? fotos : null,
+    // Sempre um array, mesmo vazio, para a chamada nunca mandar um null
+    // sem tipo em p_fotos. Isso evita a ambiguidade de sobrecarga que
+    // fazia o envio sem foto falhar, e é inofensivo quando não há foto.
+    p_fotos: fotos,
     p_treinos_qtd: treinosQtd,
     p_treinos_quais: treinosQuais,
   });
 
   if (error) {
-    if (/invalido|inválido|expirado|respondido/i.test(error.message)) {
-      return {
-        erro: "Este link não é mais válido, expirou ou já foi respondido. Peça um novo para a sua nutricionista.",
-      };
-    }
-    return {
-      erro: "Não foi possível enviar o seu check-in. Tente novamente em instantes.",
-    };
+    return { erro: interpretarErroCheckin(error, "submit_checkin_link") };
   }
 
   return { ok: true };
