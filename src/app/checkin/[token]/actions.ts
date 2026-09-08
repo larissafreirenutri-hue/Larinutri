@@ -56,8 +56,24 @@ function interpretarErroCheckin(erro: ErroPostgrest, onde: string): string {
     return "Este check-in já foi registrado. Se você respondeu duas vezes, pode ignorar esta tela.";
   }
 
-  // Algum valor fora do aceito pelo banco, uma restrição de coluna.
+  // Violação de restrição de coluna. O nome da constraint vem no erro,
+  // então dá para dizer exatamente qual campo ficou fora do aceito.
   if (code?.startsWith("23")) {
+    if (/atividade|dias_atividade/.test(msg)) {
+      return "O número de vezes de atividade física ficou fora do aceito. Use um número de 0 a 21.";
+    }
+    if (/peso/.test(msg)) {
+      return "O peso informado ficou fora do aceito. Use um valor entre 1 e 499, com vírgula ou ponto.";
+    }
+    if (/notas|saciedade|hidratacao|digestao|tranquilidade|semana_geral|adesao/.test(msg)) {
+      return "Alguma nota ficou fora de 0 a 10. Ajuste os controles e tente de novo.";
+    }
+    if (/refeicao/.test(msg)) {
+      return "A quantidade de refeições livres ficou fora do aceito. Use um número de 0 a 50.";
+    }
+    if (/fotos/.test(msg)) {
+      return "Foram anexadas fotos demais. O limite é de 5 fotos por check-in.";
+    }
     return "Algum campo ficou com um valor fora do esperado. Revise as respostas e tente enviar de novo.";
   }
 
@@ -189,11 +205,15 @@ export async function enviarCheckinRico(
     .filter((f) => f.length > 0 && f.startsWith(`${token}/`))
     .slice(0, 5);
 
-  const treinosQtdBruto = Number(String(formData.get("treinos_qtd") ?? "").trim());
+  // Tolerante de propósito: qualquer número vira um inteiro entre 0 e
+  // 21, em vez de recusar. Campo vazio fica nulo, que diz "não
+  // respondido". Assim ninguém trava por ter treinado muitas vezes.
+  const treinosBruto = String(formData.get("treinos_qtd") ?? "").trim();
+  const treinosNum = treinosBruto === "" ? null : Math.round(Number(treinosBruto));
   const treinosQtd =
-    Number.isInteger(treinosQtdBruto) && treinosQtdBruto >= 0 && treinosQtdBruto <= 21
-      ? treinosQtdBruto
-      : null;
+    treinosNum === null || !Number.isFinite(treinosNum)
+      ? null
+      : Math.min(21, Math.max(0, treinosNum));
   const treinosQuais =
     treinosQtd && treinosQtd > 0
       ? String(formData.get("treinos_quais") ?? "").trim().slice(0, 300) || null
@@ -230,6 +250,18 @@ export async function enviarCheckinRico(
   });
 
   if (error) {
+    // Retrato do payload sem dado sensível, só o formato e as faixas,
+    // para comparar um envio que falha com um que passa e achar o campo.
+    // Nada de peso, texto livre ou caminho de foto entra no log.
+    console.error("[checkin] payload que falhou (sem dado sensível):", {
+      treinos_qtd: treinosQtd,
+      refeicao_livre: refeicaoLivre,
+      refeicao_qtd: refeicaoQtd,
+      fotos: fotos.length,
+      tem_peso: peso !== null,
+      obs_len: observacoes.length,
+      alerta_len: String(formData.get("alerta_clinico") ?? "").trim().length,
+    });
     return { erro: interpretarErroCheckin(error, "submit_checkin_link") };
   }
 
