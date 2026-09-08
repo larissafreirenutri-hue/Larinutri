@@ -75,8 +75,16 @@ export function Selo({
   );
 }
 
-/** Selo de status de link, com o tom que cada situação pede. */
-export function SeloLink({ status }: { status: string }) {
+/** Selo de status de link, com o tom que cada situação pede. O rótulo
+ * pode ser sobrescrito, para os links de check-in mostrarem
+ * "Substituído" onde o status guardado é 'expirado'. */
+export function SeloLink({
+  status,
+  rotulo,
+}: {
+  status: string;
+  rotulo?: string;
+}) {
   const tom: Tom =
     status === "respondido"
       ? "vital"
@@ -86,8 +94,8 @@ export function SeloLink({ status }: { status: string }) {
           ? "argila"
           : "neutro";
 
-  const rotulo = status.charAt(0).toUpperCase() + status.slice(1);
-  return <Selo tom={tom}>{rotulo}</Selo>;
+  const texto = rotulo ?? status.charAt(0).toUpperCase() + status.slice(1);
+  return <Selo tom={tom}>{texto}</Selo>;
 }
 
 export function SeloStatusPaciente({ status }: { status: string }) {

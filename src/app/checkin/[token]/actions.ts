@@ -28,9 +28,15 @@ function interpretarErroCheckin(erro: ErroPostgrest, onde: string): string {
   const msg = `${erro?.message ?? ""} ${erro?.details ?? ""}`.toLowerCase();
   const code = erro?.code ?? "";
 
-  // Link resolvido pela função, o raise de dentro do banco.
-  if (/inválido|invalido|expirado|respondido/.test(msg)) {
-    return "Este link não é mais válido, expirou ou já foi respondido. Peça um novo para a sua nutricionista.";
+  // Mensagens vindas do raise da função, cada situação com o seu texto.
+  if (/ja foi respondido|já foi respondido/.test(msg)) {
+    return "Este check-in já foi respondido.";
+  }
+  if (/substitu/.test(msg)) {
+    return "Este link foi substituído por um mais novo. Peça o link atual para a sua nutricionista.";
+  }
+  if (/inválido|invalido/.test(msg)) {
+    return "Este link não é válido. Peça um novo para a sua nutricionista.";
   }
 
   // A função não foi encontrada, ou existe em mais de uma versão. Isso

@@ -38,12 +38,13 @@ function LinkInvalido() {
       <main className="mx-auto my-12 max-w-[520px] px-5">
         <div className="rounded-[20px] border border-linha bg-cartao px-8 py-10 text-center shadow-cartao">
           <h1 className="font-display text-[26px] text-barra">
-            Link inválido ou expirado
+            Link indisponível
           </h1>
           <p className="mt-3 font-sans text-[15px] leading-relaxed text-neutro">
             Não encontramos um check-in aberto para este endereço. O link pode
-            já ter sido respondido, ter passado dos 7 dias, ou ter sido copiado
-            pela metade. Peça um novo para a sua nutricionista.
+            já ter sido respondido, ter sido substituído por um mais novo, ou
+            ter sido copiado pela metade. Peça o link atual para a sua
+            nutricionista.
           </p>
         </div>
       </main>

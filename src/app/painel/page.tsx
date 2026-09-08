@@ -74,7 +74,7 @@ export default async function TriagemPage() {
     supabase.from("checkin_links").select("gerado_em, status").gte("gerado_em", new Date(momento - 45 * DIA).toISOString()),
     supabase
       .from("checkin_links")
-      .select("id, patient_id, gerado_em, expira_em, status, patients(full_name)")
+      .select("id, patient_id, gerado_em, status, patients(full_name)")
       .in("status", ["gerado", "enviado"])
       .order("gerado_em", { ascending: false })
       .limit(8),
@@ -96,7 +96,6 @@ export default async function TriagemPage() {
     id: string;
     patient_id: string;
     gerado_em: string;
-    expira_em: string;
     status: string;
     patients: { full_name: string } | null;
   };
@@ -122,9 +121,9 @@ export default async function TriagemPage() {
     }))
     .sort((a, b) => a.para - a.de - (b.para - b.de));
 
-  const pendentes = ((pendentesRes.data ?? []) as unknown as Pendente[]).filter(
-    (l) => Date.parse(l.expira_em) > momento,
-  );
+  // A consulta já traz só os links em aberto. Sem prazo por tempo, não
+  // há mais o que filtrar por data aqui.
+  const pendentes = (pendentesRes.data ?? []) as unknown as Pendente[];
 
   const semanas = engajamentoPorSemana(
     (linksRes.data ?? []) as { gerado_em: string; status: string }[],

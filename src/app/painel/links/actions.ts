@@ -5,7 +5,28 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { gerarToken } from "@/lib/links";
 
-export type EstadoLink = { erro?: string; token?: string };
+export type EstadoLink = { erro?: string; token?: string; substituidos?: number };
+
+/**
+ * Cancela os links ainda em aberto do paciente, marcando como
+ * 'expirado', que aqui significa substituído. Assim nunca ficam dois
+ * links válidos ao mesmo tempo para a mesma pessoa. Devolve quantos
+ * foram substituídos, para a tela poder avisar. Um link já respondido
+ * não é tocado, pois guarda a resposta.
+ */
+async function invalidarLinksAbertos(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  patientId: string,
+) {
+  const { data } = await supabase
+    .from("checkin_links")
+    .update({ status: "expirado" })
+    .eq("patient_id", patientId)
+    .in("status", ["gerado", "enviado"])
+    .select("id");
+
+  return data?.length ?? 0;
+}
 
 /** Gera o link da semana para um paciente. */
 export async function gerarLink(
@@ -28,22 +49,9 @@ export async function gerarLink(
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Dois links ativos para a mesma semana confundem o paciente, que
-  // pode responder o antigo, e a resposta cairia na semana errada.
-  const { data: jaExiste } = await supabase
-    .from("checkin_links")
-    .select("id")
-    .eq("patient_id", patientId)
-    .eq("semana", semana)
-    .neq("status", "respondido")
-    .gt("expira_em", new Date().toISOString())
-    .maybeSingle();
-
-  if (jaExiste) {
-    return {
-      erro: `Já existe um link ativo para a semana ${semana}. Apague o antigo ou gere para outra semana.`,
-    };
-  }
+  // Um novo link substitui qualquer link em aberto do paciente, para
+  // não coexistirem dois válidos. O antigo vira cancelado.
+  const substituidos = await invalidarLinksAbertos(supabase, patientId);
 
   const token = gerarToken(semana);
 
@@ -61,7 +69,7 @@ export async function gerarLink(
 
   revalidatePath("/painel/links");
   revalidatePath(`/painel/pacientes/${patientId}`);
-  return { token };
+  return { token, substituidos };
 }
 
 /** Usada pelo botão Gerar check-in da ficha do paciente. */
@@ -77,6 +85,9 @@ export async function gerarLinkDoPaciente(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  // Substitui qualquer link em aberto antes de criar o novo.
+  await invalidarLinksAbertos(supabase, patientId);
 
   await supabase.from("checkin_links").insert({
     patient_id: patientId,
@@ -115,14 +126,13 @@ export async function excluirLink(formData: FormData) {
   revalidatePath("/painel/links");
 }
 
-/** Remove de uma vez os links vencidos que ninguém respondeu. */
+/** Remove de uma vez os links cancelados, que já foram substituídos. */
 export async function limparExpirados() {
   const supabase = await createClient();
   await supabase
     .from("checkin_links")
     .delete()
-    .neq("status", "respondido")
-    .lt("expira_em", new Date().toISOString());
+    .eq("status", "expirado");
 
   revalidatePath("/painel/links");
 }
@@ -148,6 +158,9 @@ export async function novoLinkDaSemanaSeguinte(formData: FormData) {
     .filter((s): s is number => typeof s === "number");
 
   const semana = semanas.length === 0 ? 1 : Math.max(...semanas) + 1;
+
+  // Substitui qualquer link em aberto antes de criar o da semana nova.
+  await invalidarLinksAbertos(supabase, patientId);
 
   await supabase.from("checkin_links").insert({
     patient_id: patientId,

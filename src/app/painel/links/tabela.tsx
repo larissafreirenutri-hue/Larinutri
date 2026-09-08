@@ -27,8 +27,15 @@ const LEGENDA = [
   { chave: "gerado", rotulo: "Gerado", texto: "criado, ainda não enviado" },
   { chave: "enviado", rotulo: "Enviado", texto: "com o paciente, aguardando" },
   { chave: "respondido", rotulo: "Respondido", texto: "resposta no sistema" },
-  { chave: "expirado", rotulo: "Expirado", texto: "passou dos 7 dias" },
+  { chave: "expirado", rotulo: "Substituído", texto: "cancelado, um link novo o substituiu" },
 ] as const;
+
+/** Texto da coluna de validade, já sem prazo por tempo. */
+function textoValidade(efetivo: string) {
+  if (efetivo === "respondido") return "respondido";
+  if (efetivo === "expirado") return "cancelado";
+  return "sem prazo";
+}
 
 function BotaoGerar() {
   const { pending } = useFormStatus();
@@ -91,6 +98,23 @@ export function Links({
 
   const expirados = comStatus.filter((l) => l.efetivo === "expirado").length;
 
+  // Quem já tem um link em aberto, para avisar antes de substituir.
+  const comLinkAberto = useMemo(
+    () =>
+      new Set(
+        links
+          .filter((l) => l.status === "gerado" || l.status === "enviado")
+          .map((l) => l.patient_id),
+      ),
+    [links],
+  );
+
+  function confirmarSubstituicao(nome: string) {
+    return window.confirm(
+      `${nome} já tem um link em aberto. Gerar um novo vai substituir o anterior, que deixa de valer. Continuar?`,
+    );
+  }
+
   const visiveis = useMemo(
     () =>
       comStatus.filter((l) => {
@@ -110,8 +134,9 @@ export function Links({
       <Cartao className="mt-8 px-6 py-6">
         <p className="max-w-2xl font-sans text-[15px] leading-relaxed text-neutro">
           Escolha o paciente e gere o link único e individual do check-in desta
-          semana. Cada link é tokenizado, expira em 7 dias e só pode ser
-          respondido uma vez.
+          semana. Cada link é tokenizado, vale até ser respondido, uma única
+          vez. Gerar um novo para o mesmo paciente substitui o que estiver em
+          aberto.
         </p>
 
         {pacientes.length === 0 ? (
@@ -119,7 +144,18 @@ export function Links({
             Cadastre um paciente antes de gerar links.
           </p>
         ) : (
-          <form action={acao} className="mt-5 flex flex-wrap items-end gap-3">
+          <form
+            action={acao}
+            onSubmit={(e) => {
+              if (
+                comLinkAberto.has(pacienteId) &&
+                !confirmarSubstituicao(escolhido?.full_name ?? "Este paciente")
+              ) {
+                e.preventDefault();
+              }
+            }}
+            className="mt-5 flex flex-wrap items-end gap-3"
+          >
             <div className="min-w-56">
               <label htmlFor="patient_id" className={CLASSE_ROTULO}>
                 Paciente
@@ -169,10 +205,20 @@ export function Links({
           </p>
         ) : null}
 
+        {estado.token && estado.substituidos ? (
+          <p
+            role="status"
+            className="mt-4 rounded-xl border border-mel/40 bg-mel-suave px-4 py-3 font-sans text-[14px] text-mel-tinta"
+          >
+            Link gerado. O link que estava em aberto para este paciente foi
+            substituído e não vale mais.
+          </p>
+        ) : null}
+
         <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-linha pt-5">
           {LEGENDA.map((l) => (
             <span key={l.chave} className="flex items-center gap-2">
-              <SeloLink status={l.chave} />
+              <SeloLink status={l.chave} rotulo={l.rotulo} />
               <span className="font-sans text-[13px] text-neutro">
                 {l.texto}
               </span>
@@ -228,13 +274,13 @@ export function Links({
                   type="submit"
                   onClick={(e) => {
                     const ok = window.confirm(
-                      `Apagar ${expirados} link(s) expirado(s)? Eles já não podem ser respondidos, e a ação não pode ser desfeita.`,
+                      `Apagar ${expirados} link(s) cancelado(s)? Eles foram substituídos e não podem mais ser respondidos, e a ação não pode ser desfeita.`,
                     );
                     if (!ok) e.preventDefault();
                   }}
                   className={CLASSE_BOTAO_SECUNDARIO}
                 >
-                  Limpar expirados
+                  Limpar cancelados
                 </button>
               </form>
             ) : null}
@@ -273,7 +319,7 @@ export function Links({
                     Gerado
                   </th>
                   <th className="olho px-6 py-3.5 text-left font-normal">
-                    Expira
+                    Validade
                   </th>
                   <th className="olho px-6 py-3.5 text-right font-normal">
                     Ações
@@ -309,7 +355,10 @@ export function Links({
                     </td>
 
                     <td className="px-6 py-4">
-                      <SeloLink status={link.efetivo} />
+                      <SeloLink
+                        status={link.efetivo}
+                        rotulo={link.efetivo === "expirado" ? "Substituído" : undefined}
+                      />
                     </td>
 
                     <td className="px-6 py-4 font-mono text-[13px] text-neutro">
@@ -317,7 +366,7 @@ export function Links({
                     </td>
 
                     <td className="px-6 py-4 font-mono text-[13px] text-neutro">
-                      {formatarData(link.expira_em)}
+                      {textoValidade(link.efetivo)}
                     </td>
 
                     <td className="px-6 py-4">
@@ -355,6 +404,16 @@ export function Links({
                           <button
                             type="submit"
                             title="Gera o link da próxima semana para este paciente"
+                            onClick={(e) => {
+                              if (
+                                comLinkAberto.has(link.patient_id) &&
+                                !confirmarSubstituicao(
+                                  link.patients?.full_name ?? "Este paciente",
+                                )
+                              ) {
+                                e.preventDefault();
+                              }
+                            }}
                             className={CLASSE_BOTAO_SECUNDARIO}
                           >
                             Novo
@@ -405,15 +464,17 @@ export function Links({
                       </p>
                     </div>
                   </div>
-                  <SeloLink status={link.efetivo} />
+                  <SeloLink
+                    status={link.efetivo}
+                    rotulo={link.efetivo === "expirado" ? "Substituído" : undefined}
+                  />
                 </div>
 
                 <p className="mt-3 break-all font-mono text-[12.5px] text-neutro">
                   {link.token}
                 </p>
                 <p className="mt-1 font-mono text-[12px] text-tenue">
-                  gerado {formatarData(link.gerado_em)} · expira{" "}
-                  {formatarData(link.expira_em)}
+                  gerado {formatarData(link.gerado_em)} · {textoValidade(link.efetivo)}
                 </p>
 
                 <div className="mt-3.5 flex flex-wrap gap-2">
@@ -443,7 +504,20 @@ export function Links({
                       name="patient_id"
                       value={link.patient_id}
                     />
-                    <button type="submit" className={CLASSE_BOTAO_SECUNDARIO}>
+                    <button
+                      type="submit"
+                      onClick={(e) => {
+                        if (
+                          comLinkAberto.has(link.patient_id) &&
+                          !confirmarSubstituicao(
+                            link.patients?.full_name ?? "Este paciente",
+                          )
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      className={CLASSE_BOTAO_SECUNDARIO}
+                    >
                       Novo
                     </button>
                   </form>

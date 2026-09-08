@@ -15,7 +15,9 @@ export type CheckinLink = {
   token: string;
   status: StatusLink;
   gerado_em: string;
-  expira_em: string;
+  // Sem uso desde que o link deixou de expirar por prazo. Mantida por
+  // compatibilidade com os registros antigos, pode ser nula.
+  expira_em: string | null;
   checkin_id: string | null;
   patients?: { id: string; full_name: string } | null;
 };
@@ -39,10 +41,13 @@ export function gerarToken(semana: number | null) {
   return `pt_${serie}_${parteSemana}_${sufixo}`;
 }
 
-/** Status efetivo, considerando a data de expiração. */
-export function statusEfetivo(link: CheckinLink, agora = Date.now()) {
-  if (link.status === "respondido") return "respondido";
-  if (Date.parse(link.expira_em) <= agora) return "expirado";
+/**
+ * Status efetivo do link. O link não expira mais por tempo, então o
+ * status guardado no banco é o próprio status. 'expirado' agora quer
+ * dizer cancelado, quando um link mais novo substituiu este. O segundo
+ * parâmetro é mantido pela assinatura antiga de quem ainda o passa.
+ */
+export function statusEfetivo(link: CheckinLink, _agora = Date.now()) {
   return link.status;
 }
 

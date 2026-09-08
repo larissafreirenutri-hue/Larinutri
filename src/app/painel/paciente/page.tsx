@@ -14,7 +14,7 @@ const PASSOS = [
   {
     titulo: "Você gera o link",
     texto:
-      "Em Links, escolhe o paciente e a semana. Cada link é individual e vale por 7 dias.",
+      "Em Links, escolhe o paciente e a semana. Cada link é individual e vale até ser respondido.",
   },
   {
     titulo: "O paciente responde",

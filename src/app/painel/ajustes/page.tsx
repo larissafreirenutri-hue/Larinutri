@@ -150,8 +150,9 @@ export default async function AjustesPage() {
             <div className="px-6 py-5">
               <ul className="space-y-3 font-sans text-[14.5px] leading-relaxed text-neutro">
                 <li>
-                  Cada link é individual, expira em <strong className="text-tinta">7 dias</strong>{" "}
-                  e só pode ser respondido uma vez.
+                  Cada link é individual, vale{" "}
+                  <strong className="text-tinta">até ser respondido</strong> e
+                  só pode ser respondido uma vez.
                 </li>
                 <li>
                   A resposta entra na esteira como{" "}

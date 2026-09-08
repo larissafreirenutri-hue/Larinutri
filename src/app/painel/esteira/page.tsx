@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { agora } from "@/lib/visao-geral";
 import { TituloPagina } from "../ui";
 import { Quadro, type CartaoCheckin, type CartaoPendente } from "./quadro";
 
@@ -10,7 +9,6 @@ export const metadata: Metadata = {
 
 export default async function EsteiraPage() {
   const supabase = await createClient();
-  const momento = agora();
 
   // O RLS limita as duas consultas às linhas desta nutricionista.
   const [checkinsRes, linksRes] = await Promise.all([
@@ -22,7 +20,7 @@ export default async function EsteiraPage() {
       .limit(200),
     supabase
       .from("checkin_links")
-      .select("id, patient_id, gerado_em, expira_em, status, patients(full_name)")
+      .select("id, patient_id, gerado_em, status, patients(full_name)")
       .in("status", ["gerado", "enviado"])
       .order("gerado_em", { ascending: false }),
   ]);
@@ -43,7 +41,6 @@ export default async function EsteiraPage() {
     id: string;
     patient_id: string;
     gerado_em: string;
-    expira_em: string;
     status: string;
     patients: { full_name: string } | null;
   };
@@ -60,12 +57,11 @@ export default async function EsteiraPage() {
     triagem: c.triagem,
   }));
 
-  // Link vencido some da esteira, senão a coluna vira um cemitério de
-  // cobranças que já não podem ser respondidas.
+  // A própria consulta já traz só os links em aberto, gerado ou
+  // enviado. Respondidos e cancelados ficam de fora da esteira.
   const pendentes: CartaoPendente[] = (
     (linksRes.data ?? []) as unknown as LinhaLink[]
   )
-    .filter((l) => Date.parse(l.expira_em) > momento)
     .map((l) => ({
       id: l.id,
       patient_id: l.patient_id,
