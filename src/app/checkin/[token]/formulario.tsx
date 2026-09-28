@@ -90,15 +90,16 @@ export function FormularioCheckin({
           <label htmlFor="peso_kg" className={rotuloCampo}>
             Peso atual, em quilos
           </label>
+          {/* Texto, e não number, para a vírgula decimal sobreviver.
+              O servidor troca vírgula por ponto antes de salvar. */}
           <input
             id="peso_kg"
             name="peso_kg"
-            type="number"
-            step="0.1"
-            min="1"
-            max="499"
+            type="text"
             inputMode="decimal"
-            placeholder="opcional"
+            autoComplete="off"
+            pattern="[0-9.,]*"
+            placeholder="opcional, ex: 90,95"
             className={`${baseControle} placeholder:text-creme/35`}
           />
         </div>

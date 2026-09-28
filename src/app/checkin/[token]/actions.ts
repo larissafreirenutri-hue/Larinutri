@@ -90,8 +90,16 @@ function daLista(valor: FormDataEntryValue | null, permitidos: string[]) {
   return permitidos.includes(texto) ? texto : null;
 }
 
+/**
+ * Lê um número que pode vir no formato brasileiro. Aceita vírgula ou
+ * ponto como separador decimal, ignora espaços e qualquer caractere
+ * que não seja dígito, vírgula ou ponto. Vazio vira null, que diz
+ * "não informado". Assim 90,95 chega ao banco como 90.95 numérico.
+ */
 function numeroOpcional(valor: FormDataEntryValue | null) {
-  const texto = String(valor ?? "").trim().replace(",", ".");
+  const texto = String(valor ?? "")
+    .replace(/[^\d.,]/g, "") // fora dígito, vírgula e ponto, descarta
+    .replace(",", ".");
   if (texto === "") return null;
   const n = Number(texto);
   return Number.isFinite(n) ? n : null;

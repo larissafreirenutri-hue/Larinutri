@@ -350,15 +350,18 @@ export function FormularioRico({
         >
           Peso atual (kg)
         </label>
+        {/* Texto, e não number, para a vírgula decimal sobreviver. Um
+            input number descarta o "90,95" em vários aparelhos. O
+            inputmode decimal abre o teclado numérico com vírgula, e o
+            servidor normaliza a vírgula para ponto antes de salvar. */}
         <input
           id="peso_kg"
           name="peso_kg"
-          type="number"
-          step="0.1"
-          min="1"
-          max="499"
+          type="text"
           inputMode="decimal"
-          placeholder="Ex: 72,4"
+          autoComplete="off"
+          pattern="[0-9.,]*"
+          placeholder="Ex: 90,95"
           className="mt-1.5 w-full rounded-[10px] border border-linha bg-white px-3 py-2.5 font-sans text-[14px] text-tinta outline-none focus:border-vital"
         />
       </Secao>
