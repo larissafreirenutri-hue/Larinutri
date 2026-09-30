@@ -147,7 +147,20 @@ export function FormularioLancamento({
               className={controle}
             />
           </div>
-        ) : null}
+        ) : (
+          <div>
+            <label htmlFor="pago_em" className={rotulo}>
+              Data do pagamento
+            </label>
+            <input
+              id="pago_em"
+              name="pago_em"
+              type="date"
+              defaultValue={lancamento?.pago_em ?? hoje}
+              className={controle}
+            />
+          </div>
+        )}
 
         <div>
           <label htmlFor="categoria" className={rotulo}>

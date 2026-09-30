@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatarData } from "@/lib/formato";
 import { agora } from "@/lib/visao-geral";
+import { diaDeHoje, type Lancamento } from "@/lib/financeiro";
+import type { PlanoPagamento } from "@/lib/planos";
 import { statusEfetivo, proximaSemana, type CheckinLink } from "@/lib/links";
 import type { Checkin, Paciente } from "@/lib/tipos";
 import type { Anamnese, AnamneseLink } from "@/lib/anamnese";
@@ -46,8 +48,14 @@ export default async function PacientePage({
 
   const paciente = dadosPaciente as Paciente;
 
-  const [checkinsRes, linksRes, anamneseRes, anamneseLinkRes] =
-    await Promise.all([
+  const [
+    checkinsRes,
+    linksRes,
+    anamneseRes,
+    anamneseLinkRes,
+    planosRes,
+    parcelasRes,
+  ] = await Promise.all([
       supabase
         .from("checkins")
         .select("*")
@@ -74,6 +82,18 @@ export default async function PacientePage({
         .order("gerado_em", { ascending: false })
         .limit(1)
         .maybeSingle(),
+      supabase
+        .from("payment_plans")
+        .select("*")
+        .eq("patient_id", id)
+        .order("created_at", { ascending: false }),
+      // Parcelas de qualquer plano deste paciente, para o resumo e a lista.
+      supabase
+        .from("transactions")
+        .select("*")
+        .eq("patient_id", id)
+        .not("payment_plan_id", "is", null)
+        .order("parcela_num", { ascending: true }),
     ]);
 
   const anamnese = (anamneseRes.data ?? null) as Anamnese | null;
@@ -102,6 +122,9 @@ export default async function PacientePage({
   }
   const links = (linksRes.data ?? []) as CheckinLink[];
   const linkAtual = links[0] ?? null;
+
+  const planos = (planosRes.data ?? []) as PlanoPagamento[];
+  const parcelas = (parcelasRes.data ?? []) as unknown as Lancamento[];
 
   const subtitulo = [
     paciente.objetivo,
@@ -200,6 +223,9 @@ export default async function PacientePage({
         urlsPorCheckin={urlsPorCheckin}
         anamnese={anamnese}
         anamneseLink={anamneseLink}
+        planos={planos}
+        parcelas={parcelas}
+        hoje={diaDeHoje(momento)}
         agora={momento}
         botaoEditarDados={
           <Link

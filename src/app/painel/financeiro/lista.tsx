@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { formatarData, formatarMoeda } from "@/lib/formato";
 import { chaveMes, dataEfetiva, type LancamentoNaLista } from "@/lib/financeiro";
 import { FormularioLancamento } from "./formulario-lancamento";
-import { marcarComoPago, excluirLancamento } from "./actions";
+import { marcarComoPago, atualizarPagamento, excluirLancamento } from "./actions";
 
 type FiltroTipo = "todos" | "receita" | "despesa";
 type FiltroStatus = "todos" | "pago" | "pendente" | "atrasado";
@@ -14,6 +14,86 @@ const DIA = 24 * 60 * 60 * 1000;
 
 const seletor =
   "mt-2 rounded-md border border-linha bg-cartao px-3 py-2 font-sans text-sm text-tinta outline-none focus:border-vital";
+
+/** "2/6" quando é parcela de plano, lido da descrição que geramos. */
+function parcelaBadge(l: LancamentoNaLista): string | null {
+  if (l.parcela_num === null) return null;
+  const m = /de (\d+)/.exec(l.descricao);
+  return m ? `${l.parcela_num}/${m[1]}` : `parcela ${l.parcela_num}`;
+}
+
+/** Marca como pago revelando um campo de data, já com hoje, editável. */
+function MarcarPagoData({ id, hoje }: { id: string; hoje: string }) {
+  const [aberto, setAberto] = useState(false);
+
+  if (!aberto) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAberto(true)}
+        className="rounded-md border border-emerald-600/40 px-3 py-1.5 font-sans text-xs text-emerald-700 transition hover:bg-emerald-50"
+      >
+        Marcar como pago
+      </button>
+    );
+  }
+
+  return (
+    <form action={marcarComoPago} className="flex flex-wrap items-center gap-2">
+      <input type="hidden" name="id" value={id} />
+      <label className="font-sans text-xs text-neutro">
+        Pago em
+        <input
+          type="date"
+          name="pago_em"
+          defaultValue={hoje}
+          className="ml-1.5 rounded-md border border-linha bg-cartao px-2 py-1 font-sans text-xs text-tinta outline-none focus:border-vital"
+        />
+      </label>
+      <button
+        type="submit"
+        className="rounded-md bg-emerald-600 px-3 py-1.5 font-sans text-xs font-semibold text-white transition hover:brightness-105"
+      >
+        Confirmar
+      </button>
+    </form>
+  );
+}
+
+/** Corrige a data de um pagamento já registrado. */
+function CorrigirDataInline({ id, pagoEm }: { id: string; pagoEm: string }) {
+  const [aberto, setAberto] = useState(false);
+
+  if (!aberto) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAberto(true)}
+        className="rounded-md border border-linha px-3 py-1.5 font-sans text-xs text-vital-fundo transition hover:bg-vital/10"
+      >
+        Corrigir data
+      </button>
+    );
+  }
+
+  return (
+    <form action={atualizarPagamento} className="flex flex-wrap items-center gap-2">
+      <input type="hidden" name="id" value={id} />
+      <input
+        type="date"
+        name="pago_em"
+        defaultValue={pagoEm}
+        className="rounded-md border border-linha bg-cartao px-2 py-1 font-sans text-xs text-tinta outline-none focus:border-vital"
+      />
+      <button
+        type="submit"
+        className="rounded-md border border-linha px-3 py-1.5 font-sans text-xs text-vital-fundo transition hover:bg-vital/10"
+      >
+        Salvar data
+      </button>
+    </form>
+  );
+}
 
 export function Lista({
   lancamentos,
@@ -147,13 +227,26 @@ export function Lista({
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-sans text-sm text-tinta">{l.descricao}</p>
+                  <p className="flex flex-wrap items-center gap-2 font-sans text-sm text-tinta">
+                    {l.descricao}
+                    {parcelaBadge(l) ? (
+                      <span className="rounded bg-vital/10 px-1.5 py-0.5 font-mono text-[10px] text-vital-fundo">
+                        {parcelaBadge(l)}
+                      </span>
+                    ) : null}
+                  </p>
                   <p className="mt-1 flex flex-wrap items-center gap-x-3 font-sans text-xs text-neutro">
-                    <span>
-                      {l.status === "pendente" && l.vencimento
-                        ? `vence ${formatarData(l.vencimento)}`
-                        : formatarData(dataEfetiva(l))}
-                    </span>
+                    {l.vencimento ? (
+                      <span>vence {formatarData(l.vencimento)}</span>
+                    ) : null}
+                    {l.status === "pago" && l.pago_em ? (
+                      <span className="text-emerald-700">
+                        pago em {formatarData(l.pago_em)}
+                      </span>
+                    ) : null}
+                    {l.status === "pago" && !l.pago_em && !l.vencimento ? (
+                      <span>{formatarData(dataEfetiva(l))}</span>
+                    ) : null}
                     {l.patients ? <span>{l.patients.full_name}</span> : null}
                     {l.categoria ? <span>{l.categoria}</span> : null}
                   </p>
@@ -186,15 +279,9 @@ export function Lista({
 
               <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-linha pt-3">
                 {l.status === "pendente" ? (
-                  <form action={marcarComoPago}>
-                    <input type="hidden" name="id" value={l.id} />
-                    <button
-                      type="submit"
-                      className="rounded-md border border-emerald-600/40 px-3 py-1.5 font-sans text-xs text-emerald-700 transition hover:bg-emerald-50"
-                    >
-                      Marcar como pago
-                    </button>
-                  </form>
+                  <MarcarPagoData id={l.id} hoje={hoje} />
+                ) : l.pago_em ? (
+                  <CorrigirDataInline id={l.id} pagoEm={l.pago_em} />
                 ) : null}
 
                 <button

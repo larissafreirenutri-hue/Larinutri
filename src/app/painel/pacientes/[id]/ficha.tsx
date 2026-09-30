@@ -13,15 +13,19 @@ import { Cartao, Medidor, Selo, AlertaClinico, Vazio } from "../../ui";
 import { LinhaEvolucao } from "./evolucao";
 import { AbaAnamnese } from "./anamnese-aba";
 import type { Anamnese, AnamneseLink } from "@/lib/anamnese";
+import type { Lancamento } from "@/lib/financeiro";
+import type { PlanoPagamento } from "@/lib/planos";
 import { Galeria } from "./galeria";
+import { AbaPagamentos } from "./pagamentos-aba";
 
-type Aba = "visao" | "checkins" | "evolucao" | "anamnese";
+type Aba = "visao" | "checkins" | "evolucao" | "anamnese" | "pagamentos";
 
 const ABAS: { chave: Aba; rotulo: string }[] = [
   { chave: "visao", rotulo: "Visão geral" },
   { chave: "checkins", rotulo: "Check-ins" },
   { chave: "evolucao", rotulo: "Evolução" },
   { chave: "anamnese", rotulo: "Anamnese" },
+  { chave: "pagamentos", rotulo: "Pagamentos" },
 ];
 
 function Citacao({ texto }: { texto: string }) {
@@ -109,6 +113,9 @@ export function Ficha({
   urlsPorCheckin,
   anamnese,
   anamneseLink,
+  planos,
+  parcelas,
+  hoje,
   agora,
   botaoEditarDados,
 }: {
@@ -119,6 +126,9 @@ export function Ficha({
   urlsPorCheckin: Record<string, string[]>;
   anamnese: Anamnese | null;
   anamneseLink: AnamneseLink | null;
+  planos: PlanoPagamento[];
+  parcelas: Lancamento[];
+  hoje: string;
   agora: number;
   botaoEditarDados: React.ReactNode;
 }) {
@@ -365,6 +375,15 @@ export function Ficha({
           anamnese={anamnese}
           link={anamneseLink}
           agora={agora}
+        />
+      ) : null}
+
+      {aba === "pagamentos" ? (
+        <AbaPagamentos
+          patientId={paciente.id}
+          planos={planos}
+          parcelas={parcelas}
+          hoje={hoje}
         />
       ) : null}
     </>

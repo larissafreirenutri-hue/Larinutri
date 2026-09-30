@@ -3,13 +3,41 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ehStatus, ehTipo } from "@/lib/financeiro";
+import { ehStatus, ehTipo, diaDeHoje } from "@/lib/financeiro";
 
 export type EstadoLancamento = { erro?: string };
 
 function opcional(valor: FormDataEntryValue | null) {
   const texto = String(valor ?? "").trim();
   return texto === "" ? null : texto;
+}
+
+/** Aceita só uma data pura AAAA-MM-DD, senão devolve null. */
+function dataPura(valor: FormDataEntryValue | null): string | null {
+  const texto = String(valor ?? "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(texto) ? texto : null;
+}
+
+/**
+ * Fecha o plano quando não sobra parcela pendente. Chamada depois de
+ * marcar uma parcela como paga. Um plano sem parcelas pendentes está
+ * concluído. Se ainda houver, garante que ele fique ativo.
+ */
+async function conciliarPlano(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  planId: string,
+) {
+  const { count } = await supabase
+    .from("transactions")
+    .select("id", { count: "exact", head: true })
+    .eq("payment_plan_id", planId)
+    .neq("status", "pago");
+
+  await supabase
+    .from("payment_plans")
+    .update({ status: (count ?? 0) === 0 ? "concluido" : "ativo" })
+    .eq("id", planId)
+    .neq("status", "cancelado");
 }
 
 /** Aceita "1.234,56" e "1234.56". */
@@ -77,7 +105,11 @@ export async function criarLancamento(
   const { error } = await supabase.from("transactions").insert({
     ...dados,
     // Já nasce pago quando marcado assim, para entrar no caixa do mês.
-    pago_em: dados.status === "pago" ? new Date().toISOString() : null,
+    // A data é a informada, ou hoje, como data pura sem fuso.
+    pago_em:
+      dados.status === "pago"
+        ? (dataPura(formData.get("pago_em")) ?? diaDeHoje(Date.now()))
+        : null,
     owner: user.id,
   });
 
@@ -111,8 +143,11 @@ export async function atualizarLancamento(
     .maybeSingle();
 
   let pago_em: string | null = atual?.pago_em ?? null;
+  // A data informada no formulário tem prioridade, para poder corrigir.
+  const informada = dataPura(formData.get("pago_em"));
   if (dados.status === "pendente") pago_em = null;
-  if (dados.status === "pago" && !pago_em) pago_em = new Date().toISOString();
+  else if (informada) pago_em = informada;
+  else if (!pago_em) pago_em = diaDeHoje(Date.now());
 
   const { error } = await supabase
     .from("transactions")
@@ -127,17 +162,51 @@ export async function atualizarLancamento(
   return {};
 }
 
+/**
+ * Marca um lançamento como pago com a data real informada. Não assume
+ * hoje sozinho, a data vem do formulário, já preenchida com hoje mas
+ * editável. Se for parcela de um plano, concilia o plano ao final.
+ */
 export async function marcarComoPago(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
   const supabase = await createClient();
-  await supabase
+  const pago_em = dataPura(formData.get("pago_em")) ?? diaDeHoje(Date.now());
+
+  const { data: linha } = await supabase
     .from("transactions")
-    .update({ status: "pago", pago_em: new Date().toISOString() })
-    .eq("id", id);
+    .update({ status: "pago", pago_em })
+    .eq("id", id)
+    .select("payment_plan_id")
+    .maybeSingle();
+
+  if (linha?.payment_plan_id) {
+    await conciliarPlano(supabase, linha.payment_plan_id);
+  }
 
   revalidatePath("/painel/financeiro");
+  revalidatePath("/painel/pacientes", "layout");
+}
+
+/**
+ * Corrige a data real de um pagamento já marcado como pago, sem mudar o
+ * status. Serve para quando a Larissa erra a data e precisa ajustar.
+ */
+export async function atualizarPagamento(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const pago_em = dataPura(formData.get("pago_em"));
+  if (!id || !pago_em) return;
+
+  const supabase = await createClient();
+  await supabase
+    .from("transactions")
+    .update({ pago_em })
+    .eq("id", id)
+    .eq("status", "pago");
+
+  revalidatePath("/painel/financeiro");
+  revalidatePath("/painel/pacientes", "layout");
 }
 
 export async function excluirLancamento(formData: FormData) {

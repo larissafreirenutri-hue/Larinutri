@@ -21,8 +21,12 @@ export type Lancamento = {
   patient_id: string | null;
   status: Status;
   vencimento: string | null;
+  // Data pura AAAA-MM-DD, a data real do pagamento, sem hora nem fuso.
   pago_em: string | null;
   created_at: string;
+  // Vínculo com um plano de pagamento, nulo em lançamentos avulsos.
+  payment_plan_id: string | null;
+  parcela_num: number | null;
   patients?: { id: string; full_name: string } | null;
 };
 
@@ -46,8 +50,17 @@ const ROTULO_MES = new Intl.DateTimeFormat("pt-BR", {
   timeZone: FUSO,
 });
 
-/** "2026-07", sempre no fuso de Brasília. */
+/**
+ * "2026-07", o mês da data. Uma data pura AAAA-MM-DD, como pago_em ou
+ * vencimento, tem o mês lido direto do texto, sem criar um Date, que a
+ * converteria para UTC e poderia jogar o dia 01 para o mês anterior.
+ * Timestamps de verdade, com hora, seguem pelo fuso de Brasília.
+ */
 export function chaveMes(momento: number | string) {
+  if (typeof momento === "string") {
+    const puro = /^(\d{4})-(\d{2})-\d{2}$/.exec(momento);
+    if (puro) return `${puro[1]}-${puro[2]}`;
+  }
   return CHAVE_MES.format(new Date(momento));
 }
 
