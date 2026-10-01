@@ -6,6 +6,7 @@ import { formatarData } from "@/lib/formato";
 import { agora } from "@/lib/visao-geral";
 import { diaDeHoje, type Lancamento } from "@/lib/financeiro";
 import type { PlanoPagamento } from "@/lib/planos";
+import type { Retorno } from "@/lib/retornos";
 import { statusEfetivo, proximaSemana, type CheckinLink } from "@/lib/links";
 import type { Checkin, Paciente } from "@/lib/tipos";
 import type { Anamnese, AnamneseLink } from "@/lib/anamnese";
@@ -55,6 +56,7 @@ export default async function PacientePage({
     anamneseLinkRes,
     planosRes,
     parcelasRes,
+    retornosRes,
   ] = await Promise.all([
       supabase
         .from("checkins")
@@ -94,6 +96,11 @@ export default async function PacientePage({
         .eq("patient_id", id)
         .not("payment_plan_id", "is", null)
         .order("parcela_num", { ascending: true }),
+      supabase
+        .from("retornos")
+        .select("*")
+        .eq("patient_id", id)
+        .order("numero", { ascending: true }),
     ]);
 
   const anamnese = (anamneseRes.data ?? null) as Anamnese | null;
@@ -125,6 +132,7 @@ export default async function PacientePage({
 
   const planos = (planosRes.data ?? []) as PlanoPagamento[];
   const parcelas = (parcelasRes.data ?? []) as unknown as Lancamento[];
+  const retornos = (retornosRes.data ?? []) as Retorno[];
 
   const subtitulo = [
     paciente.objetivo,
@@ -225,6 +233,7 @@ export default async function PacientePage({
         anamneseLink={anamneseLink}
         planos={planos}
         parcelas={parcelas}
+        retornos={retornos}
         hoje={diaDeHoje(momento)}
         agora={momento}
         botaoEditarDados={

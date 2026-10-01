@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { parcelaVencimento } from "@/lib/planos";
+import { parcelaVencimento, MODALIDADES, type Modalidade } from "@/lib/planos";
+import { distribuirRetornos } from "@/lib/retornos";
 
 export type EstadoPlano = { erro?: string; ok?: boolean };
 
@@ -38,6 +39,14 @@ export async function criarPlano(
   const meses = inteiro(formData.get("meses"));
   const diaBruto = inteiro(formData.get("dia_vencimento"));
   const dataInicio = String(formData.get("data_inicio") ?? "").trim();
+
+  const modalidadeBruta = String(formData.get("modalidade") ?? "").trim();
+  const modalidade = (MODALIDADES as readonly string[]).includes(modalidadeBruta)
+    ? (modalidadeBruta as Modalidade)
+    : null;
+
+  const retornosBruto = inteiro(formData.get("qtd_retornos")) ?? 0;
+  const qtdRetornos = Math.min(24, Math.max(0, retornosBruto));
 
   if (!patientId) return { erro: "Escolha o paciente." };
   if (valorMensal === null || valorMensal <= 0) {
@@ -78,6 +87,8 @@ export async function criarPlano(
       dia_vencimento: diaVencimento,
       data_inicio: dataInicio,
       status: "ativo",
+      modalidade,
+      qtd_retornos: qtdRetornos,
     })
     .select("id")
     .single();
@@ -111,6 +122,21 @@ export async function criarPlano(
     return { erro: "Não foi possível gerar as parcelas. Tente de novo." };
   }
 
+  // Retornos com distribuição estratégica, o último por volta de 82% da
+  // duração, para sobrar espaço para a conversa de renovação.
+  if (qtdRetornos > 0) {
+    const datas = distribuirRetornos(dataInicio, meses, qtdRetornos);
+    const retornos = datas.map((data, i) => ({
+      owner: user.id,
+      patient_id: patientId,
+      payment_plan_id: plano.id,
+      numero: i + 1,
+      data_prevista: data,
+      status: "pendente" as const,
+    }));
+    await supabase.from("retornos").insert(retornos);
+  }
+
   revalidatePath("/painel/financeiro");
   revalidatePath(`/painel/pacientes/${patientId}`);
   return { ok: true };
@@ -133,6 +159,14 @@ export async function cancelarPlano(formData: FormData) {
     .delete()
     .eq("payment_plan_id", id)
     .neq("status", "pago");
+
+  // Retornos que ainda não aconteceram saem junto. Os já realizados
+  // ficam como histórico.
+  await supabase
+    .from("retornos")
+    .delete()
+    .eq("payment_plan_id", id)
+    .neq("status", "realizado");
 
   await supabase
     .from("payment_plans")

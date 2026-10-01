@@ -15,6 +15,7 @@ import { AbaAnamnese } from "./anamnese-aba";
 import type { Anamnese, AnamneseLink } from "@/lib/anamnese";
 import type { Lancamento } from "@/lib/financeiro";
 import type { PlanoPagamento } from "@/lib/planos";
+import type { Retorno } from "@/lib/retornos";
 import { Galeria } from "./galeria";
 import { AbaPagamentos } from "./pagamentos-aba";
 
@@ -115,6 +116,7 @@ export function Ficha({
   anamneseLink,
   planos,
   parcelas,
+  retornos,
   hoje,
   agora,
   botaoEditarDados,
@@ -128,6 +130,7 @@ export function Ficha({
   anamneseLink: AnamneseLink | null;
   planos: PlanoPagamento[];
   parcelas: Lancamento[];
+  retornos: Retorno[];
   hoje: string;
   agora: number;
   botaoEditarDados: React.ReactNode;
@@ -383,6 +386,7 @@ export function Ficha({
           patientId={paciente.id}
           planos={planos}
           parcelas={parcelas}
+          retornos={retornos}
           hoje={hoje}
         />
       ) : null}

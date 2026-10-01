@@ -4,7 +4,13 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { formatarData, formatarMoeda } from "@/lib/formato";
 import type { Lancamento } from "@/lib/financeiro";
-import { resumirPlano, type PlanoPagamento } from "@/lib/planos";
+import {
+  resumirPlano,
+  MODALIDADES,
+  ROTULO_MODALIDADE,
+  type PlanoPagamento,
+} from "@/lib/planos";
+import { fimDoPlano, diasEntre, type Retorno } from "@/lib/retornos";
 import { Cartao, Selo, Vazio } from "../../ui";
 import {
   marcarComoPago,
@@ -16,6 +22,10 @@ import {
   editarPlano,
   type EstadoPlano,
 } from "../../financeiro/planos-actions";
+import {
+  marcarRetornoRealizado,
+  remarcarRetorno,
+} from "../../financeiro/retornos-actions";
 
 const campo =
   "mt-1.5 w-full rounded-[10px] border border-linha bg-white px-3 py-2.5 font-sans text-[14px] text-tinta outline-none focus:border-vital";
@@ -106,6 +116,100 @@ function CorrigirData({ id, pagoEm }: { id: string; pagoEm: string }) {
         type="date"
         name="pago_em"
         defaultValue={pagoEm}
+        className="rounded-md border border-linha bg-white px-2 py-1 font-sans text-xs text-tinta outline-none focus:border-vital"
+      />
+      <button
+        type="submit"
+        className="rounded-md border border-linha px-3 py-1 font-sans text-xs text-vital-fundo transition hover:bg-vital/10"
+      >
+        Salvar data
+      </button>
+    </form>
+  );
+}
+
+/** Marca um retorno como realizado, com a data real editável. */
+function MarcarRetorno({
+  id,
+  patientId,
+  hoje,
+}: {
+  id: string;
+  patientId: string;
+  hoje: string;
+}) {
+  const [aberto, setAberto] = useState(false);
+
+  if (!aberto) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAberto(true)}
+        className="rounded-md border border-emerald-600/40 px-3 py-1.5 font-sans text-xs text-emerald-700 transition hover:bg-emerald-50"
+      >
+        Marcar realizado
+      </button>
+    );
+  }
+
+  return (
+    <form
+      action={marcarRetornoRealizado}
+      className="flex flex-wrap items-center gap-2"
+    >
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="patient_id" value={patientId} />
+      <label className="font-sans text-xs text-neutro">
+        Em
+        <input
+          type="date"
+          name="realizado_em"
+          defaultValue={hoje}
+          className="ml-1.5 rounded-md border border-linha bg-white px-2 py-1 font-sans text-xs text-tinta outline-none focus:border-vital"
+        />
+      </label>
+      <button
+        type="submit"
+        className="rounded-md bg-emerald-600 px-3 py-1.5 font-sans text-xs font-semibold text-white transition hover:brightness-105"
+      >
+        Confirmar
+      </button>
+    </form>
+  );
+}
+
+/** Remarca um retorno para outra data prevista. */
+function RemarcarRetorno({
+  id,
+  patientId,
+  data,
+}: {
+  id: string;
+  patientId: string;
+  data: string;
+}) {
+  const [aberto, setAberto] = useState(false);
+
+  if (!aberto) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAberto(true)}
+        className="font-sans text-xs text-vital-fundo underline underline-offset-2 transition hover:text-vital"
+      >
+        remarcar
+      </button>
+    );
+  }
+
+  return (
+    <form action={remarcarRetorno} className="flex flex-wrap items-center gap-2">
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="patient_id" value={patientId} />
+      <input
+        type="date"
+        name="data_prevista"
+        defaultValue={data}
         className="rounded-md border border-linha bg-white px-2 py-1 font-sans text-xs text-tinta outline-none focus:border-vital"
       />
       <button
@@ -218,6 +322,39 @@ function FormularioNovoPlano({
           />
         </div>
 
+        <div>
+          <label htmlFor="modalidade" className={rotulo}>
+            Modalidade
+          </label>
+          <select id="modalidade" name="modalidade" className={campo} defaultValue="">
+            <option value="">Não informar</option>
+            {MODALIDADES.map((m) => (
+              <option key={m} value={m}>
+                {ROTULO_MODALIDADE[m]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="qtd_retornos" className={rotulo}>
+            Retornos inclusos
+          </label>
+          <input
+            id="qtd_retornos"
+            name="qtd_retornos"
+            type="number"
+            min={0}
+            max={24}
+            defaultValue={0}
+            className={campo}
+          />
+          <p className="mt-1 font-sans text-[12px] text-neutro">
+            O sistema distribui as datas ao longo do plano, o último antes do
+            fim.
+          </p>
+        </div>
+
         {estado.erro ? (
           <p
             role="alert"
@@ -313,14 +450,21 @@ function Resumo({ rotulo: r, valor }: { rotulo: string; valor: string }) {
 function CartaoPlano({
   plano,
   parcelas,
+  retornos,
   hoje,
 }: {
   plano: PlanoPagamento;
   parcelas: Lancamento[];
+  retornos: Retorno[];
   hoje: string;
 }) {
   const [editando, setEditando] = useState(false);
   const resumo = resumirPlano(parcelas, plano.valor_mensal, plano.meses);
+
+  const fim = fimDoPlano(plano.data_inicio, plano.meses);
+  const diasParaFim = diasEntre(hoje, fim);
+  // Perto do fim, entre hoje e 21 dias, é hora da conversa de renovação.
+  const perto = plano.status === "ativo" && diasParaFim >= 0 && diasParaFim <= 21;
 
   const selo =
     plano.status === "concluido"
@@ -341,8 +485,25 @@ function CartaoPlano({
           </div>
           <p className="mt-1 font-sans text-[14px] text-neutro">
             {formatarMoeda(plano.valor_mensal)} por mês, {plano.meses}{" "}
-            {plano.meses === 1 ? "parcela" : "parcelas"}, início em{" "}
-            {formatarData(plano.data_inicio)}
+            {plano.meses === 1 ? "parcela" : "parcelas"}
+            {plano.modalidade
+              ? `, ${ROTULO_MODALIDADE[plano.modalidade].toLowerCase()}`
+              : ""}
+            , início em {formatarData(plano.data_inicio)}
+          </p>
+          <p
+            className={`mt-1 font-sans text-[13px] ${
+              perto ? "font-semibold text-argila" : "text-neutro"
+            }`}
+          >
+            {plano.status === "concluido"
+              ? `encerrou em ${formatarData(fim)}`
+              : `termina em ${formatarData(fim)}`}
+            {perto
+              ? diasParaFim === 0
+                ? ", é hoje, hora de falar de renovação"
+                : `, em ${diasParaFim} ${diasParaFim === 1 ? "dia" : "dias"}, hora de falar de renovação`
+              : ""}
           </p>
         </div>
 
@@ -398,6 +559,63 @@ function CartaoPlano({
           valor={`${resumo.pagasQtd} de ${plano.meses}`}
         />
       </div>
+
+      {retornos.length > 0 ? (
+        <div className="mt-5 rounded-xl border border-linha px-4 py-3">
+          <p className="olho">Retornos</p>
+          <ul className="mt-2 divide-y divide-linha">
+            {retornos.map((r) => {
+              const atrasado = r.status === "pendente" && r.data_prevista < hoje;
+              return (
+                <li
+                  key={r.id}
+                  className={`flex flex-wrap items-center justify-between gap-2 py-2.5 ${
+                    atrasado ? "text-argila" : ""
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <p className="font-sans text-[14px] text-tinta">
+                      Retorno {r.numero} de {plano.qtd_retornos}
+                      <span className="ml-2 font-sans text-[12.5px] text-neutro">
+                        {r.status === "realizado" && r.realizado_em
+                          ? `realizado em ${formatarData(r.realizado_em)}`
+                          : `previsto ${formatarData(r.data_prevista)}`}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <span
+                      className={`rounded px-2 py-0.5 font-sans text-[10px] uppercase tracking-wider ${
+                        atrasado
+                          ? "bg-argila-suave text-argila"
+                          : r.status === "realizado"
+                            ? "bg-areia text-neutro"
+                            : "bg-vital/10 text-vital-fundo"
+                      }`}
+                    >
+                      {atrasado ? "atrasado" : r.status}
+                    </span>
+                    {r.status !== "realizado" ? (
+                      <>
+                        <MarcarRetorno
+                          id={r.id}
+                          patientId={plano.patient_id ?? ""}
+                          hoje={hoje}
+                        />
+                        <RemarcarRetorno
+                          id={r.id}
+                          patientId={plano.patient_id ?? ""}
+                          data={r.data_prevista}
+                        />
+                      </>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
 
       <ul className="mt-5 divide-y divide-linha">
         {parcelas.map((p) => {
@@ -463,17 +681,24 @@ export function AbaPagamentos({
   patientId,
   planos,
   parcelas,
+  retornos,
   hoje,
 }: {
   patientId: string;
   planos: PlanoPagamento[];
   parcelas: Lancamento[];
+  retornos: Retorno[];
   hoje: string;
 }) {
-  const porPlano = (planoId: string) =>
+  const parcelasDoPlano = (planoId: string) =>
     parcelas
       .filter((p) => p.payment_plan_id === planoId)
       .sort((a, b) => (a.parcela_num ?? 0) - (b.parcela_num ?? 0));
+
+  const retornosDoPlano = (planoId: string) =>
+    retornos
+      .filter((r) => r.payment_plan_id === planoId)
+      .sort((a, b) => a.numero - b.numero);
 
   return (
     <div className="mt-6 space-y-5">
@@ -489,7 +714,8 @@ export function AbaPagamentos({
           <CartaoPlano
             key={plano.id}
             plano={plano}
-            parcelas={porPlano(plano.id)}
+            parcelas={parcelasDoPlano(plano.id)}
+            retornos={retornosDoPlano(plano.id)}
             hoje={hoje}
           />
         ))

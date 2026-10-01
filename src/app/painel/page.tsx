@@ -3,11 +3,23 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatarData } from "@/lib/formato";
 import { agora } from "@/lib/visao-geral";
+import { diaDeHoje } from "@/lib/financeiro";
 import { diaDaSemana, engajamentoPorSemana, QUEDA_RELEVANTE, diasAte } from "@/lib/triagem";
+import { fimDoPlano, diasEntre, somarDias, type Retorno } from "@/lib/retornos";
+import type { PlanoPagamento } from "@/lib/planos";
 import type { NotasPaciente } from "@/lib/carteira";
 import { Avatar } from "./marca";
 import { Cartao, Olho, Selo } from "./ui";
 import { Engajamento } from "./engajamento";
+
+/** wa.me a partir do telefone do paciente, com 55 na frente se faltar. */
+function linkWhatsApp(phone: string | null): string | null {
+  if (!phone) return null;
+  const digitos = phone.replace(/\D/g, "");
+  if (digitos.length < 10) return null;
+  const comPais = digitos.startsWith("55") ? digitos : `55${digitos}`;
+  return `https://wa.me/${comPais}`;
+}
 
 export const metadata: Metadata = {
   title: "Triagem, Larissa Freire Nutricionista",
@@ -52,6 +64,8 @@ export default async function TriagemPage() {
     pacientesRes,
     linksRes,
     pendentesRes,
+    planosAtivosRes,
+    retornosProxRes,
   ] = await Promise.all([
     supabase.from("patients").select("id", { count: "exact", head: true }).eq("status", "ativo"),
     supabase.from("checkins").select("id", { count: "exact", head: true }).eq("triagem", "respondido"),
@@ -78,12 +92,25 @@ export default async function TriagemPage() {
       .in("status", ["gerado", "enviado"])
       .order("gerado_em", { ascending: false })
       .limit(8),
+    // Planos ativos, para calcular quais estão terminando.
+    supabase
+      .from("payment_plans")
+      .select("id, patient_id, data_inicio, meses, status, patients(full_name, phone)")
+      .eq("status", "ativo"),
+    // Retornos ainda não realizados, próximos ou atrasados.
+    supabase
+      .from("retornos")
+      .select("id, patient_id, numero, data_prevista, status, patients(full_name)")
+      .in("status", ["pendente", "remarcado"])
+      .lte("data_prevista", somarDias(diaDeHoje(momento), 7))
+      .order("data_prevista", { ascending: true }),
   ]);
 
   const erro =
     ativosRes.error ?? aAnalisarRes.error ?? alertasRes.error ??
     vencendoRes.error ?? notasRes.error ?? pacientesRes.error ??
-    linksRes.error ?? pendentesRes.error;
+    linksRes.error ?? pendentesRes.error ??
+    planosAtivosRes.error ?? retornosProxRes.error;
 
   type Alerta = {
     id: string;
@@ -135,6 +162,43 @@ export default async function TriagemPage() {
     full_name: string;
     plano_vence: string;
   }[];
+
+  const hojeSP = diaDeHoje(momento);
+
+  // Renovações se aproximando: planos ativos cujo fim cai nas próximas
+  // três semanas, tempo de puxar a conversa com o paciente ainda ativo.
+  type PlanoLinha = PlanoPagamento & {
+    patients: { full_name: string; phone: string | null } | null;
+  };
+  const renovacoes = ((planosAtivosRes.data ?? []) as unknown as PlanoLinha[])
+    .map((p) => {
+      const fim = fimDoPlano(p.data_inicio, p.meses);
+      return {
+        id: p.id,
+        patientId: p.patient_id,
+        nome: p.patients?.full_name ?? "Paciente removido",
+        whats: linkWhatsApp(p.patients?.phone ?? null),
+        fim,
+        dias: diasEntre(hojeSP, fim),
+      };
+    })
+    .filter((r) => r.dias >= 0 && r.dias <= 21)
+    .sort((a, b) => a.dias - b.dias);
+
+  // Retornos: atrasados primeiro, depois os dos próximos sete dias.
+  type RetornoLinha = Retorno & {
+    patients: { full_name: string } | null;
+  };
+  const retornos = ((retornosProxRes.data ?? []) as unknown as RetornoLinha[])
+    .map((r) => ({
+      id: r.id,
+      patientId: r.patient_id,
+      nome: r.patients?.full_name ?? "Paciente removido",
+      numero: r.numero,
+      data: r.data_prevista,
+      atrasado: r.data_prevista < hojeSP,
+    }))
+    .sort((a, b) => a.data.localeCompare(b.data));
 
   return (
     <>
@@ -296,6 +360,89 @@ export default async function TriagemPage() {
                       <span className="shrink-0 font-mono text-[12.5px] text-mel-tinta">
                         em {diasAte(v.plano_vence, momento)} dias
                       </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Cartao>
+          ) : null}
+
+          {renovacoes.length > 0 ? (
+            <Cartao>
+              <header className="border-b border-linha px-6 py-5">
+                <h2 className="font-display text-[21px] text-barra">
+                  Renovações se aproximando
+                </h2>
+                <p className="mt-1 font-sans text-[13px] text-neutro">
+                  Planos terminando nas próximas três semanas.
+                </p>
+              </header>
+              <ul className="px-6 py-5 space-y-2.5">
+                {renovacoes.map((r) => (
+                  <li
+                    key={r.id}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-linha px-4 py-3"
+                  >
+                    <Link
+                      href={`/painel/pacientes/${r.patientId}`}
+                      className="min-w-0 flex-1 transition hover:text-vital-fundo"
+                    >
+                      <span className="block truncate font-sans text-[15px] text-tinta">
+                        {r.nome}
+                      </span>
+                      <span className="font-mono text-[12.5px] text-mel-tinta">
+                        termina {formatarData(r.fim)}
+                        {r.dias === 0
+                          ? ", é hoje"
+                          : `, em ${r.dias} ${r.dias === 1 ? "dia" : "dias"}`}
+                      </span>
+                    </Link>
+                    {r.whats ? (
+                      <a
+                        href={r.whats}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 rounded-md border border-emerald-600/40 px-3 py-1.5 font-sans text-xs text-emerald-700 transition hover:bg-emerald-50"
+                      >
+                        WhatsApp
+                      </a>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </Cartao>
+          ) : null}
+
+          {retornos.length > 0 ? (
+            <Cartao>
+              <header className="border-b border-linha px-6 py-5">
+                <h2 className="font-display text-[21px] text-barra">Retornos</h2>
+                <p className="mt-1 font-sans text-[13px] text-neutro">
+                  Atrasados e dos próximos sete dias.
+                </p>
+              </header>
+              <ul className="px-6 py-5 space-y-2.5">
+                {retornos.map((r) => (
+                  <li key={r.id}>
+                    <Link
+                      href={`/painel/pacientes/${r.patientId}`}
+                      className={`flex items-center justify-between gap-4 rounded-xl border px-4 py-3 transition ${
+                        r.atrasado
+                          ? "border-argila/35 bg-argila-suave"
+                          : "border-linha hover:border-vital/50"
+                      }`}
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate font-sans text-[15px] text-tinta">
+                          {r.nome}
+                        </span>
+                        <span className="font-mono text-[12.5px] text-neutro">
+                          retorno {r.numero}, {formatarData(r.data)}
+                        </span>
+                      </span>
+                      <Selo tom={r.atrasado ? "argila" : "mel"}>
+                        {r.atrasado ? "atrasado" : "em breve"}
+                      </Selo>
                     </Link>
                   </li>
                 ))}

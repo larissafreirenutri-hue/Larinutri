@@ -3,6 +3,15 @@ import type { Lancamento } from "./financeiro";
 export const STATUS_PLANO = ["ativo", "concluido", "cancelado"] as const;
 export type StatusPlano = (typeof STATUS_PLANO)[number];
 
+export const MODALIDADES = ["online", "presencial", "domiciliar"] as const;
+export type Modalidade = (typeof MODALIDADES)[number];
+
+export const ROTULO_MODALIDADE: Record<Modalidade, string> = {
+  online: "Online",
+  presencial: "Presencial",
+  domiciliar: "Domiciliar",
+};
+
 export type PlanoPagamento = {
   id: string;
   owner: string;
@@ -13,6 +22,8 @@ export type PlanoPagamento = {
   dia_vencimento: number | null;
   data_inicio: string;
   status: StatusPlano;
+  modalidade: Modalidade | null;
+  qtd_retornos: number;
   created_at: string;
 };
 
