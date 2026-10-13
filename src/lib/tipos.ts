@@ -19,6 +19,9 @@ export type Paciente = {
   sono_habitual?: string | null;
   treino_planejado?: string | null;
   meta_agua?: string | null;
+  // Portal do paciente, migração 0023.
+  auth_user_id?: string | null;
+  acesso_status?: string | null;
 };
 
 export type Checkin = {

@@ -1,13 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseEnv } from "./env";
-
-/** Rotas que exigem sessão. Qualquer subcaminho também é protegido. */
-const ROTAS_PROTEGIDAS = ["/painel"];
+import { papelDoUsuario } from "@/lib/portal";
 
 /**
- * Renova o token da sessão a cada requisição e barra acesso ao painel
- * quando não há usuário autenticado.
+ * Renova o token da sessão a cada requisição e roteia por papel. A
+ * nutricionista fica restrita ao painel, o paciente ao portal, e uma
+ * tentativa cruzada é redirecionada. Isto é a camada de roteamento, a
+ * proteção de dados mora no RLS do banco.
  */
 export async function updateSession(request: NextRequest) {
   const { url, key } = getSupabaseEnv();
@@ -38,22 +38,41 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const caminho = request.nextUrl.pathname;
-  const ehProtegida = ROTAS_PROTEGIDAS.some(
-    (rota) => caminho === rota || caminho.startsWith(`${rota}/`),
-  );
+  const pedePainel = caminho === "/painel" || caminho.startsWith("/painel/");
+  const pedePortal =
+    caminho === "/meu-acompanhamento" ||
+    caminho.startsWith("/meu-acompanhamento/");
 
-  if (!user && ehProtegida) {
+  const redirecionarPara = (pathname: string, manterRedirect = false) => {
     const destino = request.nextUrl.clone();
-    destino.pathname = "/login";
-    destino.searchParams.set("redirecionar", caminho);
+    destino.pathname = pathname;
+    destino.search = "";
+    if (manterRedirect) destino.searchParams.set("redirecionar", caminho);
     return NextResponse.redirect(destino);
+  };
+
+  // Sem sessão: cada área manda para o seu próprio login.
+  if (!user) {
+    if (pedePainel) return redirecionarPara("/login", true);
+    if (pedePortal) return redirecionarPara("/entrar", true);
+    return response;
   }
 
-  if (user && caminho === "/login") {
-    const destino = request.nextUrl.clone();
-    destino.pathname = "/painel";
-    destino.search = "";
-    return NextResponse.redirect(destino);
+  const papel = papelDoUsuario(user.app_metadata);
+
+  if (papel === "paciente") {
+    // Paciente nunca entra no painel da nutricionista.
+    if (pedePainel) return redirecionarPara("/meu-acompanhamento");
+    if (caminho === "/entrar" || caminho === "/login") {
+      return redirecionarPara("/meu-acompanhamento");
+    }
+    return response;
+  }
+
+  // Nutricionista: fica no painel, não usa a área do paciente.
+  if (pedePortal) return redirecionarPara("/painel");
+  if (caminho === "/login" || caminho === "/entrar") {
+    return redirecionarPara("/painel");
   }
 
   return response;

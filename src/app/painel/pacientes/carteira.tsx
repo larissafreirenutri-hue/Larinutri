@@ -239,8 +239,17 @@ export function Carteira({
                       <div className="flex items-center gap-3.5">
                         <Avatar nome={p.full_name} />
                         <div className="min-w-0">
-                          <p className="font-sans text-[16px] font-semibold text-tinta">
+                          <p className="flex items-center gap-2 font-sans text-[16px] font-semibold text-tinta">
                             {p.full_name}
+                            {p.acesso_status === "ativo" ? (
+                              <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-sans text-[10px] font-medium uppercase tracking-wider text-emerald-800">
+                                portal
+                              </span>
+                            ) : p.acesso_status === "convidado" ? (
+                              <span className="rounded-full bg-mel-suave px-2 py-0.5 font-sans text-[10px] font-medium uppercase tracking-wider text-mel-tinta">
+                                convidado
+                              </span>
+                            ) : null}
                           </p>
                           <p className="mt-0.5 font-mono text-[12.5px] text-neutro">
                             {p.restricao || "Nenhuma"}
@@ -354,8 +363,13 @@ export function Carteira({
               >
                 <Avatar nome={p.full_name} />
                 <span className="min-w-0 flex-1">
-                  <span className="block font-sans text-[16px] font-semibold text-tinta">
+                  <span className="flex items-center gap-2 font-sans text-[16px] font-semibold text-tinta">
                     {p.full_name}
+                    {p.acesso_status === "ativo" ? (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-sans text-[10px] font-medium uppercase tracking-wider text-emerald-800">
+                        portal
+                      </span>
+                    ) : null}
                   </span>
                   <span className="mt-0.5 block font-mono text-[12.5px] text-neutro">
                     {p.restricao || "Nenhuma"}

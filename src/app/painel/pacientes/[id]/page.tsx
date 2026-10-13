@@ -19,6 +19,8 @@ import {
   CLASSE_BOTAO_SECUNDARIO,
 } from "../../ui";
 import { Ficha } from "./ficha";
+import { AcessoPortal } from "./acesso-portal";
+import type { AcessoStatus } from "@/lib/portal";
 import { createAdminClient, BUCKET_FOTOS } from "@/lib/supabase/admin";
 import { arquivarPaciente } from "../actions";
 
@@ -224,6 +226,15 @@ export default async function PacientePage({
           </div>
         </div>
       </Cartao>
+
+      <div className="mt-5">
+        <AcessoPortal
+          patientId={paciente.id}
+          nome={paciente.full_name}
+          phone={paciente.phone}
+          acessoStatus={(paciente.acesso_status as AcessoStatus) ?? "sem_acesso"}
+        />
+      </div>
 
       <Ficha
         paciente={paciente}
