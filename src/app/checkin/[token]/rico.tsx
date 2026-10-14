@@ -3,8 +3,13 @@
 import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { DIMENSOES, corDaNota } from "@/lib/dimensoes";
-import { enviarCheckinRico, type EstadoCheckin } from "./actions";
+import type { EstadoCheckin } from "@/lib/checkin-payload";
 import { FotosDaSemana } from "./fotos";
+
+type AcaoCheckin = (
+  estado: EstadoCheckin,
+  formData: FormData,
+) => Promise<EstadoCheckin>;
 
 const SECOES = [
   {
@@ -264,16 +269,25 @@ function BotaoEnviar() {
 }
 
 export function FormularioRico({
-  token,
   primeiroNome,
   semana,
+  acaoEnvio,
+  campoNome,
+  campoValor,
+  uploadUrl,
 }: {
-  token: string;
   primeiroNome: string;
   semana: number | null;
+  /** Ação de envio: por token, no link, ou pela sessão, no portal. */
+  acaoEnvio: AcaoCheckin;
+  /** Identificador do check-in no envio: "token" ou "link_id". */
+  campoNome: "token" | "link_id";
+  campoValor: string;
+  /** Endpoint de upload de fotos, escopado ao remetente. */
+  uploadUrl: string;
 }) {
   const [estado, acao] = useActionState<EstadoCheckin, FormData>(
-    enviarCheckinRico,
+    acaoEnvio,
     {},
   );
   const [temAlerta, setTemAlerta] = useState(false);
@@ -324,7 +338,7 @@ export function FormularioRico({
 
   return (
     <form action={acao} onSubmit={aoEnviar}>
-      <input type="hidden" name="token" value={token} />
+      <input type="hidden" name={campoNome} value={campoValor} />
 
       <div className="mb-[18px] rounded-[20px] bg-gradient-to-br from-barra to-barra-alta p-[26px]">
         <p className="olho text-dourado">Acompanhamento da semana</p>
@@ -369,7 +383,7 @@ export function FormularioRico({
       {SECOES.map((secao) => (
         <div key={`bloco-${secao.chave}`}>
         {/* Fotos entram depois de Bem-estar, antes do Fechamento. */}
-        {secao.chave === "fechamento" ? <FotosDaSemana token={token} /> : null}
+        {secao.chave === "fechamento" ? <FotosDaSemana uploadUrl={uploadUrl} /> : null}
         <Secao titulo={secao.titulo} apoio={secao.apoio}>
           {secao.chave === "treino" ? <Treinos /> : null}
           {DIMENSOES.filter((d) => d.secao === secao.chave).map((d) => (
@@ -509,7 +523,7 @@ export function FormularioRico({
       </div>
 
       <p className="mb-6 text-center font-mono text-[11px] text-tenue">
-        Check-in individual · {token}
+        Check-in individual e confidencial
       </p>
     </form>
   );

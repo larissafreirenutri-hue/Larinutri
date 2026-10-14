@@ -15,7 +15,7 @@ type Foto = {
   erro?: string;
 };
 
-export function FotosDaSemana({ token }: { token: string }) {
+export function FotosDaSemana({ uploadUrl }: { uploadUrl: string }) {
   const [fotos, setFotos] = useState<Foto[]>([]);
   const [aviso, setAviso] = useState<string | null>(null);
   // Dois inputs: um para a galeria, sem capture, e um para a câmera,
@@ -38,7 +38,7 @@ export function FotosDaSemana({ token }: { token: string }) {
 
   async function enviarUma(foto: Foto, indice: number) {
     try {
-      const resposta = await fetch(`/api/checkin/${token}/upload`, {
+      const resposta = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

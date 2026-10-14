@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { FormularioCheckin } from "./formulario";
 import { FormularioRico } from "./rico";
+import { enviarCheckinRico } from "./actions";
 import { Folha } from "@/app/painel/marca";
 
 export const metadata: Metadata = {
@@ -93,9 +94,12 @@ export default async function CheckinPage({
       <Barra />
       <main className="mx-auto w-full max-w-[640px] flex-1 px-5 py-6">
         <FormularioRico
-          token={token}
           primeiroNome={linha.primeiro_nome}
           semana={linha.semana ?? null}
+          acaoEnvio={enviarCheckinRico}
+          campoNome="token"
+          campoValor={token}
+          uploadUrl={`/api/checkin/${token}/upload`}
         />
       </main>
     </>

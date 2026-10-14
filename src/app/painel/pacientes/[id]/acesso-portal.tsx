@@ -10,6 +10,10 @@ import {
   enviarResetSenhaPaciente,
   type EstadoAcesso,
 } from "../acesso-actions";
+import {
+  abrirCheckinSemana,
+  type EstadoAbrirSemana,
+} from "../../links/actions";
 
 function tomDoStatus(status: AcessoStatus) {
   if (status === "ativo") return "verde" as const;
@@ -118,6 +122,36 @@ function BotaoReset({ patientId }: { patientId: string }) {
   );
 }
 
+/** Abre o check-in da semana no portal, jeito manual para testar. */
+function BotaoAbrirSemana({ patientId }: { patientId: string }) {
+  const [estado, acao, pending] = useActionState<EstadoAbrirSemana, FormData>(
+    abrirCheckinSemana,
+    {},
+  );
+
+  return (
+    <form action={acao} className="flex flex-col gap-1">
+      <input type="hidden" name="patient_id" value={patientId} />
+      <button type="submit" disabled={pending} className={CLASSE_BOTAO_SECUNDARIO}>
+        {pending ? "Abrindo..." : "Abrir check-in da semana"}
+      </button>
+      {estado.ok ? (
+        <span className="font-sans text-[12px] text-emerald-700">
+          Check-in da semana aberto. Já aparece no portal do paciente.
+        </span>
+      ) : null}
+      {estado.jaAberto ? (
+        <span className="font-sans text-[12px] text-neutro">
+          O check-in desta semana já estava aberto ou respondido.
+        </span>
+      ) : null}
+      {estado.erro ? (
+        <span className="font-sans text-[12px] text-argila">{estado.erro}</span>
+      ) : null}
+    </form>
+  );
+}
+
 export function AcessoPortal({
   patientId,
   nome,
@@ -206,8 +240,9 @@ export function AcessoPortal({
             com o e-mail e a senha dele. Se esqueceu a senha, pode recuperar
             sozinho ali mesmo, ou você envia o link por e-mail:
           </p>
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap items-start gap-3">
             <BotaoReset patientId={patientId} />
+            <BotaoAbrirSemana patientId={patientId} />
           </div>
         </div>
       ) : null}

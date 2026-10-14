@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { enviarCheckin, type EstadoCheckin } from "./actions";
+import { enviarCheckin } from "./actions";
+import type { EstadoCheckin } from "@/lib/checkin-payload";
 
 const rotuloCampo = "block font-sans text-sm text-creme/80";
 const baseControle =

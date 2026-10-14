@@ -1,8 +1,12 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatarData, formatarPeso, formatarVariacao } from "@/lib/formato";
 import { DIMENSOES_DA_FICHA, notaDe, notasPreenchidas } from "@/lib/dimensoes";
 import { urlBase } from "@/lib/url-base";
+import { diaDeHoje } from "@/lib/financeiro";
+import { agora } from "@/lib/visao-geral";
+import { segundaDaSemana } from "@/lib/semana";
 import type { Checkin, Paciente } from "@/lib/tipos";
 import { Cartao, Medidor } from "../painel/ui";
 import { LinhaEvolucao } from "../painel/pacientes/[id]/evolucao";
@@ -51,6 +55,21 @@ export default async function MeuAcompanhamentoPage({
 
   const checkins = (dadosCheckins ?? []) as Checkin[];
   const ultimo = checkins[0] ?? null;
+
+  // Check-in da semana corrente, de segunda a domingo. No máximo um por
+  // semana, então uma linha diz o estado: aberto, respondido ou nenhum.
+  const segunda = segundaDaSemana(diaDeHoje(agora()));
+  const { data: linkSemana } = await supabase
+    .from("checkin_links")
+    .select("id, status")
+    .eq("patient_id", paciente.id)
+    .eq("semana_inicio", segunda)
+    .neq("status", "expirado")
+    .maybeSingle();
+
+  const semanaAberta =
+    linkSemana?.status === "gerado" || linkSemana?.status === "enviado";
+  const semanaRespondida = linkSemana?.status === "respondido";
 
   // Peso atual é o último informado, e a variação compara com o de
   // partida, o peso inicial do cadastro ou o primeiro check-in com peso.
@@ -108,17 +127,54 @@ export default async function MeuAcompanhamentoPage({
         </Cartao>
       </section>
 
-      {/* Placeholder do check-in, que chega na próxima fase. */}
+      {/* Check-in da semana, o aviso principal da entrada. */}
       <section className="mt-4">
-        <div className="rounded-2xl border border-dashed border-linha bg-cartao px-6 py-6 text-center">
-          <p className="font-sans text-[15px] font-semibold text-tinta">
-            Seu check-in aparece aqui toda semana
-          </p>
-          <p className="mx-auto mt-1.5 max-w-md font-sans text-[13.5px] leading-relaxed text-neutro">
-            Em breve você responde o seu check-in por aqui mesmo. Por enquanto,
-            siga pelo link que a Larissa te envia.
-          </p>
-        </div>
+        {semanaAberta ? (
+          <div className="rounded-2xl border border-vital/40 bg-vital/5 px-6 py-6">
+            <p className="olho text-vital-fundo">Check-in desta semana</p>
+            <h2 className="mt-2 font-display text-[22px] text-barra">
+              Seu check-in desta semana está aberto
+            </h2>
+            <p className="mt-1.5 font-sans text-[14.5px] leading-relaxed text-neutro">
+              Leva uns 3 minutos, respondendo com sinceridade. É o que ajuda a
+              Larissa a ajustar o seu plano.
+            </p>
+            <Link
+              href="/meu-acompanhamento/check-in"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-vital px-5 py-3 font-sans text-[15px] font-semibold text-white shadow-acao transition hover:brightness-105"
+            >
+              Responder agora
+            </Link>
+          </div>
+        ) : semanaRespondida ? (
+          <div className="rounded-2xl border border-emerald-600/30 bg-emerald-50 px-6 py-5">
+            <div className="flex items-center gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-emerald-600/15">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#047857" strokeWidth="2.5" aria-hidden>
+                  <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <div>
+                <p className="font-sans text-[15px] font-semibold text-emerald-800">
+                  Check-in desta semana enviado, obrigada!
+                </p>
+                <p className="mt-0.5 font-sans text-[13.5px] text-emerald-700">
+                  A Larissa vai analisar e te dar um retorno. Bom descanso.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-linha bg-cartao px-6 py-6 text-center">
+            <p className="font-sans text-[15px] font-semibold text-tinta">
+              Nenhum check-in aberto por enquanto
+            </p>
+            <p className="mx-auto mt-1.5 max-w-md font-sans text-[13.5px] leading-relaxed text-neutro">
+              Seu próximo check-in abre na segunda. Quando estiver disponível,
+              ele aparece aqui em destaque.
+            </p>
+          </div>
+        )}
       </section>
 
       {ultimo && notasPreenchidas(ultimo) > 0 ? (

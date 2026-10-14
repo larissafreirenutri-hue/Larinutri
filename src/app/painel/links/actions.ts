@@ -4,8 +4,79 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { gerarToken } from "@/lib/links";
+import { segundaDaSemana } from "@/lib/semana";
+import { diaDeHoje } from "@/lib/financeiro";
+import { agora } from "@/lib/visao-geral";
 
 export type EstadoLink = { erro?: string; token?: string; substituidos?: number };
+
+export type EstadoAbrirSemana = { erro?: string; ok?: boolean; jaAberto?: boolean };
+
+/**
+ * Abre o check-in da semana corrente para um paciente, no portal. Cria
+ * uma linha em checkin_links com a segunda-feira da semana, que a área
+ * logada do paciente passa a mostrar em destaque. Uso único por semana,
+ * garantido pelo índice no banco. Enquanto a automação de segunda não
+ * existe, este é o jeito manual de abrir, para testar a Fase 2.
+ */
+export async function abrirCheckinSemana(
+  _anterior: EstadoAbrirSemana,
+  formData: FormData,
+): Promise<EstadoAbrirSemana> {
+  const patientId = String(formData.get("patient_id") ?? "").trim();
+  if (!patientId) return { erro: "Paciente não identificado." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const segunda = segundaDaSemana(diaDeHoje(agora()));
+
+  // Já existe check-in desta semana, aberto ou respondido? Então não
+  // cria outro, o uso é único por semana.
+  const { data: existente } = await supabase
+    .from("checkin_links")
+    .select("id, status")
+    .eq("patient_id", patientId)
+    .eq("semana_inicio", segunda)
+    .neq("status", "expirado")
+    .maybeSingle();
+
+  if (existente) return { jaAberto: true };
+
+  // Número sequencial da semana, só para exibição, seguindo o que já há.
+  const { data: semanas } = await supabase
+    .from("checkin_links")
+    .select("semana")
+    .eq("patient_id", patientId);
+
+  const numeros = (semanas ?? [])
+    .map((l) => l.semana)
+    .filter((s): s is number => typeof s === "number");
+  const semana = numeros.length === 0 ? 1 : Math.max(...numeros) + 1;
+
+  const { error } = await supabase.from("checkin_links").insert({
+    patient_id: patientId,
+    semana,
+    semana_inicio: segunda,
+    token: gerarToken(semana),
+    status: "gerado",
+    owner: user.id,
+  });
+
+  if (error) {
+    // Corrida com outra aba que abriu ao mesmo tempo cai aqui.
+    if (error.code === "23505") return { jaAberto: true };
+    return { erro: "Não foi possível abrir o check-in da semana. Tente de novo." };
+  }
+
+  revalidatePath("/painel/esteira");
+  revalidatePath(`/painel/pacientes/${patientId}`);
+  revalidatePath("/meu-acompanhamento");
+  return { ok: true };
+}
 
 /**
  * Cancela os links ainda em aberto do paciente, marcando como
