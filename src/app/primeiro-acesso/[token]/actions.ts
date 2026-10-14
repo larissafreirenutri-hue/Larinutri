@@ -107,5 +107,6 @@ export async function definirSenha(
     redirect("/entrar?novo=1");
   }
 
-  redirect("/meu-acompanhamento");
+  // novo=1 faz a área mostrar, uma vez, o aviso com o endereço de login.
+  redirect("/meu-acompanhamento?novo=1");
 }

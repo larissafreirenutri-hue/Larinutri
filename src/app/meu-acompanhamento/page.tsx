@@ -1,17 +1,19 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatarData, formatarPeso, formatarVariacao } from "@/lib/formato";
 import { DIMENSOES_DA_FICHA, notaDe, notasPreenchidas } from "@/lib/dimensoes";
+import { urlBase } from "@/lib/url-base";
 import type { Checkin, Paciente } from "@/lib/tipos";
 import { Cartao, Medidor } from "../painel/ui";
 import { LinhaEvolucao } from "../painel/pacientes/[id]/evolucao";
+import { BemVinda } from "./bem-vinda";
 
-export const metadata: Metadata = {
-  title: "Meu acompanhamento, Larissa Freire",
-};
-
-export default async function MeuAcompanhamentoPage() {
+export default async function MeuAcompanhamentoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ novo?: string }>;
+}) {
+  const { novo } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -39,6 +41,7 @@ export default async function MeuAcompanhamentoPage() {
 
   const paciente = dadosPaciente as Paciente;
   const primeiro = paciente.full_name.split(" ")[0];
+  const enderecoLogin = `${await urlBase()}/entrar`;
 
   const { data: dadosCheckins } = await supabase
     .from("checkins")
@@ -63,6 +66,8 @@ export default async function MeuAcompanhamentoPage() {
 
   return (
     <>
+      {novo === "1" ? <BemVinda enderecoLogin={enderecoLogin} /> : null}
+
       <section>
         <h1 className="font-display text-[28px] leading-tight text-barra">
           Olá, {primeiro}!

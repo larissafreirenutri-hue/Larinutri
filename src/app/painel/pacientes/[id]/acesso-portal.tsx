@@ -4,7 +4,12 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { ROTULO_ACESSO, type AcessoStatus } from "@/lib/portal";
 import { Selo, CLASSE_BOTAO_SECUNDARIO } from "../../ui";
-import { criarAcesso, revogarAcesso, type EstadoAcesso } from "../acesso-actions";
+import {
+  criarAcesso,
+  revogarAcesso,
+  enviarResetSenhaPaciente,
+  type EstadoAcesso,
+} from "../acesso-actions";
 
 function tomDoStatus(status: AcessoStatus) {
   if (status === "ativo") return "verde" as const;
@@ -85,6 +90,34 @@ function LinkGerado({
   );
 }
 
+/** Botão para a Larissa disparar o e-mail de redefinição de senha. */
+function BotaoReset({ patientId }: { patientId: string }) {
+  const [estado, acao, pending] = useActionState<EstadoAcesso, FormData>(
+    enviarResetSenhaPaciente,
+    {},
+  );
+
+  if (estado.enviado) {
+    return (
+      <p className="font-sans text-[13px] text-emerald-700">
+        E-mail de redefinição enviado para o paciente.
+      </p>
+    );
+  }
+
+  return (
+    <form action={acao} className="flex flex-col gap-1">
+      <input type="hidden" name="patient_id" value={patientId} />
+      <button type="submit" disabled={pending} className={CLASSE_BOTAO_SECUNDARIO}>
+        {pending ? "Enviando..." : "Enviar redefinição de senha"}
+      </button>
+      {estado.erro ? (
+        <span className="font-sans text-[12px] text-argila">{estado.erro}</span>
+      ) : null}
+    </form>
+  );
+}
+
 export function AcessoPortal({
   patientId,
   nome,
@@ -97,6 +130,8 @@ export function AcessoPortal({
   acessoStatus: AcessoStatus;
 }) {
   const [estado, acao] = useActionState<EstadoAcesso, FormData>(criarAcesso, {});
+  const enderecoLogin =
+    typeof window !== "undefined" ? `${window.location.origin}/entrar` : "/entrar";
 
   return (
     <div className="rounded-2xl border border-linha bg-cartao px-6 py-5 shadow-cartao">
@@ -161,11 +196,20 @@ export function AcessoPortal({
         <LinkGerado token={estado.token} nome={nome} phone={phone} />
       ) : null}
 
-      {acessoStatus === "ativo" && !estado.token ? (
-        <p className="mt-3 font-sans text-[13px] text-neutro">
-          O paciente já tem acesso. Se ele esqueceu a senha, pode recuperar em
-          Entrar, ou você pode revogar e criar de novo.
-        </p>
+      {acessoStatus === "ativo" ? (
+        <div className="mt-4 border-t border-linha pt-4">
+          <p className="font-sans text-[13px] text-neutro">
+            O paciente entra sempre por{" "}
+            <span className="font-mono text-[12.5px] text-vital-fundo">
+              {enderecoLogin}
+            </span>{" "}
+            com o e-mail e a senha dele. Se esqueceu a senha, pode recuperar
+            sozinho ali mesmo, ou você envia o link por e-mail:
+          </p>
+          <div className="mt-3">
+            <BotaoReset patientId={patientId} />
+          </div>
+        </div>
       ) : null}
     </div>
   );

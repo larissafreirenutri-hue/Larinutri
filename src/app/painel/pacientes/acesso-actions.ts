@@ -5,8 +5,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { gerarTokenConvite, HORAS_CONVITE } from "@/lib/portal";
+import { urlBase } from "@/lib/url-base";
 
-export type EstadoAcesso = { erro?: string; token?: string };
+export type EstadoAcesso = { erro?: string; token?: string; enviado?: boolean };
 
 /**
  * Gera um convite de primeiro acesso para o paciente. Não cria senha
@@ -72,6 +73,46 @@ export async function criarAcesso(
   revalidatePath(`/painel/pacientes/${patientId}`);
   revalidatePath("/painel/pacientes");
   return { token };
+}
+
+/**
+ * Dispara um e-mail de redefinição de senha para o paciente que já tem
+ * acesso ativo. Resolve sozinho o esquecimento de senha, sem a Larissa
+ * precisar revogar e recriar. O link do e-mail leva a /redefinir-senha.
+ */
+export async function enviarResetSenhaPaciente(
+  _anterior: EstadoAcesso,
+  formData: FormData,
+): Promise<EstadoAcesso> {
+  const patientId = String(formData.get("patient_id") ?? "").trim();
+  if (!patientId) return { erro: "Paciente não identificado." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: paciente } = await supabase
+    .from("patients")
+    .select("email, auth_user_id")
+    .eq("id", patientId)
+    .maybeSingle();
+
+  if (!paciente?.email || !paciente.auth_user_id) {
+    return { erro: "Este paciente ainda não tem acesso ativo." };
+  }
+
+  const base = await urlBase();
+  const { error } = await supabase.auth.resetPasswordForEmail(paciente.email, {
+    redirectTo: `${base}/redefinir-senha`,
+  });
+
+  if (error) {
+    return { erro: "Não foi possível enviar o e-mail agora. Tente de novo." };
+  }
+
+  return { enviado: true };
 }
 
 /**

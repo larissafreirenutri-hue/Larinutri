@@ -1,4 +1,19 @@
+import type { Metadata, Viewport } from "next";
 import { sairPaciente } from "../entrar/actions";
+
+export const metadata: Metadata = {
+  title: "Meu acompanhamento, Larissa Freire",
+  // Deixa a área instalável como atalho na tela inicial do celular.
+  appleWebApp: {
+    capable: true,
+    title: "Acompanhamento",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#4A3220",
+};
 
 export default function PortalLayout({
   children,
