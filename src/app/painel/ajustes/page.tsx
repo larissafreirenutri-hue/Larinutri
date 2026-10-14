@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CONTEUDO, ehPendente } from "@/lib/conteudo";
+import { formatarData, formatarDataHora } from "@/lib/formato";
 import { sair } from "@/app/login/actions";
 import { Cartao, Olho, Selo, TituloPagina, CLASSE_BOTAO_SECUNDARIO } from "../ui";
 
@@ -43,6 +44,15 @@ export default async function AjustesPage() {
       supabase.from("transactions").select("id", { count: "exact", head: true }),
       supabase.from("tasks").select("id", { count: "exact", head: true }),
     ]);
+
+  // Última abertura automática, para a Larissa ver que a rotina rodou.
+  const { data: ultimaRotina } = await supabase
+    .from("cron_execucoes")
+    .select("executado_em, semana_inicio, abertos, ativos")
+    .eq("job", "abrir-checkins")
+    .order("executado_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   const crn = CONTEUDO.sobre.crn;
   const faltaCrn = ehPendente(crn);
@@ -173,6 +183,38 @@ export default async function AjustesPage() {
                   Abrir a esteira
                 </Link>
               </div>
+            </div>
+          </Cartao>
+
+          <Cartao>
+            <header className="border-b border-linha px-6 py-5">
+              <h2 className="font-display text-[21px] text-barra">
+                Abertura automática do check-in
+              </h2>
+            </header>
+            <div className="px-6 py-5">
+              <p className="font-sans text-[14.5px] leading-relaxed text-neutro">
+                Toda segunda-feira às 7h, o check-in da semana abre sozinho para
+                os pacientes ativos. Eles encontram o check-in já disponível ao
+                entrar no portal.
+              </p>
+              {ultimaRotina ? (
+                <div className="mt-4 rounded-xl bg-areia-clara px-4 py-3">
+                  <Olho>Última abertura</Olho>
+                  <p className="mt-1 font-sans text-[14.5px] text-tinta">
+                    {formatarDataHora(ultimaRotina.executado_em)}
+                  </p>
+                  <p className="mt-0.5 font-sans text-[13px] text-neutro">
+                    {ultimaRotina.abertos} de {ultimaRotina.ativos}{" "}
+                    {ultimaRotina.ativos === 1 ? "ativo" : "ativos"} na semana de{" "}
+                    {formatarData(ultimaRotina.semana_inicio)}
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-4 font-sans text-[13.5px] text-tenue">
+                  Ainda não há registro de abertura automática.
+                </p>
+              )}
             </div>
           </Cartao>
 

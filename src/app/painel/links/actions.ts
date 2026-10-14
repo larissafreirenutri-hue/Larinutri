@@ -7,6 +7,7 @@ import { gerarToken } from "@/lib/links";
 import { segundaDaSemana } from "@/lib/semana";
 import { diaDeHoje } from "@/lib/financeiro";
 import { agora } from "@/lib/visao-geral";
+import { abrirCheckinDaSemana } from "@/lib/abrir-checkin";
 
 export type EstadoLink = { erro?: string; token?: string; substituidos?: number };
 
@@ -34,43 +35,18 @@ export async function abrirCheckinSemana(
 
   const segunda = segundaDaSemana(diaDeHoje(agora()));
 
-  // Já existe check-in desta semana, aberto ou respondido? Então não
-  // cria outro, o uso é único por semana.
-  const { data: existente } = await supabase
-    .from("checkin_links")
-    .select("id, status")
-    .eq("patient_id", patientId)
-    .eq("semana_inicio", segunda)
-    .neq("status", "expirado")
-    .maybeSingle();
-
-  if (existente) return { jaAberto: true };
-
-  // Número sequencial da semana, só para exibição, seguindo o que já há.
-  const { data: semanas } = await supabase
-    .from("checkin_links")
-    .select("semana")
-    .eq("patient_id", patientId);
-
-  const numeros = (semanas ?? [])
-    .map((l) => l.semana)
-    .filter((s): s is number => typeof s === "number");
-  const semana = numeros.length === 0 ? 1 : Math.max(...numeros) + 1;
-
-  const { error } = await supabase.from("checkin_links").insert({
-    patient_id: patientId,
-    semana,
-    semana_inicio: segunda,
-    token: gerarToken(semana),
-    status: "gerado",
+  // Mesma regra do cron, pelo helper compartilhado, com a sessão da
+  // nutricionista como cliente e ela própria como owner.
+  const resultado = await abrirCheckinDaSemana(supabase, {
+    patientId,
     owner: user.id,
+    segunda,
   });
 
-  if (error) {
-    // Corrida com outra aba que abriu ao mesmo tempo cai aqui.
-    if (error.code === "23505") return { jaAberto: true };
+  if (resultado === "erro") {
     return { erro: "Não foi possível abrir o check-in da semana. Tente de novo." };
   }
+  if (resultado === "ja_existia") return { jaAberto: true };
 
   revalidatePath("/painel/esteira");
   revalidatePath(`/painel/pacientes/${patientId}`);
