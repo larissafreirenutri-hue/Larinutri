@@ -2,7 +2,6 @@
   "crons": [
     {
       "path": "/api/cron/abrir-checkins",
-      "comment": "Abre o check-in da semana para os pacientes ativos. O Vercel Cron usa UTC, entao 10h UTC de segunda corresponde a 7h em Brasilia (UTC-3). Se o Brasil voltar a ter horario de verao, revisar para 9h UTC.",
       "schedule": "0 10 * * 1"
     }
   ]
